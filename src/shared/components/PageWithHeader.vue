@@ -2,6 +2,9 @@
   <IonPage>
     <IonHeader>
       <IonToolbar>
+        <IonButtons slot="start">
+          <IonBackButton />
+        </IonButtons>
         <IonTitle>{{ title }}</IonTitle>
       </IonToolbar>
     </IonHeader>
@@ -14,7 +17,10 @@
 
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue'
+import {
+  IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
+  IonButtons, IonBackButton 
+} from '@ionic/vue'
 
 const props = defineProps<{
   title: string

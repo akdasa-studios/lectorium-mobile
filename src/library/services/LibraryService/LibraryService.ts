@@ -6,6 +6,10 @@ export interface Lecture {
 }
 
 export class LibraryService {
+  public getLecture(id: string): Lecture {
+    return { id, title: 'Lecture 1', description: 'Description 1' };
+  }
+
   public getLecturesList(): Lecture[] {
     return [
       { id: "1", title: 'Lecture 1', description: 'Description 1' },

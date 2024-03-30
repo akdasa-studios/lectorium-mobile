@@ -1,40 +1,36 @@
 <template>
-  <PageWithHeader title="Home">
-    <LecturesList
-      :lectures="lectures"
-      @click="onLectureClicked"
-    />
+  <PageWithHeader title="Library">
+    {{ lecture }}
   </PageWithHeader>
 </template>
 
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { onIonViewWillEnter, useIonRouter } from '@ionic/vue'
+import { onIonViewWillEnter } from '@ionic/vue'
 import { PageWithHeader } from '@/shared/components'
-import { LecturesList, LectureViewModel } from '@/library/components'
 import { useLibraryService } from '@/library/composables'
-import { lecturesToViewModel } from '@/library/helpers/mappers'
+import { lectureToViewModel } from '@/library/helpers/mappers'
+
+// ── Interface ───────────────────────────────────────────────────────
+const props = defineProps<{
+  lectureId: string
+}>()
 
 // ── Dependencies ────────────────────────────────────────────────────
 const libraryService = useLibraryService()
-const router = useIonRouter()
 
 // ── State ───────────────────────────────────────────────────────────
-const lectures = ref<LectureViewModel[]>([])
+const lecture = ref<LectureViewModel>()
 
 // ── Hooks ───────────────────────────────────────────────────────────
 onIonViewWillEnter(onEnter)
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onEnter() {
-  lectures.value = lecturesToViewModel(
-    await libraryService.getLecturesList()
+  lecture.value = lectureToViewModel(
+    await libraryService.getLecture(props.lectureId)
   )
-}
-
-function onLectureClicked(lectureId: string) {
-  router.push({ name: 'lecture', params: { 'id': lectureId } })
 }
 </script>
 
