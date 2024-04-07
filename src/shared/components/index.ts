@@ -1,3 +1,3 @@
 export { default as PageWithHeader } from './PageWithHeader.vue'
-export { default as GlobalAudioPlayer } from './GlobalAudioPlayer.vue'
+export { default as AudioPlayer } from './AudioPlayer.vue'
 

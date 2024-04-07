@@ -2,19 +2,35 @@
 export interface Lecture {
   id: string;
   title: string;
-  description: string;
+  url: string;
+  location: string;
+  date: string;
+  references: string[];
 }
 
 export class LibraryService {
-  public getLecture(id: string): Lecture {
-    return { id, title: 'Lecture 1', description: 'Description 1' };
+  public async getLecture(id: string): Promise<Lecture|undefined> {
+    return (await this.getLecturesList()).find(x => x.id === id)
   }
 
-  public getLecturesList(): Lecture[] {
+  public async getLecturesList(): Promise<Lecture[]> {
     return [
-      { id: "1", title: 'Lecture 1', description: 'Description 1' },
-      { id: "2", title: 'Lecture 2', description: 'Description 2' },
-      { id: "3", title: 'Lecture 3', description: 'Description 3' },
-    ];
+      {
+        id: "BG19730707LONDON",
+        title: "The Material World Means",
+        url: "https://audio.iskcondesiretree.com/01_-_Srila_Prabhupada/01_-_Lectures/01_-_English/01_-_Topic_wise/Bhagavad_Gita/Chapter-01/SP_BG_01-01_London_1973-07-07_The_Material_World_Means--etc.mp3",
+        location: "London",
+        date: "19730707",
+        references: ["BG 1.1"]
+      },
+      {
+        id: "BG19730722LONDON",
+        title: "The art of preaching",
+        url: "https://audio.iskcondesiretree.com/01_-_Srila_Prabhupada/01_-_Lectures/01_-_English/01_-_Topic_wise/Bhagavad_Gita/Chapter-01/SP_BG_01-28_London_1973-07-22_The_Art_of_Preaching.mp3",
+        location: "London",
+        date: "19730722",
+        references: ["BG 1.28"]
+      }
+    ]
   }
 }

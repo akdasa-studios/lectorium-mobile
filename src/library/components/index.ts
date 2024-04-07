@@ -1,3 +1,3 @@
-export { default as LecturesList } from './LecturesList/LecturesList.vue'
-export { default as LecturesListItem } from './LecturesList/LecturesListItem.vue'
-export { type LectureViewModel } from './LecturesList/LectureViewModel'
+export { default as TracksList } from './TracksList/TracksList.vue'
+export { default as TracksListItem } from './TracksList/TracksListItem.vue'
+export { type TrackViewModel } from './TracksList/TrackViewModel'

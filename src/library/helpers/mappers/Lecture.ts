@@ -1,19 +1,20 @@
-import { type LectureViewModel } from "@/library/components"
+import { type TrackViewModel } from "@/library/components"
 import { Lecture } from "@/library/services"
 
 export function lectureToViewModel(
   lecture: Lecture
-): LectureViewModel {
+): TrackViewModel {
   return {
     id: lecture.id,
     title: lecture.title,
-    description: lecture.description,
+    references: lecture.references,
+    location: lecture.location
   }
 }
 
 export function lecturesToViewModel(
   lectures: Lecture[]
-): LectureViewModel[] {
+): TrackViewModel[] {
   return lectures.map(lectureToViewModel)
 }
 

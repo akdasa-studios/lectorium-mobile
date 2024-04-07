@@ -1,10 +1,12 @@
 <template>
   <IonList>
-    <LecturesListItem 
-      v-for="lecture in lectures" 
-      :key="lecture.id" 
-      :title="lecture.title"
-      @click="onLectureClicked(lecture.id)"
+    <TracksListItem 
+      v-for="item in items" 
+      :key="item.id" 
+      :title="item.title"
+      :location="item.location"
+      :references="item.references"
+      @click="onTrackClicked(item.id)"
     />
   </IonList>
 </template>
@@ -12,22 +14,22 @@
 
 <script setup lang="ts">
 import { IonList } from '@ionic/vue'
-import LecturesListItem from './LecturesListItem.vue'
-import LectureViewModel from './LectureViewModel.ts'
+import TracksListItem from './TracksListItem.vue'
+import { type TrackViewModel } from './TrackViewModel'
 
 // ── Interface ───────────────────────────────────────────────────────
-const props = defineProps<{
-  lectures: LectureViewModel[]
+defineProps<{
+  items: TrackViewModel[]
 }>()
 
 const emit = defineEmits<{
-  click: (lectureId: string) => void;
+  click: [lectureId: string]
 }>()
 
 
 // ── Handlers ────────────────────────────────────────────────────────
-function onLectureClicked(lectureId: string) {
-  emit('click', lectureId)
+function onTrackClicked(trackId: string) {
+  emit('click', trackId)
 }
 </script>
 

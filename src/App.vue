@@ -1,11 +1,12 @@
 <template>
-  <ion-app>
-    <ion-router-outlet />
+  <IonApp>
+    <IonRouterOutlet />
     <GlobalAudioPlayer />
-  </ion-app>
+  </IonApp>
 </template>
+
 
 <script setup lang="ts">
 import { IonApp, IonRouterOutlet } from '@ionic/vue'
-import { GlobalAudioPlayer } from '@/shared/components'
+import { GlobalAudioPlayer } from '@/shared/containers'
 </script>

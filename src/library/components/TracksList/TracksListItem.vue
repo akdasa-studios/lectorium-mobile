@@ -1,26 +1,31 @@
 <template>
   <IonItem @click="onItemClicked">
-    <IonLabel>{{ props.title }}</IonLabel>
+    <IonLabel>
+      <h3>
+        <b>{{ references[0] }}</b>
+        {{ title }}
+      </h3>
+      <p>{{ location }}</p>
+    </IonLabel>
   </IonItem>
 </template>
 
 
 <script setup lang="ts">
 import { IonItem, IonLabel } from '@ionic/vue'
+import { type TrackViewModel } from './TrackViewModel'
 
 // ── Interface ───────────────────────────────────────────────────────
-
-const props = defineProps<{
-  title: string;
-}>()
+defineProps<
+  Omit<TrackViewModel, 'id'>
+>()
 
 const emit = defineEmits<{
-  click: void;
+  click: []
 }>()
 
 
 // ── Handlers ────────────────────────────────────────────────────────
-
 function onItemClicked() {
   emit('click')
 }

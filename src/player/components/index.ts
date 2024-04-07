@@ -1,2 +1,2 @@
-export { default as LecturePlayer } from './LecturePlayer/LecturePlayer.vue'
+export { default as AudioPlayerControls } from './AudioPlayerControls/AudioPlayerControls.vue'
 
