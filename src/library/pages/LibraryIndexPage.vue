@@ -15,9 +15,11 @@ import { PageWithHeader } from '@/shared/components'
 import { LecturesList, LectureViewModel } from '@/library/components'
 import { useLibraryService } from '@/library/composables'
 import { lecturesToViewModel } from '@/library/helpers/mappers'
+import { useGlobalAudioPlayer } from '@/shared/composables'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const libraryService = useLibraryService()
+const globalAudioPlayer = useGlobalAudioPlayer()
 const router = useIonRouter()
 
 // ── State ───────────────────────────────────────────────────────────
@@ -34,7 +36,11 @@ async function onEnter() {
 }
 
 function onLectureClicked(lectureId: string) {
-  router.push({ name: 'lecture', params: { 'id': lectureId } })
+  globalAudioPlayer.trackId.value = lectureId
+  globalAudioPlayer.url.value = "https://audio.iskcondesiretree.com/01_-_Srila_Prabhupada/01_-_Lectures/01_-_English/01_-_Topic_wise/Bhagavad_Gita/Chapter-01/SP_BG_01-01_London_1973-07-07_The_Material_World_Means--etc.mp3";
+  globalAudioPlayer.playing.value = true;
+  router.push({ name: 'player' })
+
 }
 </script>
 

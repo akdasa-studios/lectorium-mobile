@@ -3,9 +3,14 @@
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="tab1" href="/app/library">
+        <ion-tab-button tab="library" href="/app/library">
           <ion-icon aria-hidden="true" :icon="libraryOutline" />
           <ion-label>Library</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="player" href="/app/player">
+          <ion-icon aria-hidden="true" :icon="playOutline" />
+          <ion-label>Player</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
@@ -17,5 +22,5 @@ import {
   IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, 
   IonPage, IonRouterOutlet 
 } from '@ionic/vue'
-import { libraryOutline } from 'ionicons/icons'
+import { libraryOutline, playOutline } from 'ionicons/icons'
 </script>

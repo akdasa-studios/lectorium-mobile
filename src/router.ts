@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
 import AppMainPage from './AppMainPage.vue'
 import { routes as LibraryRoutes } from './library/routes'
+import { routes as PlayerRoutes } from './player/routes'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -16,7 +17,8 @@ const routes: Array<RouteRecordRaw> = [
         path: '',
         redirect: '/app/library'
       },
-      ...LibraryRoutes
+      ...LibraryRoutes,
+      ...PlayerRoutes
     ]
   }
 ]

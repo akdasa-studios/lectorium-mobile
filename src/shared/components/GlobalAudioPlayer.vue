@@ -1,7 +1,6 @@
 <template>
   <audio 
     ref="audioRef"
-    :src="globalAudioPlayer.url.value"
   />
 </template>
 
