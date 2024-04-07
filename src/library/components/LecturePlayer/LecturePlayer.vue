@@ -5,7 +5,7 @@
 
     <div class="Waveform">
       <div class="chart">
-        <div id="waveform" /> 
+        {{ position }}
       </div>
     </div>
 
@@ -14,7 +14,7 @@
         @click="onPlayBackwardButtonClicked"
       />
       <PlayButton 
-        :playing="isPlaying"
+        :playing="playing"
         @click="onPlayButtonClicked"
       />
       <PlayForwardButton
@@ -26,63 +26,25 @@
 
 
 <script setup lang="ts">
-import { onMounted, watch, toRefs, ref } from 'vue'
 import PlayButton from './PlayButton.vue'
 import PlayForwardButton from './PlayForwardButton.vue'
 import PlayBackwardButton from './PlayBackwardButton.vue'
-import WaveSurfer from 'wavesurfer.js'
 
 // ── Interface ───────────────────────────────────────────────────────
-const props = defineProps<{
-  url: string
-}>()
-
-// ── State ───────────────────────────────────────────────────────────
-let wavesurfer = undefined
-const isPlaying = ref(false)
-
-// ── Hooks ───────────────────────────────────────────────────────────
-onMounted(onMounted)
+const playing = defineModel('playing', { type: Boolean, default: false })
+const position = defineModel('position', { type: Number, default: 0 })
 
 // ── Handlers ────────────────────────────────────────────────────────
-function onMounted() {
-  setTimeout(async () => {
-    const data = await fetch("http://localhost:8080/1.json");
-    const json = await data.json();
-
-    wavesurfer = WaveSurfer.create({
-      container: '#waveform',
-      height: 70,
-      waveColor: '#4F4A85',
-      progressColor: '#383351',
-      url: props.url,
-      barWidth: 2,
-      barRadius: 2,
-      barGap: 2,
-      cursorWidth: 0,
-      peaks: json.data
-    })
-    wavesurfer.on('finish', () => {
-      isPlaying.value = false
-    })
-  }, 20)
-}
-
 function onPlayButtonClicked() {
-  isPlaying.value = !isPlaying.value
-  if (isPlaying.value) {
-    wavesurfer.play()
-  } else {
-    wavesurfer.pause()
-  }
+  playing.value = !playing.value
 }
 
 function onPlayBackwardButtonClicked() {
-  wavesurfer.setTime(wavesurfer.getCurrentTime() - 15)
+  position.value -= 10;
 }
 
 function onPlayForwardButtonClicked() {
-  wavesurfer.setTime(wavesurfer.getCurrentTime() + 15)
+  position.value += 10;
 }
 </script>
 
