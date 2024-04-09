@@ -23,7 +23,12 @@ watch(playlist.currentTrackId, onTrackChanged)
 // ── Handlers ────────────────────────────────────────────────────────
 async function onTrackChanged(trackId: string|undefined) {
   if (!trackId) { return }
+  audioPlayer.startLoading()
   const response = await libraryService.getLecture(trackId)
-  if (response?.url) { audioPlayer.play(response?.url) }
+  if (response?.url) { 
+    audioPlayer.play(response.url) 
+  } else { 
+    audioPlayer.stop() 
+  }
 }
 </script>

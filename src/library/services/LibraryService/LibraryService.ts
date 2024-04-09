@@ -14,6 +14,8 @@ export class LibraryService {
   }
 
   public async getLecturesList(): Promise<Lecture[]> {
+    await new Promise(r => setTimeout(r, 1000));
+
     return [
       {
         id: "BG19730707LONDON",

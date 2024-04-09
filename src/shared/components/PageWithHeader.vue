@@ -10,7 +10,8 @@
     </IonHeader>
 
     <IonContent>
-      <slot />
+      <slot v-if="!loading"/>
+      <div v-else>Loading...</div>
     </IonContent>
   </IonPage>
 </template>
@@ -22,8 +23,9 @@ import {
   IonButtons, IonBackButton 
 } from '@ionic/vue'
 
-const props = defineProps<{
+defineProps<{
   title: string
+  loading: boolean
 }>()
 </script>
 

@@ -19,6 +19,6 @@ const audioRef = ref()
 const player = useMediaControls(audioRef, { src: url })
 
 // ── Hooks ───────────────────────────────────────────────────────────
-syncRef(playing, player.playing)
+syncRef(playing,  player.playing, { direction: "ltr" })
 syncRef(position, player.currentTime)
 </script>

@@ -1,5 +1,8 @@
 <template>
-  <PageWithHeader title="Library">
+  <PageWithHeader 
+    title="Library"
+    :loading="false"
+  >
     <AudioPlayerControls 
       style="height: 100%;" 
       v-model:playing="audioPlayer.playing.value"

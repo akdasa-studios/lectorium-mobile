@@ -1,4 +1,4 @@
-import { type TrackViewModel } from "@/library/components"
+import { PlayingStatus, type TrackViewModel } from "@/library/components"
 import { Lecture } from "@/library/services"
 
 export function lectureToViewModel(
@@ -8,7 +8,8 @@ export function lectureToViewModel(
     id: lecture.id,
     title: lecture.title,
     references: lecture.references,
-    location: lecture.location
+    location: lecture.location,
+    playingStatus: PlayingStatus.None,
   }
 }
 

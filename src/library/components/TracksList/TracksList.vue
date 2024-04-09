@@ -6,6 +6,7 @@
       :title="item.title"
       :location="item.location"
       :references="item.references"
+      :playing-status="item.playingStatus"
       @click="onTrackClicked(item.id)"
     />
   </IonList>
@@ -23,9 +24,8 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  click: [lectureId: string]
+  click: [trackId: string]
 }>()
-
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onTrackClicked(trackId: string) {
