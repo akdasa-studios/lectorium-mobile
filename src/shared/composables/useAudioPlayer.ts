@@ -8,10 +8,8 @@ export const useAudioPlayer = createGlobalState(
     const playing = ref(false)
     const loading = ref(false)
 
-    function play(uri: string) {
-      playing.value = false
-      url.value = uri
-      setTimeout(() => { playing.value = true; loading.value = false; }, 10)
+    function play() {
+      playing.value = true
     }
 
     function startLoading() {
@@ -20,6 +18,10 @@ export const useAudioPlayer = createGlobalState(
 
     function togglePlaying() {
       playing.value = !playing.value
+    }
+
+    function stop() {
+      playing.value = false
     }
 
     return { url, position, play, stop, togglePlaying, playing, loading, startLoading }

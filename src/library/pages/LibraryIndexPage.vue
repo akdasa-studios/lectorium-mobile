@@ -75,6 +75,9 @@ function onTrackClicked(trackId: string) {
   if (playlist.currentTrackId.value === trackId) {
     audioPlayer.togglePlaying()
   } else {
+    // If the playlist is empty, set playing to true. This will start the audio
+    // once it is downloaded. Enqueue the trackId to the playlist.
+    if (playlist.isEmpty()) { audioPlayer.play() }
     playlist.enqueue(trackId)
   }
 }

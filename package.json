@@ -17,6 +17,7 @@
     "@capacitor/keyboard": "5.0.8",
     "@capacitor/status-bar": "5.0.7",
     "@ionic/cli": "^7.2.0",
+    "@ionic/storage": "^4.0.0",
     "@ionic/vue": "^7.0.0",
     "@ionic/vue-router": "^7.0.0",
     "@vueuse/core": "^10.9.0",

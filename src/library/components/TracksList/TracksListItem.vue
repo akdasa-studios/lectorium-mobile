@@ -40,9 +40,9 @@ type StatusIconMap = {
 const statusIconMaps: StatusIconMap = {
   [PlayingStatus.InQueue]: { icon: checkmarkCircle,     color: 'medium'  },
   [PlayingStatus.Loading]: { icon: caretDownCircle,     color: 'primary' },
-  [PlayingStatus.Playing]: { icon: playCircle,          color: 'success' },
-  [PlayingStatus.Paused]:  { icon: pauseCircle,         color: 'warning' },
-  [PlayingStatus.Stoped]:  { icon: stopCircle,          color: 'danger'  },
+  [PlayingStatus.Playing]: { icon: playCircle,          color: 'primary' },
+  [PlayingStatus.Paused]:  { icon: pauseCircle,         color: 'primary' },
+  [PlayingStatus.Stoped]:  { icon: stopCircle,          color: 'primary' },
   [PlayingStatus.Played]:  { icon: checkmarkDoneCircle, color: 'success' },
   [PlayingStatus.None]:    { icon: undefined,           color: undefined }
 }

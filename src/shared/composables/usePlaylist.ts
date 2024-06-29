@@ -7,16 +7,19 @@ export const usePlaylist = createGlobalState(
     const currentTrackId = ref<string|undefined>()
 
     function enqueue(trackId: string) {
-      if (currentTrackId.value === undefined && trackIds.value.length === 0) {
-        currentTrackId.value = trackId
-      }
-
       if (!trackIds.value.includes(trackId)) {
         trackIds.value.push(trackId)
       }
+      if (!currentTrackId.value) {
+        currentTrackId.value = trackId
+      }
     }
 
-    return { enqueue, trackIds, currentTrackId }
+    function isEmpty() {
+      return trackIds.value.length === 0
+    }
+
+    return { enqueue, isEmpty, trackIds, currentTrackId }
   }
 )
 

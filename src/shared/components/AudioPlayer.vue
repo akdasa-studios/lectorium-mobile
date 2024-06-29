@@ -1,13 +1,11 @@
 <template>
-  <audio 
-    ref="audioRef"
-  />
+  <audio ref="audioRef" />
 </template>
 
 
 <script lang="ts" setup>
-import { useMediaControls, syncRef } from '@vueuse/core'
-import { ref } from 'vue'
+import { useMediaControls, watchThrottled } from '@vueuse/core'
+import { ref, watch } from 'vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 const playing  = defineModel('playing',  { type: Boolean, default: false })
@@ -19,6 +17,22 @@ const audioRef = ref()
 const player = useMediaControls(audioRef, { src: url })
 
 // ── Hooks ───────────────────────────────────────────────────────────
-syncRef(playing,  player.playing, { direction: "ltr" })
-syncRef(position, player.currentTime)
+
+// Note: setting playing to true doesn't start the audio immediately
+//       it will be started when the url is set
+watch([playing, url], () => {
+  if (url.value && playing.value) {
+    player.currentTime.value = position.value
+    player.playing.value = true
+  }
+
+  if (!playing.value) { player.playing.value = false }
+})
+
+// Note: throttle the position update to avoid too many updates
+watchThrottled(
+  player.currentTime,
+  (v) => { position.value = v },
+  { throttle: 1000 }
+)
 </script>

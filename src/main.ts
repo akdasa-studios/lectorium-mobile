@@ -23,10 +23,20 @@ import '@ionic/vue/css/display.css'
 /* Theme variables */
 import './theme.css'
 
-const app = createApp(App)
-  .use(IonicVue)
-  .use(router)
-  
-router.isReady().then(() => {
-  app.mount('#app')
-});
+/* */
+import { runConfigPersistence, runPlaylistPersistence } from '@/shared/tasks'
+
+async function createAndRunApp() {
+  await runPlaylistPersistence()
+  await runConfigPersistence()
+
+  const app = createApp(App)
+    .use(IonicVue)
+    .use(router)
+
+  router.isReady().then(async () => {
+    app.mount('#app')
+  })
+}
+
+createAndRunApp()
