@@ -1,4 +1,4 @@
-export { 
-  LibraryService, type Lecture 
-} from './LibraryService/LibraryService'
+export {
+  LibraryRepository, type Lecture
+} from './LibraryRepository/LibraryRepository'
 

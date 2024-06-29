@@ -1,7 +1,11 @@
 export enum PlayingStatus {
   None,
+  InQueue,
+  Loading,
   Playing,
   Paused,
+  Stoped,
+  Played,
 }
 
 export interface TrackViewModel {

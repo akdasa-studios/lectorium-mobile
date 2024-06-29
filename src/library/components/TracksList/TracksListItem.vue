@@ -1,9 +1,9 @@
 <template>
   <IonItem @click="onItemClicked">
-    <IonIcon 
-      v-if="isPlaying"
+    <IonIcon
       aria-hidden="true"
-      :icon="playingStatusIcon"
+      :icon="playingStatusIcon.icon"
+      :color="playingStatusIcon.color"
       slot="end"
     />
     <IonLabel>
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { IonItem, IonLabel, IonIcon } from '@ionic/vue'
 import { PlayingStatus, type TrackViewModel } from './TrackViewModel'
-import { play, pause } from 'ionicons/icons'
+import { playCircle, pauseCircle, stopCircle, checkmarkCircle, checkmarkDoneCircle, caretDownCircle } from 'ionicons/icons'
 import { computed } from 'vue';
 
 // ── Interface ───────────────────────────────────────────────────────
@@ -33,19 +33,19 @@ const emit = defineEmits<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const statusIconMaps = {
-  [PlayingStatus.Playing]: play,
-  [PlayingStatus.Paused]: pause,
-  [PlayingStatus.None]: undefined
+type StatusIconMap = {
+  [key in PlayingStatus]: { icon?: string, color?: string }
 }
-const trackIsPlayingStatuses = [
-  PlayingStatus.Playing,
-  PlayingStatus.Paused
-]
 
-const isPlaying = computed(
-  () => trackIsPlayingStatuses.includes(props.playingStatus)
-)
+const statusIconMaps: StatusIconMap = {
+  [PlayingStatus.InQueue]: { icon: checkmarkCircle,     color: 'medium'  },
+  [PlayingStatus.Loading]: { icon: caretDownCircle,     color: 'primary' },
+  [PlayingStatus.Playing]: { icon: playCircle,          color: 'success' },
+  [PlayingStatus.Paused]:  { icon: pauseCircle,         color: 'warning' },
+  [PlayingStatus.Stoped]:  { icon: stopCircle,          color: 'danger'  },
+  [PlayingStatus.Played]:  { icon: checkmarkDoneCircle, color: 'success' },
+  [PlayingStatus.None]:    { icon: undefined,           color: undefined }
+}
 const playingStatusIcon = computed(
   () => statusIconMaps[props.playingStatus]
 )
@@ -55,4 +55,3 @@ function onItemClicked() {
   emit('click')
 }
 </script>
-

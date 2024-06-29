@@ -1,9 +1,15 @@
 <template>
-  <PageWithHeader 
+  <PageWithHeader
     title="Library"
-    :loading="isLoading"
+    :loading="false /* TODO: on first sync */"
+    :header-border="false"
   >
+    <template v-slot:header>
+      <IonSearchbar v-model="searchQuery" :debounce="150" />
+    </template>
+
     <TracksList
+      v-if="!isLibraryEmpty"
       :items="tracks"
       @click="onTrackClicked"
     />
@@ -12,43 +18,56 @@
 
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { PlayingStatus, TracksList } from '@/library/components'
-import { useLibraryService } from '@/library/composables'
+import { PlayingStatus, TrackViewModel, TracksList } from '@/library/components'
+import { useLibraryRepository } from '@/library/composables'
 import { lecturesToViewModel } from '@/library/helpers/mappers'
 import { usePlaylist, useAudioPlayer } from '@/shared/composables'
 import { PageWithHeader } from '@/shared/components'
+import { IonSearchbar } from '@ionic/vue'
+import { Lecture } from '../services'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const libraryService = useLibraryService()
+const libraryRepository = useLibraryRepository()
 const playlist = usePlaylist()
 const audioPlayer = useAudioPlayer()
 
 // ── State ───────────────────────────────────────────────────────────
-const { state: tracks, isLoading } = useAsyncState(
-  () => libraryService.getLecturesList().then(t => lecturesToViewModel(t)),
-  [], { shallow: false }
+const searchQuery = ref('')
+const isLibraryEmpty = computed(() => state.value.length === 0)
+const tracks = ref<TrackViewModel[]>([])
+const { state, execute } = useAsyncState<Lecture[], [string], true>(
+  (p) => libraryRepository.getLecturesList(p), [], { resetOnExecute: false }
 )
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch([
-  playlist.currentTrackId, audioPlayer.playing, audioPlayer.loading
-], (
-  [trackId, playing,  loading], 
-  [lastTrackId]
-) => {
-  if (trackId) {
-    onTrackPlayingStateChanged(
-        trackId,
-        playing || loading ? PlayingStatus.Playing : PlayingStatus.Paused
-    );
+  state,
+  playlist.trackIds.value,  /* When playlist changes */
+  playlist.currentTrackId,  /* When track changes */
+  audioPlayer.playing,      /* When audio player state changes */
+  audioPlayer.loading,      /* When audio player state changes */
+], () => {
+  tracks.value = lecturesToViewModel(state.value)
+  for (const track of tracks.value) {
+    if (track.id === playlist.currentTrackId.value) {
+      track.playingStatus =
+        audioPlayer.loading.value
+          ? PlayingStatus.Loading
+          : audioPlayer.playing.value
+            ? PlayingStatus.Playing
+            : PlayingStatus.Paused
+    } else if (playlist.trackIds.value.includes(track.id)) {
+      track.playingStatus = PlayingStatus.InQueue
+    } else {
+      track.playingStatus = PlayingStatus.None
+    }
   }
+})
 
-  // Track has changed, update state of it
-  if (lastTrackId && trackId != lastTrackId) {
-    onTrackPlayingStateChanged(lastTrackId, PlayingStatus.None);
-  }
+watch(searchQuery, async (value) => {
+  await execute(0, value)
 })
 
 // ── Handlers ────────────────────────────────────────────────────────
@@ -59,12 +78,4 @@ function onTrackClicked(trackId: string) {
     playlist.enqueue(trackId)
   }
 }
-
-function onTrackPlayingStateChanged(
-  trackId: string, value: PlayingStatus
-) {
-  const track = tracks.value.find(x => x.id === trackId);
-  if (track) { track.playingStatus = value }
-}
 </script>
-

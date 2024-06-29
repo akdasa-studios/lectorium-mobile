@@ -10,12 +10,12 @@
 import { watch } from 'vue'
 import { AudioPlayer } from '@/shared/components'
 import { usePlaylist, useAudioPlayer } from '@/shared/composables'
-import { useLibraryService } from '@/library/composables'
+import { useLibraryRepository } from '@/library/composables'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const playlist = usePlaylist()
 const audioPlayer = useAudioPlayer()
-const libraryService = useLibraryService()
+const libraryService = useLibraryRepository()
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch(playlist.currentTrackId, onTrackChanged)
@@ -25,10 +25,10 @@ async function onTrackChanged(trackId: string|undefined) {
   if (!trackId) { return }
   audioPlayer.startLoading()
   const response = await libraryService.getLecture(trackId)
-  if (response?.url) { 
-    audioPlayer.play(response.url) 
-  } else { 
-    audioPlayer.stop() 
+  if (response?.url) {
+    audioPlayer.play(response.url)
+  } else {
+    audioPlayer.stop()
   }
 }
 </script>

@@ -1,8 +1,8 @@
 <template>
   <IonList>
-    <TracksListItem 
-      v-for="item in items" 
-      :key="item.id" 
+    <TracksListItem
+      v-for="item in items"
+      :key="item.id"
       :title="item.title"
       :location="item.location"
       :references="item.references"
@@ -32,4 +32,3 @@ function onTrackClicked(trackId: string) {
   emit('click', trackId)
 }
 </script>
-

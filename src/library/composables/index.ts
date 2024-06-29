@@ -1,1 +1,1 @@
-export { useLibraryService } from './useLibraryService'
+export { useLibraryRepository } from './useLibraryRepository'

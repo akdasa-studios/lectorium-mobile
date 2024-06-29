@@ -1,17 +1,24 @@
 <template>
   <IonPage>
-    <IonHeader>
+    <IonHeader :class="{'ion-no-border': !headerBorder}">
       <IonToolbar>
         <IonButtons slot="start">
           <IonBackButton />
         </IonButtons>
-        <IonTitle>{{ title }}</IonTitle>
+
+        <slot name="header">
+          <IonTitle>{{ title }}</IonTitle>
+        </slot>
       </IonToolbar>
     </IonHeader>
 
     <IonContent>
-      <slot v-if="!loading"/>
-      <div v-else>Loading...</div>
+      <IonLoading
+        :isOpen="loading"
+        :duration="0"
+        message="Loading..."
+      />
+      <slot></slot>
     </IonContent>
   </IonPage>
 </template>
@@ -20,12 +27,15 @@
 <script setup lang="ts">
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
-  IonButtons, IonBackButton 
+  IonButtons, IonBackButton, IonLoading,
 } from '@ionic/vue'
 
-defineProps<{
+withDefaults(defineProps<{
   title: string
   loading: boolean
-}>()
+  headerBorder?: boolean
+}>(), {
+  headerBorder: true
+})
 </script>
 
