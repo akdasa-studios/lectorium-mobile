@@ -25,8 +25,11 @@ import './theme.css'
 
 /* */
 import { runConfigPersistence, runPlaylistPersistence } from '@/shared/tasks'
+import { register } from 'swiper/element/bundle'
 
 async function createAndRunApp() {
+  register()
+
   await runPlaylistPersistence()
   await runConfigPersistence()
 

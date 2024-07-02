@@ -1,45 +1,49 @@
 <template>
-  <PageWithHeader
-    title="Library"
-    :loading="false /* TODO: on first sync */"
-    :header-border="false"
-  >
-    <template v-slot:header>
-      <IonSearchbar v-model="searchQuery" :debounce="150" />
+  <PageWithDrawer ref="page">
+    <template v-slot:drawer>
+      <TracksSearchInput v-model="searchQuery" />
+      <CollectionsList
+        v-if="isCollectionsVisible"
+        :items=collections
+      />
     </template>
 
     <TracksList
-      v-if="!isLibraryEmpty"
       :items="tracks"
       @click="onTrackClicked"
     />
-  </PageWithHeader>
+  </PageWithDrawer>
 </template>
 
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { PlayingStatus, TrackViewModel, TracksList } from '@/library/components'
-import { useLibraryRepository } from '@/library/composables'
+import { PlayingStatus, TrackViewModel, TracksList, CollectionsList, TracksSearchInput } from '@/library/components'
+import { useCollectionsRepository, useLibraryRepository } from '@/library/composables'
 import { lecturesToViewModel } from '@/library/helpers/mappers'
+import { PageWithDrawer } from '@/shared/components'
 import { usePlaylist, useAudioPlayer } from '@/shared/composables'
-import { PageWithHeader } from '@/shared/components'
-import { IonSearchbar } from '@ionic/vue'
 import { Lecture } from '../services'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const libraryRepository = useLibraryRepository()
+const collectionsRepository = useCollectionsRepository()
 const playlist = usePlaylist()
 const audioPlayer = useAudioPlayer()
+const page = ref(null)
 
 // ── State ───────────────────────────────────────────────────────────
 const searchQuery = ref('')
 const isLibraryEmpty = computed(() => state.value.length === 0)
 const tracks = ref<TrackViewModel[]>([])
+
 const { state, execute } = useAsyncState<Lecture[], [string], true>(
   (p) => libraryRepository.getLecturesList(p), [], { resetOnExecute: false }
 )
+const { state: collections } = useAsyncState(() => collectionsRepository.getAll(), [])
+
+const isCollectionsVisible = ref(true)
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch([
@@ -68,6 +72,7 @@ watch([
 
 watch(searchQuery, async (value) => {
   await execute(0, value)
+  isCollectionsVisible.value = value === ''
 })
 
 // ── Handlers ────────────────────────────────────────────────────────

@@ -13,7 +13,7 @@ export class LibraryRepository {
   }
 
   public async getLecturesList(query?: string): Promise<Lecture[]> {
-    await new Promise(r => setTimeout(r, 1000));
+    // await new Promise(r => setTimeout(r, 1000));
 
     return [
       {
