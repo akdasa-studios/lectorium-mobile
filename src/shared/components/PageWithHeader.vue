@@ -12,7 +12,9 @@
       </IonToolbar>
     </IonHeader>
 
-    <IonContent>
+    <IonContent
+      ref="content"
+    >
       <IonLoading
         :isOpen="loading"
         :duration="0"
@@ -29,7 +31,9 @@ import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
   IonButtons, IonBackButton, IonLoading,
 } from '@ionic/vue'
+import { ref } from 'vue'
 
+// ── Interface ───────────────────────────────────────────────────────
 withDefaults(defineProps<{
   title: string
   loading: boolean
@@ -37,5 +41,18 @@ withDefaults(defineProps<{
 }>(), {
   headerBorder: true
 })
+
+defineExpose({
+  scrollTo
+})
+
+// ── State ───────────────────────────────────────────────────────────
+const content = ref<InstanceType<typeof IonContent>>()
+
+// ── Helpers ─────────────────────────────────────────────────────────
+function scrollTo(y: number) {
+  content.value?.$el.scrollToPoint(0, y, 500);
+  console.log('scrollTo', y)
+}
 </script>
 

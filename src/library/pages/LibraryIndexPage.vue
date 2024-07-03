@@ -12,6 +12,10 @@
       :items="tracks"
       @click="onTrackClicked"
     />
+
+    <CollectionsCreateDialog
+      v-model:isOpen="isCreateDialogOpen"
+    />
   </PageWithDrawer>
 </template>
 
@@ -19,7 +23,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { PlayingStatus, TrackViewModel, TracksList, CollectionsList, TracksSearchInput } from '@/library/components'
+import { PlayingStatus, TrackViewModel, TracksList, CollectionsList, TracksSearchInput, CollectionsCreateDialog } from '@/library/components'
 import { useCollectionsRepository, useLibraryRepository } from '@/library/composables'
 import { lecturesToViewModel } from '@/library/helpers/mappers'
 import { PageWithDrawer } from '@/shared/components'
@@ -44,6 +48,7 @@ const { state, execute } = useAsyncState<Lecture[], [string], true>(
 const { state: collections } = useAsyncState(() => collectionsRepository.getAll(), [])
 
 const isCollectionsVisible = ref(true)
+const isCreateDialogOpen = ref(true)
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch([

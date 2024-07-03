@@ -13,4 +13,8 @@ export class CollectionsRepository {
       { id: "123", title: "Ватсала дас", cover: "https://treningi4you.com/upload/iblock/d61/d611d4bb9bf8b6e34d14ccbffe6217df.jpg" },
     ]
   }
+
+  public async getById(id: string): Promise<Collection> {
+    return { id: "123", title: "Бхагавад-гита", cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShfakbIGHgEsHovFta0QQ32bgBJ2TyFT6ivQ&s" }
+  }
 }
