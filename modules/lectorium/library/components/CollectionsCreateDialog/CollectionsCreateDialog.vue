@@ -1,111 +1,106 @@
 <template>
   <IonModal :isOpen="isOpen">
-    <IonHeader>
+    <Header>
       <IonToolbar>
-        <IonTitle>Modal</IonTitle>
+        <IonTitle>Create collection</IonTitle>
         <IonButtons slot="end">
           <IonButton @click="isOpen = false">Close</IonButton>
         </IonButtons>
       </IonToolbar>
-    </IonHeader>
+    </Header>
 
     <IonContent>
-      <IonList>
-        <IonListHeader>
-          <IonLabel>Authors</IonLabel>
-          <IonButton @click="isSelectAuthorDialogOpen = !isSelectAuthorDialogOpen">Add</IonButton>
-        </IonListHeader>
+      <IonList lines="full" class="ion-no-margin ion-no-padding">
+        <IonItem>
+          <IonLabel position="stacked">Name</IonLabel>
+          <IonInput aria-label="First Name" type="text" v-model="collection.title"></IonInput>
+        </IonItem>
 
-        <IonItemSliding v-for="i in 4">
-          <IonItem>
-            <IonLabel>Srila Prabhupada</IonLabel>
-          </IonItem>
+        <IonItem :button="true" @click="isSelectAuthorDialogOpen = true">
+          <IonLabel>
+            Authors
+          </IonLabel>
+          <IonNote slot="end">{{ collection.authors.length }}</IonNote>
+        </IonItem>
 
-          <IonItemOptions>
-            <IonItemOption color="danger">Delete</IonItemOption>
-          </IonItemOptions>
-        </IonItemSliding>
+        <IonItem :button="true" @click="isSelectSourcesDialogOpen = true">
+          <IonLabel>
+            Sources
+          </IonLabel>
+          <IonNote slot="end">{{ collection.sources.length }}</IonNote>
+        </IonItem>
+
+        <IonItem :button="true" @click="isSelectLanguagesDialogOpen = true">
+          <IonLabel>
+            Languages
+          </IonLabel>
+          <IonNote slot="end">{{ collection.languages.length }}</IonNote>
+        </IonItem>
       </IonList>
-
-
-      <IonList>
-        <IonListHeader>
-          <IonLabel>Sources</IonLabel>
-          <IonButton>Add</IonButton>
-        </IonListHeader>
-
-        <IonItemSliding v-for="i in 4">
-          <IonItem>
-            <IonLabel>Bhagavad gita</IonLabel>
-          </IonItem>
-
-          <IonItemOptions>
-            <IonItemOption>Favorite</IonItemOption>
-            <IonItemOption color="danger">Delete</IonItemOption>
-          </IonItemOptions>
-        </IonItemSliding>
-      </IonList>
-
-      <IonList>
-        <IonListHeader>
-          <IonLabel>Languages</IonLabel>
-          <IonButton>Add</IonButton>
-        </IonListHeader>
-
-        <IonItemSliding v-for="i in 2">
-          <IonItem>
-            <IonLabel>RU</IonLabel>
-          </IonItem>
-
-          <IonItemOptions>
-            <IonItemOption>Favorite</IonItemOption>
-            <IonItemOption color="danger">Delete</IonItemOption>
-          </IonItemOptions>
-        </IonItemSliding>
-      </IonList>
-
     </IonContent>
 
-    <!-- Author selector dialog -->
     <SelectAuthorDialog
       v-model:open="isSelectAuthorDialogOpen"
-      @select="onAuthorSelected"
-    >
-      <template v-slot="{ item }">
-        <IonItem>
-          <IonLabel>{{ item.name }}</IonLabel>
-        </IonItem>
-      </template>
-    </SelectAuthorDialog>
+      @select="onAuthorsSelected"
+    />
+    <SelectSourcesDialog
+      v-model:open="isSelectSourcesDialogOpen"
+      @select="onSourcesSelected"
+    />
+    <SelectLanguagesDialog
+      v-model:open="isSelectLanguagesDialogOpen"
+      @select="onLanguagesSelected"
+    />
   </IonModal>
 </template>
 
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useAsyncState } from '@vueuse/core'
+import { Collection } from '@core/models'
 import {
   IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-  IonContent, IonList, IonItem, IonLabel, IonItemGroup, IonItemDivider,
-  IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
+  IonContent, IonList, IonItem, IonLabel, IonNote, IonInput
 } from '@ionic/vue'
-import { SelectAuthorDialog } from '@lectorium/library/components'
-import { ref } from 'vue';
-import { Author } from '@lectorium/library/services'
-import { useCollectionsRepository } from '@lectorium/library/composables'
-import { useAsyncState } from '@vueuse/core'
+import { Header } from '@lectorium/shared/components'
+import { SelectAuthorDialog, SelectSourcesDialog, SelectLanguagesDialog } from '@lectorium/library/components'
+import { useLibrary } from '@lectorium/library/composables'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const collectionsRepository = useCollectionsRepository()
+const library = useLibrary()
 
 // ── Interface ───────────────────────────────────────────────────────
 const isOpen = defineModel('isOpen', { type: Boolean, default: false, })
 const { state: collection } = useAsyncState(
-  () => collectionsRepository.getById("11"), {})
+  async () => toModelView(await library.collections.getById("11")),
+  {}, { shallow: false })
 
 // ── State ───────────────────────────────────────────────────────────
 const isSelectAuthorDialogOpen = ref(false)
+const isSelectSourcesDialogOpen = ref(false)
+const isSelectLanguagesDialogOpen = ref(false)
 
 // ── Handlers ────────────────────────────────────────────────────────
-function onAuthorSelected(author: Author) {
-  console.log('Author selected:', author)
+function onAuthorsSelected(authorIds: string[]) {
+  collection.value.authors = authorIds
+}
+
+function onSourcesSelected(sourceIds: string[]) {
+  collection.value.sources = sourceIds
+}
+
+function onLanguagesSelected(languageIds: string[]) {
+  collection.value.languages = languageIds
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+function toModelView(collection: Collection) {
+  return {
+    title: collection.title,
+    authors: collection.authors || [],
+    sources: collection.sources || [],
+    languages: collection.languages || [],
+  }
 }
 </script>

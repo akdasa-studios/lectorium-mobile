@@ -1,3 +1,5 @@
 export * from './Track'
 export * from './Collection'
 export * from './Author'
+export * from './Source'
+export * from './Language'

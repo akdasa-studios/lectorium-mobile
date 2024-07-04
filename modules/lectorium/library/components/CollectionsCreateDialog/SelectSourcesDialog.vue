@@ -1,7 +1,7 @@
 <template>
   <SelectorDialog
     v-model:open="open"
-    title="Authors"
+    title="Sources"
     :items="items"
     @select="onSelect"
   />
@@ -12,7 +12,7 @@
 import { useAsyncState } from '@vueuse/core'
 import { SelectorDialog } from '@lectorium/shared/components'
 import { useLibrary } from '@lectorium/library/composables'
-import { Author } from '@core/models'
+import { Source } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -21,12 +21,12 @@ const library = useLibrary()
 const open = defineModel('open', { type: Boolean, default: false, })
 
 const emit = defineEmits<{
-  select: [item: string[]]
+  select: [ids: string[]]
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
 const { state: items } = useAsyncState(
-  async () => map2(await library.authors.getAll()), [])
+  async () => map2(await library.sources.getAll()), [])
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onSelect(ids: string[]) {
@@ -34,10 +34,10 @@ function onSelect(ids: string[]) {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
-function map2(authors: Author[]) {
-  return authors.map((author) => ({
-    id: author.id,
-    title: author.name,
+function map2(sources: Source[]) {
+  return sources.map((source) => ({
+    id: source.id,
+    title: source.title,
     checked: false,
   }))
 }

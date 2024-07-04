@@ -1,10 +1,11 @@
 <template>
   <PageWithDrawer ref="page">
     <template v-slot:drawer>
-      <TracksSearchInput v-model="searchQuery" />
+      <Searchbar v-model="searchQuery" />
       <CollectionsList
         v-if="isCollectionsVisible"
         :items=collections
+        @add="isCreateDialogOpen = true"
       />
     </template>
 
@@ -23,16 +24,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { PlayingStatus, TrackViewModel, TracksList, CollectionsList, TracksSearchInput, CollectionsCreateDialog } from '@lectorium/library/components'
-import { useCollectionsRepository, useLibraryRepository } from '@lectorium/library/composables'
+import { Track } from '@core/models'
+import { PlayingStatus, TrackViewModel, TracksList, CollectionsList, CollectionsCreateDialog } from '@lectorium/library/components'
+import { Searchbar } from '@lectorium/shared/components'
+import { useLibrary } from '@lectorium/library/composables'
 import { lecturesToViewModel } from '@lectorium/library/helpers/mappers'
 import { PageWithDrawer } from '@lectorium/shared/components'
 import { usePlaylist, useAudioPlayer } from '@lectorium/shared/composables'
-import { Track } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const libraryRepository = useLibraryRepository()
-const collectionsRepository = useCollectionsRepository()
+const library = useLibrary()
 const playlist = usePlaylist()
 const audioPlayer = useAudioPlayer()
 const page = ref(null)
@@ -43,12 +44,12 @@ const isLibraryEmpty = computed(() => state.value.length === 0)
 const tracks = ref<TrackViewModel[]>([])
 
 const { state, execute } = useAsyncState<Track[], [string], true>(
-  (p) => libraryRepository.getLecturesList(p), [], { resetOnExecute: false }
+  (p) => library.tracks.getLecturesList(p), [], { resetOnExecute: false }
 )
-const { state: collections } = useAsyncState(() => collectionsRepository.getAll(), [])
+const { state: collections } = useAsyncState(() => library.collections.getAll(), [])
 
 const isCollectionsVisible = ref(true)
-const isCreateDialogOpen = ref(true)
+const isCreateDialogOpen = ref(false)
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch([

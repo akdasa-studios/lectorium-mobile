@@ -12,8 +12,11 @@
         :cover="item.cover"
       />
     </swiper-slide>
+
     <swiper-slide>
-      <CollectionsCardAdd />
+      <CollectionsCardAdd
+        @click="emit('add')"
+      />
     </swiper-slide>
   </swiper-container>
 </template>
@@ -32,6 +35,11 @@ export type Collection = {
 
 defineProps<{
   items: Collection[]
+}>()
+
+const emit = defineEmits<{
+  click: [value: string]
+  add: []
 }>()
 
 // ── Handlers ────────────────────────────────────────────────────────

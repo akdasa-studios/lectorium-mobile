@@ -10,12 +10,12 @@
 import { watch } from 'vue'
 import { AudioPlayer } from '@lectorium/shared/components'
 import { usePlaylist, useAudioPlayer } from '@lectorium/shared/composables'
-import { useLibraryRepository } from '@lectorium/library/composables'
+import { useLibrary } from '@lectorium/library/composables'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const playlist = usePlaylist()
 const audioPlayer = useAudioPlayer()
-const libraryService = useLibraryRepository()
+const library = useLibrary()
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch(playlist.currentTrackId, onTrackChanged, { immediate: true })
@@ -25,7 +25,7 @@ async function onTrackChanged(trackId: string|undefined) {
   if (!trackId) { return }
 
   audioPlayer.loading.value = true
-  const response = await libraryService.getLecture(trackId)
+  const response = await library.tracks.getLecture(trackId)
 
   if (response?.url) {
     audioPlayer.url.value = response.url
