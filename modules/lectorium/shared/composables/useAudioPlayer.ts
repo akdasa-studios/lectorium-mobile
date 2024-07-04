@@ -5,6 +5,7 @@ export const useAudioPlayer = createGlobalState(
   () => {
     const url = ref('')
     const position = ref(0)
+    const duration = ref(0)
     const playing = ref(false)
     const loading = ref(false)
 
@@ -24,6 +25,6 @@ export const useAudioPlayer = createGlobalState(
       playing.value = false
     }
 
-    return { url, position, play, stop, togglePlaying, playing, loading, startLoading }
+    return { url, position, play, stop, togglePlaying, playing, loading, startLoading, duration }
   }
 )

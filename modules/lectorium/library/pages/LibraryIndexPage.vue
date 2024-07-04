@@ -1,5 +1,6 @@
 <template>
   <PageWithDrawer ref="page">
+  <!-- Top drawer -->
     <template v-slot:drawer>
       <Searchbar v-model="searchQuery" />
       <CollectionsList

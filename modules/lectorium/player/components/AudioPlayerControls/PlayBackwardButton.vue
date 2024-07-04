@@ -11,8 +11,8 @@ import { playBackOutline } from 'ionicons/icons'
 
 <style scoped>
 .PlayBackwardButton {
-  min-width: 50px;
-  min-height: 50px;
+  min-width: 25px;
+  min-height: 25px;
 }
 </style>
 

@@ -23,7 +23,7 @@ classDiagram
 
     class Source {
         +string id
-        +string name
+        +string title
     }
 
     class Language {
@@ -45,6 +45,7 @@ classDiagram
 classDiagram
     class Collection {
         +string id
+        +string title
         +Author authors
         +Source sources
         +Language[] languages

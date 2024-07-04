@@ -10,6 +10,7 @@ import { ref, watch } from 'vue'
 // ── Interface ───────────────────────────────────────────────────────
 const playing  = defineModel('playing',  { type: Boolean, default: false })
 const position = defineModel('position', { type: Number,  default: 0 })
+const duration = defineModel('duration', { type: Number,  default: 0 })
 const url      = defineModel('url',      { type: String,  default: '' })
 
 // ── State ───────────────────────────────────────────────────────────
@@ -34,5 +35,10 @@ watchThrottled(
   player.currentTime,
   (v) => { position.value = v },
   { throttle: 1000 }
+)
+
+watch(
+  player.duration,
+  (v) => { duration.value = v }
 )
 </script>

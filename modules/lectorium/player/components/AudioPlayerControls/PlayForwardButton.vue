@@ -11,8 +11,8 @@ import { playForwardOutline } from 'ionicons/icons'
 
 <style scoped>
 .PlayForwardButton {
-  min-width: 50px;
-  min-height: 50px;
+  min-width: 25px;
+  min-height: 25px;
 }
 </style>
 

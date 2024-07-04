@@ -1,5 +1,5 @@
 <template>
-  <div class="LecturePlayer">
+  <!-- <div class="LecturePlayer">
     <div class="Header">
     </div>
 
@@ -7,13 +7,13 @@
       <div class="chart">
         {{ position }}
       </div>
-    </div>
+    </div> -->
 
     <div class="Player">
       <PlayBackwardButton
         @click="onPlayBackwardButtonClicked"
       />
-      <PlayButton 
+      <PlayButton
         :playing="playing"
         @click="onPlayButtonClicked"
       />
@@ -21,7 +21,7 @@
         @click="onPlayForwardButtonClicked"
       />
     </div>
-  </div>
+  <!-- </div> -->
 </template>
 
 
@@ -64,7 +64,7 @@ function onPlayForwardButtonClicked() {
   justify-content: center;
   align-items: center;
   gap: 3em;
-  margin: 2em;
+  margin: .5em;
 }
 
 .Waveform {

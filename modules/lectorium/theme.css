@@ -236,7 +236,53 @@ http://ionicframework.com/docs/theming/ */
 }
 
 html {
-  /* For more information on dynamic font scaling, visit the documentation: 
+  /* For more information on dynamic font scaling, visit the documentation:
   https://ionicframework.com/docs/layout/dynamic-font-scaling */
   --ion-dynamic-font: var(--ion-default-dynamic-font);
+}
+
+.ion-color-slate {
+	--ion-color-base: var(--ion-color-slate);
+	--ion-color-base-rgb: var(--ion-color-slate-rgb);
+	--ion-color-contrast: var(--ion-color-slate-contrast);
+	--ion-color-contrast-rgb: var(--ion-color-slate-contrast-rgb);
+	--ion-color-shade: var(--ion-color-slate-shade);
+	--ion-color-tint: var(--ion-color-slate-tint);
+}
+
+
+:root {
+	--ion-color-black-bean: #280003;
+	--ion-color-black-bean-rgb: 40,0,3;
+	--ion-color-black-bean-contrast: #ffffff;
+	--ion-color-black-bean-contrast-rgb: 255,255,255;
+	--ion-color-black-bean-shade: #230003;
+	--ion-color-black-bean-tint: #3e1a1c;
+}
+
+.ion-color-black-bean {
+	--ion-color-base: var(--ion-color-black-bean);
+	--ion-color-base-rgb: var(--ion-color-black-bean-rgb);
+	--ion-color-contrast: var(--ion-color-black-bean-contrast);
+	--ion-color-contrast-rgb: var(--ion-color-black-bean-contrast-rgb);
+	--ion-color-shade: var(--ion-color-black-bean-shade);
+	--ion-color-tint: var(--ion-color-black-bean-tint);
+}
+
+:root {
+	--ion-color-oxford-blue: #1D263B;
+	--ion-color-oxford-blue-rgb: 29,38,59;
+	--ion-color-oxford-blue-contrast: #ffffff;
+	--ion-color-oxford-blue-contrast-rgb: 255,255,255;
+	--ion-color-oxford-blue-shade: #1a2134;
+	--ion-color-oxford-blue-tint: #6A82B4;
+}
+
+.ion-color-oxford-blue {
+	--ion-color-base: var(--ion-color-oxford-blue);
+	--ion-color-base-rgb: var(--ion-color-oxford-blue-rgb);
+	--ion-color-contrast: var(--ion-color-oxford-blue-contrast);
+	--ion-color-contrast-rgb: var(--ion-color-oxford-blue-contrast-rgb);
+	--ion-color-shade: var(--ion-color-oxford-blue-shade);
+	--ion-color-tint: var(--ion-color-oxford-blue-tint);
 }

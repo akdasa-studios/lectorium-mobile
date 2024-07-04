@@ -3,6 +3,7 @@
     v-model:url="audioPlayer.url.value"
     v-model:playing="audioPlayer.playing.value"
     v-model:position="audioPlayer.position.value"
+    v-model:duration="audioPlayer.duration.value"
   />
 </template>
 
