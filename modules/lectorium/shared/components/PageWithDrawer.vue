@@ -14,6 +14,7 @@
     </IonContent>
 
     <IonContent
+      :scroll-y="false"
       class="parts bottomDrawer"
       color="oxford-blue"
       ref="bottomDrawerRef"
@@ -29,7 +30,21 @@
             @click="audioPlayer.togglePlaying()"
           />
         </div>
+
       </div>
+
+      <IonContent class="ion-padding text" color="oxford-blue" v-if="currentTrack">
+        <span
+          v-for="text in currentTrack.text"
+          :key="text.start"
+          :class="{
+            'highlight': text.start <= audioPlayer.position.value *1000 && text.end >= audioPlayer.position.value*1000
+          }"
+        >
+          {{ text.text }}
+          <hr v-if="text.newParagraph" />
+        </span>
+      </IonContent>
 
       <!-- <AudioPlayerControls /> -->
     </IonContent>
@@ -44,10 +59,14 @@ import { Drawer } from '@lectorium/shared/components'
 import { useAudioPlayer, usePlaylist } from '@lectorium/shared/composables'
 import { AudioPlayerControls } from '@lectorium/player/components'
 import { PlayButton } from '@lectorium/player/components'
+import { Track } from '@core/models'
+import { useLibrary } from '@lectorium/library/composables'
 
 type BottomDrawerState = "closed" | "semi-open" | "open"
 const audioPlayer = useAudioPlayer()
 const playlist = usePlaylist()
+
+const library = useLibrary()
 
 // ── State ───────────────────────────────────────────────────────────
 // const pageRef = ref<InstanceType<typeof IonPage>>()
@@ -56,9 +75,10 @@ const topDrawerRef = ref<InstanceType<typeof IonContent>>()
 const bottomDrawerRef = ref<InstanceType<typeof IonContent>>()
 
 const isDrawerOpen = defineModel("isDrawerOpen", { type: Boolean, default: false })
-const bottomDrawerState = ref<bottomDrawerState>("closed")
+const bottomDrawerState = ref<BottomDrawerState>("closed")
 const openDrawerGesture = ref<ReturnType<typeof createGesture>>()
 const openBottomDrawerGesture = ref<ReturnType<typeof createGesture>>()
+const currentTrack = ref<Track>()
 
 // ── Hooks ───────────────────────────────────────────────────────────
 onMounted(() => {
@@ -86,6 +106,11 @@ onUnmounted(() => {
   openDrawerGesture.value?.destroy()
   openBottomDrawerGesture.value?.destroy()
 })
+
+watch(playlist.currentTrackId, async (value) => {
+  if (!value) return;
+  currentTrack.value = await library.tracks.getLecture(value)
+}, { immediate: true })
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onMoveHandler(ev: GestureDetail): boolean | void {
@@ -205,5 +230,14 @@ const percentPlayedStyle = computed(() => `${percentPlayed.value+2}%`)
 .trackTitle {
   font-weight: bold;
   color: var(--ion-color-oxford-blue-contrast);
+}
+
+.highlight {
+  background: var(--ion-color-oxford-blue-tint);
+}
+
+.text {
+  /* text-align: justify; */
+  /* text-justify: inter-word; */
 }
 </style>

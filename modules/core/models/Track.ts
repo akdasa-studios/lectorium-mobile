@@ -5,4 +5,11 @@ export interface Track {
   location: string;
   date: string;
   references: string[];
+  text: TrackText[];
+}
+
+export type TrackText = {
+  start: number;
+  end: number;
+  text: string;
 }
