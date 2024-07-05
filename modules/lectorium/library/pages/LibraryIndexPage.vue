@@ -15,6 +15,18 @@
       @click="onTrackClicked"
     />
 
+    <ion-tab-bar class="bar">
+        <ion-tab-button tab="library" href="/app/library">
+          <ion-icon aria-hidden="true" :icon="homeOutline" />
+          <ion-label>Home</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="player" href="/app/player">
+          <ion-icon aria-hidden="true" :icon="playOutline" />
+          <ion-label>Player</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+
     <CollectionsCreateDialog
       v-model:isOpen="isCreateDialogOpen"
     />
@@ -32,6 +44,13 @@ import { useLibrary } from '@lectorium/library/composables'
 import { lecturesToViewModel } from '@lectorium/library/helpers/mappers'
 import { PageWithDrawer } from '@lectorium/shared/components'
 import { usePlaylist, useAudioPlayer } from '@lectorium/shared/composables'
+
+import {
+  IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon,
+  IonPage, IonRouterOutlet
+} from '@ionic/vue'
+import { homeOutline, playOutline } from 'ionicons/icons'
+
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -94,3 +113,12 @@ function onTrackClicked(trackId: string) {
   }
 }
 </script>
+
+
+<style scoped>
+.bar {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+}
+</style>

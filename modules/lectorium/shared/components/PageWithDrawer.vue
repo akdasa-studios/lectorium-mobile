@@ -13,25 +13,17 @@
       <slot></slot>
     </IonContent>
 
-    <IonContent
-      :scroll-y="false"
-      class="parts bottomDrawer"
-      color="oxford-blue"
+    <BottomDrawer
+      :percent="percentPlayed"
       ref="bottomDrawerRef"
     >
-      <div class="trackControls">
-        <div class="trackInfo">
-          <div class="trackTitle">Current track</div>
-          <div>Author</div>
-        </div>
-        <div class="trackButtons">
-          <PlayButton
-            :playing="audioPlayer.playing"
-            @click="audioPlayer.togglePlaying()"
-          />
-        </div>
-
-      </div>
+      <AudioControlsCompact
+        v-if="currentTrack"
+        :title="currentTrack.title"
+        :author="'Author'"
+        :playing="audioPlayer.playing.value"
+        @playClicked="audioPlayer.togglePlaying()"
+      />
 
       <IonContent
         class="ion-padding text"
@@ -43,20 +35,9 @@
           :time="audioPlayer.position.value * 1000"
           @rewind="(pos) => audioPlayer.position.value = pos / 1000"
         />
-        <!-- <span
-          v-for="text in currentTrack.text"
-          :key="text.start"
-          :class="{
-            'highlight': text.start <= audioPlayer.position.value *1000 && text.end >= audioPlayer.position.value*1000
-          }"
-        >
-          {{ text.text }}
-          <hr v-if="text.newParagraph" />
-        </span> -->
       </IonContent>
+    </BottomDrawer>
 
-      <!-- <AudioPlayerControls /> -->
-    </IonContent>
   </IonPage>
 </template>
 
@@ -66,12 +47,13 @@ import { IonPage, IonContent, createGesture, GestureDetail } from '@ionic/vue'
 import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { Drawer } from '@lectorium/shared/components'
 import { useAudioPlayer, usePlaylist } from '@lectorium/shared/composables'
-import { AudioPlayerControls } from '@lectorium/player/components'
-import { PlayButton } from '@lectorium/player/components'
 import { Track } from '@core/models'
 import { useLibrary } from '@lectorium/library/composables'
 import { Prompter } from '@lectorium/shared/components'
+import AudioControlsCompact from '@lectorium/library/components/BottomDrawer/AudioControlsCompact.vue'
+import { BottomDrawer
 
+ } from '@lectorium/library/components'
 type BottomDrawerState = "closed" | "semi-open" | "open"
 const audioPlayer = useAudioPlayer()
 const playlist = usePlaylist()
@@ -79,8 +61,6 @@ const playlist = usePlaylist()
 const library = useLibrary()
 
 // ── State ───────────────────────────────────────────────────────────
-// const pageRef = ref<InstanceType<typeof IonPage>>()
-
 const topDrawerRef = ref<InstanceType<typeof IonContent>>()
 const bottomDrawerRef = ref<InstanceType<typeof IonContent>>()
 
@@ -127,19 +107,8 @@ function onMoveHandler(ev: GestureDetail): boolean | void {
   console.log("onMoveHandler", ev.velocityY)
   if (ev.velocityY > 0 && isDrawerOpen.value === false) {
     isDrawerOpen.value = true
-
-
-    // offsetTop.value = "0%"
-    // offsetBottom.value = "75px"
-    // bottomDrawerState.value = "closed"
   } else if (ev.velocityY < 0) {
     isDrawerOpen.value = false
-    // console.log(pageRef.value.$el)
-    // bottomDrawerState.value = "open"
-
-    // pageRef.value.$el.style.transform = `translateY(-100px)`
-    // offsetTop.value = "-50%"
-    // offsetBottom.value = "15px"
   }
 }
 function onMoveHandler2(ev: GestureDetail): boolean | void {
@@ -164,7 +133,6 @@ const offsetTop = computed(() => bottomDrawerState.value === "open" ? "-50%" : "
 const offsetBottom = computed(() => bottomDrawerState.value === "semi-open" || bottomDrawerState.value === "open" ? "75px" : "0px") //ref("75px")
 const topDrawerBorderRadius = computed(() => bottomDrawerState.value !== "closed" ? "5px" : "0px")
 const percentPlayed = computed(() => audioPlayer.position.value / audioPlayer.duration.value * 100)
-const percentPlayedStyle = computed(() => `${percentPlayed.value+2}%`)
 </script>
 
 
@@ -175,14 +143,11 @@ const percentPlayedStyle = computed(() => `${percentPlayed.value+2}%`)
   transform: translateY(v-bind(offsetTop));
   gap: 10px;
   background-color: var(--ion-color-medium);
-  /* display: block; */
-  /* flex-direction: column; */
-  /* height: 100%; */
   height: 200%;
 }
 
 .parts {
-  transition: all 0.5s;
+  transition: all 1.5s;
   overflow: hidden;
 }
 
@@ -190,66 +155,6 @@ const percentPlayedStyle = computed(() => `${percentPlayed.value+2}%`)
   flex: 0 0 calc(50% - v-bind(offsetBottom));
   border-bottom-left-radius: v-bind(topDrawerBorderRadius);
   border-bottom-right-radius: v-bind(topDrawerBorderRadius);
-  box-shadow: 0px 2px 4px var(--ion-color-medium);
-
-  /* height: 75; */
-
-  /* max-height: calc(100% - 50px); */
-  /* border-radius: 10px; */
-  /* top: 0px; */
-}
-.bottomDrawer {
-  /* box-shadow: 0px -.01px 2px var(--ion-color-medium); */
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  /* margin-top: +25px; */
-  /* height: 50%; */
-}
-
-.bottomDrawer::after {
-  content: '';
-  position: absolute;
-  left: -2px;
-  top: 0px;
-  height: 4px;
-  background: var(--ion-color-oxford-blue-tint);
-  width: v-bind(percentPlayedStyle);
-  display: inline-block;
-  border-radius: 5px;
-  transition: all 0.5s;
-}
-
-.trackControls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 65px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.trackInfo {
-  color: var(--ion-color-oxford-blue-contrast);
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 0.8rem;
-}
-
-.trackTitle {
-  font-weight: bold;
-  color: var(--ion-color-oxford-blue-contrast);
-}
-
-.highlight {
-  background: var(--ion-color-oxford-blue-tint);
-  border-radius: 5px;
-  border: 1px solid var(--ion-color-oxford-blue-tint);
-}
-
-.text {
-  /* text-align: justify; */
-  /* text-justify: inter-word; */
+  box-shadow: 0px 2px 4px var(--ion-color-medium-shade);
 }
 </style>

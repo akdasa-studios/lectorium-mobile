@@ -6,3 +6,5 @@ export { default as CollectionsCreateDialog } from './CollectionsCreateDialog/Co
 export { default as SelectAuthorDialog } from './CollectionsCreateDialog/SelectAuthorDialog.vue'
 export { default as SelectSourcesDialog } from './CollectionsCreateDialog/SelectSourcesDialog.vue'
 export { default as SelectLanguagesDialog } from './CollectionsCreateDialog/SelectLanguagesDialog.vue'
+export { default as AudioControlsCompact } from './BottomDrawer/AudioControlsCompact.vue'
+export { default as BottomDrawer } from './BottomDrawer/BottomDrawer.vue'
