@@ -12,32 +12,6 @@
 
       <slot></slot>
     </IonContent>
-
-    <BottomDrawer
-      :percent="percentPlayed"
-      ref="bottomDrawerRef"
-    >
-      <AudioControlsCompact
-        v-if="currentTrack"
-        :title="currentTrack.title"
-        :author="'Author'"
-        :playing="audioPlayer.playing.value"
-        @playClicked="audioPlayer.togglePlaying()"
-      />
-
-      <IonContent
-        class="ion-padding text"
-        color="oxford-blue"
-        v-if="currentTrack"
-      >
-        <Prompter
-          :text="currentTrack.text"
-          :time="audioPlayer.position.value * 1000"
-          @rewind="(pos) => audioPlayer.position.value = pos / 1000"
-        />
-      </IonContent>
-    </BottomDrawer>
-
   </IonPage>
 </template>
 
@@ -80,21 +54,21 @@ onMounted(() => {
     onMove: ev => onMoveHandler(ev)
   });
 
-  openBottomDrawerGesture.value = createGesture({
-    el: bottomDrawerRef.value?.$el,
-    gestureName: 'open-bottom-drawer',
-    gesturePriority: 31,
-    direction: 'y',
-    onMove: ev => onMoveHandler2(ev)
-  });
+  // openBottomDrawerGesture.value = createGesture({
+  //   el: bottomDrawerRef.value?.$el,
+  //   gestureName: 'open-bottom-drawer',
+  //   gesturePriority: 31,
+  //   direction: 'y',
+  //   onMove: ev => onMoveHandler2(ev)
+  // });
 
   openDrawerGesture.value.enable();
-  openBottomDrawerGesture.value.enable();
+  // openBottomDrawerGesture.value.enable();
 })
 
 onUnmounted(() => {
   openDrawerGesture.value?.destroy()
-  openBottomDrawerGesture.value?.destroy()
+  // openBottomDrawerGesture.value?.destroy()
 })
 
 watch(playlist.currentTrackId, async (value) => {
@@ -111,14 +85,14 @@ function onMoveHandler(ev: GestureDetail): boolean | void {
     isDrawerOpen.value = false
   }
 }
-function onMoveHandler2(ev: GestureDetail): boolean | void {
-  console.log("onMoveHandler2", ev.velocityY)
-  if (ev.velocityY > 1) {
-    bottomDrawerState.value = playlist.currentTrackId.value ? "semi-open" : "closed"
-  } else if (ev.velocityY < -1) {
-    bottomDrawerState.value = "open"
-  }
-}
+// function onMoveHandler2(ev: GestureDetail): boolean | void {
+//   console.log("onMoveHandler2", ev.velocityY)
+//   if (ev.velocityY > 1) {
+//     bottomDrawerState.value = playlist.currentTrackId.value ? "semi-open" : "closed"
+//   } else if (ev.velocityY < -1) {
+//     bottomDrawerState.value = "open"
+//   }
+// }
 
 watch(playlist.currentTrackId, (value) => {
   console.log("playlist.currentTrackId", value)
@@ -129,13 +103,13 @@ watch(playlist.currentTrackId, (value) => {
   }
 }, { immediate: true })
 
-const offsetTop = computed(() => bottomDrawerState.value === "open" ? "-50%" : "0%") //ref("-0px")
-const offsetBottom = computed(() => bottomDrawerState.value === "semi-open" || bottomDrawerState.value === "open" ? "75px" : "0px") //ref("75px")
-const topDrawerBorderRadius = computed(() => bottomDrawerState.value !== "closed" ? "5px" : "0px")
-const percentPlayed = computed(() => audioPlayer.position.value / audioPlayer.duration.value * 100)
+// const offsetTop = computed(() => bottomDrawerState.value === "open" ? "-50%" : "0%") //ref("-0px")
+// const offsetBottom = computed(() => bottomDrawerState.value === "semi-open" || bottomDrawerState.value === "open" ? "75px" : "0px") //ref("75px")
+// const topDrawerBorderRadius = computed(() => bottomDrawerState.value !== "closed" ? "5px" : "0px")
+// const percentPlayed = computed(() => audioPlayer.position.value / audioPlayer.duration.value * 100)
 </script>
 
-
+<!--
 
 <style scoped>
 .page {
@@ -157,4 +131,4 @@ const percentPlayed = computed(() => audioPlayer.position.value / audioPlayer.du
   border-bottom-right-radius: v-bind(topDrawerBorderRadius);
   box-shadow: 0px 2px 4px var(--ion-color-medium-shade);
 }
-</style>
+</style> -->

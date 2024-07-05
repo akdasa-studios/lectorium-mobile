@@ -15,18 +15,6 @@
       @click="onTrackClicked"
     />
 
-    <ion-tab-bar class="bar">
-        <ion-tab-button tab="library" href="/app/library">
-          <ion-icon aria-hidden="true" :icon="homeOutline" />
-          <ion-label>Home</ion-label>
-        </ion-tab-button>
-
-        <ion-tab-button tab="player" href="/app/player">
-          <ion-icon aria-hidden="true" :icon="playOutline" />
-          <ion-label>Player</ion-label>
-        </ion-tab-button>
-      </ion-tab-bar>
-
     <CollectionsCreateDialog
       v-model:isOpen="isCreateDialogOpen"
     />
