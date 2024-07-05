@@ -5,10 +5,14 @@ export interface Track {
   location: string;
   date: string;
   references: string[];
-  text: TrackText[];
+  text: TrackTextParagraph[];
 }
 
-export type TrackText = {
+export type TrackTextParagraph = {
+  blocks: TrackTextBlock[];
+}
+
+export type TrackTextBlock = {
   start: number;
   end: number;
   text: string;

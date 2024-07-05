@@ -41,4 +41,9 @@ watch(
   player.duration,
   (v) => { duration.value = v }
 )
+
+watch(
+  position,
+  (v) => { player.currentTime.value = v }
+)
 </script>

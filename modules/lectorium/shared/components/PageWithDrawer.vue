@@ -33,8 +33,17 @@
 
       </div>
 
-      <IonContent class="ion-padding text" color="oxford-blue" v-if="currentTrack">
-        <span
+      <IonContent
+        class="ion-padding text"
+        color="oxford-blue"
+        v-if="currentTrack"
+      >
+        <Prompter
+          :text="currentTrack.text"
+          :time="audioPlayer.position.value * 1000"
+          @rewind="(pos) => audioPlayer.position.value = pos / 1000"
+        />
+        <!-- <span
           v-for="text in currentTrack.text"
           :key="text.start"
           :class="{
@@ -43,7 +52,7 @@
         >
           {{ text.text }}
           <hr v-if="text.newParagraph" />
-        </span>
+        </span> -->
       </IonContent>
 
       <!-- <AudioPlayerControls /> -->
@@ -61,6 +70,7 @@ import { AudioPlayerControls } from '@lectorium/player/components'
 import { PlayButton } from '@lectorium/player/components'
 import { Track } from '@core/models'
 import { useLibrary } from '@lectorium/library/composables'
+import { Prompter } from '@lectorium/shared/components'
 
 type BottomDrawerState = "closed" | "semi-open" | "open"
 const audioPlayer = useAudioPlayer()
@@ -234,6 +244,8 @@ const percentPlayedStyle = computed(() => `${percentPlayed.value+2}%`)
 
 .highlight {
   background: var(--ion-color-oxford-blue-tint);
+  border-radius: 5px;
+  border: 1px solid var(--ion-color-oxford-blue-tint);
 }
 
 .text {

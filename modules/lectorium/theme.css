@@ -272,8 +272,13 @@ html {
 :root {
 	--ion-color-oxford-blue: #1D263B;
 	--ion-color-oxford-blue-rgb: 29,38,59;
-	--ion-color-oxford-blue-contrast: #ffffff;
+	--ion-color-oxford-blue-contrast: #D6E9FF;
 	--ion-color-oxford-blue-contrast-rgb: 255,255,255;
+
+  /* --ion-color-oxford-blue-contrast-shade: #99C7FF; */
+
+
+
 	--ion-color-oxford-blue-shade: #1a2134;
 	--ion-color-oxford-blue-tint: #6A82B4;
 }
