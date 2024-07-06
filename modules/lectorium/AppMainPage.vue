@@ -6,11 +6,11 @@
     <PlayerSection
       ref="playerSectionRef"
       :playing="audioPlayer.playing.value"
-      :position="audioPlayer.position.value * 1000"
+      :position="audioPlayer.position.value"
       :percentPlayed="percentPlayed"
       :track="currentTrack"
       @play-clicked="audioPlayer.togglePlaying()"
-      @rewind="audioPlayer.position.value = $event / 1000"
+      @rewind="audioPlayer.position.value = $event"
     />
   </IonPage>
 </template>

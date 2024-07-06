@@ -48,9 +48,9 @@ const emit = defineEmits<{
 
 // ── Computed ───────────────────────────────────────────────────────
 function formatTime(ms: number) {
-  const seconds = Math.floor((ms / 1000) % 60);
-  const minutes = Math.floor((ms / 1000 / 60) % 60);
-  const hours = Math.floor((ms / 1000 / 60 / 60));
+  const seconds = Math.floor(ms % 60);
+  const minutes = Math.floor((ms / 60) % 60);
+  const hours = Math.floor((ms / 60 / 60));
 
   let formattedTime;
 
