@@ -45,6 +45,7 @@ const percentPlayed = computed(() => audioPlayer.position.value / audioPlayer.du
 const animation = ref("0.5s")
 
 // ── Hooks ───────────────────────────────────────────────────────────
+//@ts-ignore
 watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
   playerSectionGesture.value = swipeVerticalGesture.create({
     el: value,
@@ -66,6 +67,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
   });
 })
 
+//@ts-ignore
 watch(() => playerSectionRef.value?.handleBottomRef?.$el, (value) => {
   playerSectionGesture.value = swipeVerticalGesture.create({
     el: value,
