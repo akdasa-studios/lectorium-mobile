@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.akdasa.lectorium',
+  appId: 'studio.akdasa.lectorium',
   appName: 'lectorium',
   webDir: 'dist',
   server: {
