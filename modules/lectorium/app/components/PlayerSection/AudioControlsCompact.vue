@@ -15,7 +15,7 @@
 
 
 <script setup lang="ts">
-import { PlayButton } from '@lectorium/player/components'
+import PlayButton from './PlayButton.vue'
 
 defineProps<{
   title: string,

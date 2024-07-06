@@ -4,7 +4,7 @@
 
 
 <script setup lang="ts">
-import { ref, computed, toRefs } from 'vue'
+import { computed, toRefs } from 'vue'
 import { IonIcon } from '@ionic/vue'
 import { playCircle, pauseCircle } from 'ionicons/icons'
 
