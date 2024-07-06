@@ -73,7 +73,8 @@ const library = useLibrary()
 // ── Interface ───────────────────────────────────────────────────────
 const isOpen = defineModel('isOpen', { type: Boolean, default: false, })
 const { state: collection } = useAsyncState(
-  async () => toModelView(await library.collections.getById("11")),
+async () => toModelView(await library.collections.getById("11")),
+  //@ts-ignore
   {}, { shallow: false })
 
 // ── State ───────────────────────────────────────────────────────────

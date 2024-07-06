@@ -7,7 +7,7 @@ export class LibraryRepository {
 
   public async getLecturesList(query?: string): Promise<Track[]> {
     // await new Promise(r => setTimeout(r, 1000));
-
+    //@ts-ignore
     return [
 
       {
@@ -3543,8 +3543,8 @@ export class LibraryRepository {
     ].filter(x => !query
       || x.title.toLowerCase().includes(query.toLowerCase())
       || x.references.some(r => r.toLowerCase().includes(query.toLowerCase()))
-      || x.location.toLowerCase().includes(query.toLowerCase())
-      || x.date.includes(query)
+      || x.location?.toLowerCase().includes(query.toLowerCase())
+      || x.date?.includes(query)
     );
   }
 }

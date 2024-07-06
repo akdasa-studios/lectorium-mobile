@@ -12,7 +12,7 @@
 import { useAsyncState } from '@vueuse/core'
 import { SelectorDialog } from '@lectorium/shared/components'
 import { useLibrary } from '@lectorium/library/composables'
-import { Source } from '@core/models'
+import { Language } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
