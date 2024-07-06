@@ -63,7 +63,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
       }
       pageTranslateOffset.value = 0
     },
-    onMove: ev => { pageTranslateOffset.value = ev.deltaY; animation.value = "0s"; }
+    onMove: ev => { pageTranslateOffset.value = ev.deltaY; animation.value = "0.1s"; }
   });
 })
 
@@ -78,7 +78,7 @@ watch(() => playerSectionRef.value?.handleBottomRef?.$el, (value) => {
       }
       pageTranslateOffset.value = 0
     },
-    onMove: ev => { pageTranslateOffset.value = ev.deltaY; animation.value = "0s"; }
+    onMove: ev => { pageTranslateOffset.value = ev.deltaY; animation.value = "0.1s"; }
   });
 })
 
