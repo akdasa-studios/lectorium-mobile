@@ -2,10 +2,16 @@
   <div class="PlayerSection">
     <AudioControlsCompact
       v-if="track"
+      ref="audioControlsCompactRef"
       :title="track.title"
       :author="'Author'"
       :playing="playing"
       @playClicked="emit('playClicked')"
+    />
+
+    <CloseHandle
+      ref="closeRef"
+      class="closeHandle"
     />
 
     <IonContent
@@ -24,11 +30,17 @@
 
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { IonContent } from '@ionic/vue'
 import { Track } from '@core/models'
 import AudioControlsCompact from './AudioControlsCompact.vue'
 import Prompter from './Prompter.vue'
+import CloseHandle from './CloseHandle.vue'
+
+// ── State ───────────────────────────────────────────────────────────
+const percentPlayedStyle = computed(() => `${props.percentPlayed + 2}%`)
+const audioControlsCompactRef = ref()
+const closeRef = ref()
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
@@ -38,13 +50,16 @@ const props = defineProps<{
   track: Track | undefined
 }>()
 
+defineExpose({
+  handleTopRef: audioControlsCompactRef,
+  handleBottomRef: closeRef
+})
+
 const emit = defineEmits<{
   playClicked: [],
   rewind: [position: number],
 }>()
 
-// ── State ───────────────────────────────────────────────────────────
-const percentPlayedStyle = computed(() => `${props.percentPlayed + 2}%`)
 </script>
 
 
@@ -69,5 +84,9 @@ const percentPlayedStyle = computed(() => `${props.percentPlayed + 2}%`)
   width: v-bind(percentPlayedStyle);
   border-radius: 5px;
   transition: all 0.5s;
+}
+
+.closeHandle {
+  margin: 1rem;
 }
 </style>

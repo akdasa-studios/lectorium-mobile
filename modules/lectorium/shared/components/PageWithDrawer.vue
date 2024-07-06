@@ -58,7 +58,6 @@ watch(playlist.currentTrackId, async (value) => {
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onMoveHandler(ev: GestureDetail): boolean | void {
-  console.log("onMoveHandler", ev.velocityY)
   if (ev.velocityY > 0 && isDrawerOpen.value === false) {
     isDrawerOpen.value = true
   } else if (ev.velocityY < 0) {
