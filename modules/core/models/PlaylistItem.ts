@@ -5,8 +5,8 @@ export enum PlaylistItemStatus {
 }
 
 export type PlaylistItem = {
-  id: string
   trackId: string
   collectionId?: string
   order: number
+  played: number
 }

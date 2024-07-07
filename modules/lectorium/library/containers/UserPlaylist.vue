@@ -39,7 +39,6 @@ watch([audioPlayer.currentTrackId, audioPlayer.playing], async () => {
 
 async function fetchData(): Promise<TrackViewModel[]> {
   const playlistItems = await userData.playlistItems.getAll()
-  console.log(playlistItems)
 
   const tracks =
     (await Promise.all(
@@ -51,17 +50,18 @@ async function fetchData(): Promise<TrackViewModel[]> {
         return acc
       }, {} as Record<string, Track>)
 
-  return playlistItems.map(i => ({
-    playlistItemId: i.id,
-    trackId: tracks[i.trackId].id,
-    location: tracks[i.trackId].location,
-    references: tracks[i.trackId].references,
-    title: tracks[i.trackId].title,
-    playingStatus: audioPlayer.currentTrackId.value === i.trackId
-      ? audioPlayer.playing.value ? PlayingStatus.Playing : PlayingStatus.Paused
-      : PlayingStatus.None,
-  }))
-
+  return playlistItems
+    .sort((a, b) => a.order - b.order)
+    .map(i => ({
+      order: i.order,
+      trackId: tracks[i.trackId].id,
+      location: tracks[i.trackId].location,
+      references: tracks[i.trackId].references,
+      title: tracks[i.trackId].title,
+      playingStatus: audioPlayer.currentTrackId.value === i.trackId
+        ? audioPlayer.playing.value ? PlayingStatus.Playing : PlayingStatus.Paused
+        : PlayingStatus.None,
+    }))
 }
 
 // ── Hooks ───────────────────────────────────────────────────────────

@@ -1,36 +1,50 @@
 import { PlaylistItem } from '@core/models'
+import { Database, Repository } from '@core/persistence/Database'
 
 export class PlaylistItemsRepository {
-  private items: PlaylistItem[] = [
-    {
-      id: "123",
-      trackId: "1966-00-00 - Нью Йорк - БГ 02.12",
-      order: 1,
-    },
-    {
-      id: "124",
-      trackId: "1966-00-00 - Нью-Йорк - БГ 02.48",
-      order: 2,
-    }
-  ]
+  private _db: Repository<PlaylistItem>
 
-  public async addTrack(trackId: string): Promise<PlaylistItem> {
-    const item = {
-      id: "125",
-      trackId,
-      order: this.items.length + 1,
-    }
-
-    this.items.push(item)
-
-    return item
+  constructor() {
+    this._db = new Repository<PlaylistItem>(
+      "playlistItem",
+      new Database({ name: 'data' })
+    )
   }
 
-  public async add(item: PlaylistItem): Promise<void> {
-    this.items.push(item)
+  public async get(
+    trackId: string
+  ): Promise<PlaylistItem> {
+    return await this._db.get(`playlistItem/${trackId}`)
+  }
+
+  public async addTrack(
+    trackId: string
+  ): Promise<void> {
+    // Get the maximum order value from the existing tracks
+    const existingTracksOrder = (await this.getAll()).map(item => item.order)
+    const maxOrder = Math.max(...existingTracksOrder, 0)
+
+    // Add the new track to the playlist
+    await this._db.put({
+      //@ts-ignore
+      _id: `playlistItem/${trackId}`,
+      trackId: trackId,
+      order: maxOrder + 1
+    })
+  }
+
+  public async setPlayedTime(
+    trackId: string,
+    played: number
+  ): Promise<void> {
+    const entity = await this.get(trackId)
+    await this._db.put({
+      ...entity,
+      played: played
+    })
   }
 
   public async getAll(): Promise<PlaylistItem[]> {
-    return this.items
+    return this._db.getAll()
   }
 }

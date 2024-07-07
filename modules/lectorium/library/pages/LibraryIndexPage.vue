@@ -50,12 +50,14 @@ const isCollectionsVisible = computed(() => searchQuery.value === '')
 const isCreateDialogOpen = ref(false)
 
 // ── Handlers ────────────────────────────────────────────────────────
-function onPlaylistItemClicked(trackId: string) {
+async function onPlaylistItemClicked(trackId: string) {
   if (audioPlayer.currentTrackId.value === trackId) {
     audioPlayer.playing.value = !audioPlayer.playing.value
   } else {
+    const status = await userData.playlistItems.get(trackId)
+    console.log('onPlaylistItemClicked', trackId, status)
     audioPlayer.playing.value = true
-    audioPlayer.position.value = 0
+    audioPlayer.position.value = status?.played
     audioPlayer.currentTrackId.value = trackId
   }
 }
