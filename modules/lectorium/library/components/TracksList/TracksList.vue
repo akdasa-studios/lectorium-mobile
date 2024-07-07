@@ -2,12 +2,12 @@
   <IonList>
     <TracksListItem
       v-for="item in items"
-      :key="item.id"
+      :key="item.trackId"
       :title="item.title"
       :location="item.location"
       :references="item.references"
       :playing-status="item.playingStatus"
-      @click="onTrackClicked(item.id)"
+      @click="onTrackClicked(item)"
     />
   </IonList>
 </template>
@@ -24,11 +24,11 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  click: [trackId: string]
+  click: [track: TrackViewModel]
 }>()
 
 // ── Handlers ────────────────────────────────────────────────────────
-function onTrackClicked(trackId: string) {
-  emit('click', trackId)
+function onTrackClicked(track: TrackViewModel) {
+  emit('click', track)
 }
 </script>

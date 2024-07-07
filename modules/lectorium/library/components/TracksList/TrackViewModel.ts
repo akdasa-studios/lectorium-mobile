@@ -10,7 +10,9 @@ export enum PlayingStatus {
 
 export interface TrackViewModel {
   /** Track unique identifier */
-  id: string
+  trackId: string
+
+  playlistItemId?: string
 
   /** Track title */
   title: string

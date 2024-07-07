@@ -1,6 +1,6 @@
 <template>
   <AudioPlayer
-    v-model:url="audioPlayer.url.value"
+    v-model:url="url"
     v-model:playing="audioPlayer.playing.value"
     v-model:position="audioPlayer.position.value"
     v-model:duration="audioPlayer.duration.value"
@@ -8,29 +8,30 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
-import { AudioPlayer } from '@lectorium/shared/components'
-import { usePlaylist, useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library/composables'
+import { AudioPlayer } from '@lectorium/shared/components'
+import { useAudioPlayer } from '@lectorium/shared/composables'
+import { ref, watch } from 'vue'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const playlist = usePlaylist()
 const audioPlayer = useAudioPlayer()
 const library = useLibrary()
 
+// ── State ───────────────────────────────────────────────────────────
+const url = ref<string>("")
+
 // ── Hooks ───────────────────────────────────────────────────────────
-watch(playlist.currentTrackId, onTrackChanged, { immediate: true })
+watch(audioPlayer.currentTrackId, onTrackChanged, { immediate: true })
 
 // ── Handlers ────────────────────────────────────────────────────────
-async function onTrackChanged(trackId: string|undefined) {
+async function onTrackChanged(
+  trackId: string|undefined
+) {
   if (!trackId) { return }
 
-  audioPlayer.loading.value = true
-  const response = await library.tracks.getLecture(trackId)
-
-  if (response?.url) {
-    audioPlayer.url.value = response.url
-    audioPlayer.loading.value = false
-  }
+  const track = await library.tracks.get(trackId)
+  url.value = track.url
+  // audioPlayer.loading.value = true
+  // audioPlayer.loading.value = false
 }
 </script>

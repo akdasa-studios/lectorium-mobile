@@ -1,7 +1,7 @@
 <template>
   <IonPage class="page">
     <MainSection
-      :shrink="playerSectionState !== 'closed'"
+      :shrink-size="mainSectionShrinkSize"
     />
     <PlayerSection
       ref="playerSectionRef"
@@ -9,7 +9,7 @@
       :position="audioPlayer.position.value"
       :percentPlayed="percentPlayed"
       :track="currentTrack"
-      @play-clicked="audioPlayer.togglePlaying()"
+      @play-clicked="audioPlayer.playing.value = !audioPlayer.playing.value"
       @rewind="audioPlayer.position.value = $event"
     />
   </IonPage>
@@ -20,13 +20,12 @@
 import { onUnmounted, ref, computed, watch } from 'vue'
 import { IonPage, IonContent, createGesture } from '@ionic/vue'
 import { Track } from '@core/models'
-import { useAudioPlayer, usePlaylist } from '@lectorium/shared/composables'
+import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library/composables'
 import { MainSection, PlayerSection, useSwipeVerticallyGesture } from '@lectorium/app'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
-const playlist = usePlaylist()
 const library = useLibrary()
 const swipeVerticalGesture = useSwipeVerticallyGesture()
 
@@ -35,7 +34,7 @@ type BottomDrawerState = "closed" | "semi-open" | "open"
 const pageTranslate        = computed(() => playerSectionState.value === "open" ? "-50%" : "0%")
 const pageTranslateOffset  = ref(0)
 const pageTranslateOffsetCss = computed(() => `${pageTranslateOffset.value}px`)
-
+const mainSectionShrinkSize = ref(0)
 const playerSectionRef     = ref<InstanceType<typeof IonContent>>()
 const playerSectionState   = ref<BottomDrawerState>("closed")
 const playerSectionGesture = ref<ReturnType<typeof createGesture>>()
@@ -49,21 +48,30 @@ const animation = ref("0.5s")
 watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
   playerSectionGesture.value = swipeVerticalGesture.create({
     el: value,
-    onStart: ev => { ev.data = playerSectionState.value; },
+    onStart: ev => {
+      animation.value = "0.05s";
+      ev.data = playerSectionState.value;
+    },
     onEnd: ev => {
       animation.value = "0.5s";
-      if (ev.data === "open" && pageTranslateOffset.value > 10) {
+      if (ev.data === "open" && ev.deltaY > 10) {
         playerSectionState.value = "semi-open"
-      } else if (ev.data === "semi-open" && pageTranslateOffset.value > 10) {
+        mainSectionShrinkSize.value = 75
+      } else if (ev.data === "semi-open" && ev.deltaY > 10) {
         playerSectionState.value = "closed";
-        audioPlayer.stop();
-        playlist.currentTrackId.value = ""
+        audioPlayer.playing.value = false
+        audioPlayer.currentTrackId.value = ""
       } else if (pageTranslateOffset.value < -100) {
         playerSectionState.value = "open"
       }
       pageTranslateOffset.value = 0
     },
-    onMove: ev => { pageTranslateOffset.value = ev.deltaY; animation.value = "0.1s"; }
+    onMove: ev => {
+      pageTranslateOffset.value = Math.min(0, ev.deltaY)
+      if (ev.deltaY > 0) {
+        mainSectionShrinkSize.value = Math.max(0, 75 - ev.deltaY)
+      }
+    }
   });
 })
 
@@ -87,8 +95,9 @@ onUnmounted(() => {
   playerSectionGesture2.value?.destroy()
 })
 
-watch(playlist.currentTrackId, async (value) => {
+watch(audioPlayer.currentTrackId, async (value) => {
   playerSectionState.value = value ? "semi-open" : "closed";
+  mainSectionShrinkSize.value = value ? 75 : 0;
   if (!value) return;
   currentTrack.value = await library.tracks.getLecture(value)
 }, { immediate: true })

@@ -8,10 +8,10 @@ import { useMediaControls, watchThrottled } from '@vueuse/core'
 import { ref, watch } from 'vue'
 
 // ── Interface ───────────────────────────────────────────────────────
-const playing  = defineModel('playing',  { type: Boolean, default: false })
-const position = defineModel('position', { type: Number,  default: 0 })
-const duration = defineModel('duration', { type: Number,  default: 0 })
-const url      = defineModel('url',      { type: String,  default: '' })
+const playing  = defineModel<boolean>('playing', { default: false, required: true })
+const position = defineModel<number>('position', { default: 0, required: true })
+const duration = defineModel<number>('duration', { default: 0, required: true })
+const url      = defineModel<string>('url', { default: '', required: true })
 
 // ── State ───────────────────────────────────────────────────────────
 const audioRef = ref()
@@ -20,9 +20,9 @@ const player = useMediaControls(audioRef, { src: url })
 // ── Hooks ───────────────────────────────────────────────────────────
 
 // Note: setting playing to true doesn't start the audio immediately
-//       it will be started when the url is set
-watch([playing, url], () => {
-  if (url.value && playing.value) {
+//       it will be started when the url is set and the player is not waiting
+watch([playing, url, player.waiting], () => {
+  if (url.value && playing.value && !player.waiting.value) {
     player.currentTime.value = position.value
     player.playing.value = true
   }

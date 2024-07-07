@@ -1,4 +1,7 @@
-import { AuthorsRepository, CollectionsRepository, LanguagesRepository, LibraryRepository, SourcesRepository } from '@lectorium/library/services'
+import {
+  AuthorsRepository, CollectionsRepository, LanguagesRepository,
+  LibraryRepository, SourcesRepository
+} from '@lectorium/library/services'
 
 export function useLibrary() {
   return {

@@ -13,13 +13,13 @@ import { computed, toRefs } from 'vue';
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
-  shrink: boolean
+  shrinkSize: number
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const { shrink } = toRefs(props)
-const topSectionShrink = computed(() => shrink.value ? "75px" : "0px")
-const topSectionRadius = computed(() => shrink.value ? "5px" : "0px")
+const { shrinkSize } = toRefs(props)
+const styleShrinkSize = computed(() => `${shrinkSize.value}px`)
+const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
 </script>
 
 
@@ -28,9 +28,9 @@ const topSectionRadius = computed(() => shrink.value ? "5px" : "0px")
   overflow: hidden;
   transition: flex 0.5s;
 
-  flex: 0 0 calc(50% - v-bind(topSectionShrink));
-  border-bottom-left-radius: v-bind(topSectionRadius);
-  border-bottom-right-radius: v-bind(topSectionRadius);
+  flex: 0 0 calc(50% - v-bind(styleShrinkSize));
+  border-bottom-left-radius: v-bind(styleBottomRadius);
+  border-bottom-right-radius: v-bind(styleBottomRadius);
   box-shadow: 0px 2px 4px var(--ion-color-medium-shade);
 }
 </style>
