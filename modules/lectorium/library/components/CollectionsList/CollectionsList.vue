@@ -2,14 +2,13 @@
   <swiper-container
     :slides-per-view="3.1"
     :space-between="-10"
+    ref="swiper"
   >
-    <swiper-slide>
-      <CollectionsCardAll
-        @click="emit('add')"
-      />
-    </swiper-slide>
+    <SwiperSlide>
+      <CollectionsCardAll />
+    </SwiperSlide>
 
-    <swiper-slide
+    <SwiperSlide
       v-for="item in items"
       @click="onClick(item.id)"
     >
@@ -17,21 +16,23 @@
         :title="item.title"
         :cover="item.cover"
       />
-    </swiper-slide>
+    </SwiperSlide>
 
-    <swiper-slide>
+    <SwiperSlide>
       <CollectionsCardAdd
         @click="emit('add')"
       />
-    </swiper-slide>
+    </SwiperSlide>
   </swiper-container>
 </template>
 
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue'
 import CollectionsCard from './CollectionsCard.vue'
 import CollectionsCardAll from './CollectionsCardAll.vue'
 import CollectionsCardAdd from './CollectionsCardAdd.vue'
+import { ref, toRefs, watch } from 'vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 export type Collection = {
@@ -40,7 +41,7 @@ export type Collection = {
   cover: string
 }
 
-defineProps<{
+const props = defineProps<{
   items: Collection[]
 }>()
 
@@ -49,8 +50,19 @@ const emit = defineEmits<{
   add: []
 }>()
 
+// ── State ───────────────────────────────────────────────────────────
+const { items } = toRefs(props)
+const swiper = ref<{ swiper: typeof Swiper }>()
+
+// ── Hooks ───────────────────────────────────────────────────────────
+watch(items, onItemsChanged, { flush: 'post' })
+
 // ── Handlers ────────────────────────────────────────────────────────
 function onClick(value: string) {
   console.log(value)
+}
+
+function onItemsChanged() {
+  swiper.value?.swiper.update()
 }
 </script>

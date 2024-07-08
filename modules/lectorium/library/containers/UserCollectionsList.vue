@@ -1,6 +1,6 @@
 <template>
   <CollectionsList
-    :items=collections
+    :items="collections"
     @add="emit('add')"
   />
 </template>
@@ -20,5 +20,7 @@ const emit = defineEmits<{
 const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
-const { state: collections } = useAsyncState(() => userData.collections.getAll(), [])
+const { state: collections } = useAsyncState(
+  async () => await userData.collections.getAll(), [],
+)
 </script>

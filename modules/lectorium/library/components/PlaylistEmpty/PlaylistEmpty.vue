@@ -25,9 +25,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
   padding: 2rem;
   text-align: center;
+  margin-top: 50%;
+  /* position: relative; */
+  /* top: 25%; */
 }
 
 .image {

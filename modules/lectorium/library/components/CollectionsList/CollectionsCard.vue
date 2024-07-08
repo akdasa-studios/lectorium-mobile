@@ -16,7 +16,7 @@ const props = defineProps<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const cover = `url(${props.cover})`
+const cover = `url(${props.cover || ('https://picsum.photos/200/300#' + Math.random())})`
 </script>
 
 
@@ -28,8 +28,6 @@ const cover = `url(${props.cover})`
   background-attachment: fixed;
   background-position: center;
   background-color: var(--ion-color-primary);
-
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, .1);
 }
 
 .content {
