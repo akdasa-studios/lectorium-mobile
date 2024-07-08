@@ -1,43 +1,21 @@
 <template>
-  <IonModal :isOpen="isOpen">
-    <Header>
-      <IonToolbar>
-        <IonTitle>Create collection</IonTitle>
-        <IonButtons slot="end">
-          <IonButton @click="isOpen = false">Close</IonButton>
-        </IonButtons>
-      </IonToolbar>
-    </Header>
+  <IonModal
+    :isOpen="isOpen"
+  >
+    <CollectionsDialogHeader
+      @save="onSave()"
+      @close="onClose()"
+    />
 
-    <IonContent>
-      <IonList lines="full" class="ion-no-margin ion-no-padding">
-        <IonItem>
-          <IonLabel position="stacked">Name</IonLabel>
-          <IonInput aria-label="First Name" type="text" v-model="collection.title"></IonInput>
-        </IonItem>
-
-        <IonItem :button="true" @click="isSelectAuthorDialogOpen = true">
-          <IonLabel>
-            Authors
-          </IonLabel>
-          <IonNote slot="end">{{ collection.authors.length }}</IonNote>
-        </IonItem>
-
-        <IonItem :button="true" @click="isSelectSourcesDialogOpen = true">
-          <IonLabel>
-            Sources
-          </IonLabel>
-          <IonNote slot="end">{{ collection.sources.length }}</IonNote>
-        </IonItem>
-
-        <IonItem :button="true" @click="isSelectLanguagesDialogOpen = true">
-          <IonLabel>
-            Languages
-          </IonLabel>
-          <IonNote slot="end">{{ collection.languages.length }}</IonNote>
-        </IonItem>
-      </IonList>
-    </IonContent>
+    <CollectionsDialogForm
+      v-model:title="collection.title"
+      :authorsCount="collection.authors.length"
+      :sourcesCount="collection.sources.length"
+      :languagesCount="collection.languages.length"
+      @selectAuthors="isSelectAuthorDialogOpen = true"
+      @selectSources="isSelectSourcesDialogOpen = true"
+      @selectLanguages="isSelectLanguagesDialogOpen = true"
+    />
 
     <SelectAuthorDialog
       v-model:open="isSelectAuthorDialogOpen"
@@ -56,33 +34,39 @@
 
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useAsyncState } from '@vueuse/core'
+import { reactive, ref, toRaw } from 'vue'
 import { Collection } from '@core/models'
-import {
-  IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-  IonContent, IonList, IonItem, IonLabel, IonNote, IonInput
-} from '@ionic/vue'
-import { Header } from '@lectorium/shared/components'
+import { IonModal } from '@ionic/vue'
 import { SelectAuthorDialog, SelectSourcesDialog, SelectLanguagesDialog } from '@lectorium/library/components'
-import { useLibrary } from '@lectorium/library/composables'
-
-// ── Dependencies ────────────────────────────────────────────────────
-const library = useLibrary()
+import { EmptyCollection } from '@lectorium/library/services/repositories/CollectionsRepository'
+import CollectionsDialogHeader from './CollectionsDialogHeader.vue'
+import CollectionsDialogForm from './CollectionsDialogForm.vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 const isOpen = defineModel('isOpen', { type: Boolean, default: false, })
-const { state: collection } = useAsyncState(
-async () => toModelView(await library.collections.getById("11")),
-  //@ts-ignore
-  {}, { shallow: false })
+
+const emit = defineEmits<{
+  save: [collection: Collection],
+  close: [],
+}>();
 
 // ── State ───────────────────────────────────────────────────────────
+const collection = ref<Collection>(EmptyCollection())
 const isSelectAuthorDialogOpen = ref(false)
 const isSelectSourcesDialogOpen = ref(false)
 const isSelectLanguagesDialogOpen = ref(false)
 
 // ── Handlers ────────────────────────────────────────────────────────
+function onClose() {
+  isOpen.value = false
+}
+
+function onSave() {
+  emit('save', toRaw(collection.value))
+  isOpen.value = false
+  collection.value = EmptyCollection()
+}
+
 function onAuthorsSelected(authorIds: string[]) {
   collection.value.authors = authorIds
 }
@@ -93,15 +77,5 @@ function onSourcesSelected(sourceIds: string[]) {
 
 function onLanguagesSelected(languageIds: string[]) {
   collection.value.languages = languageIds
-}
-
-// ── Helpers ─────────────────────────────────────────────────────────
-function toModelView(collection: Collection) {
-  return {
-    title: collection.title,
-    authors: collection.authors || [],
-    sources: collection.sources || [],
-    languages: collection.languages || [],
-  }
 }
 </script>

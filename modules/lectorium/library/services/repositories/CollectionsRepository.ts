@@ -1,21 +1,42 @@
 import { Collection } from '@core/models'
+import { Database, Repository } from '@core/persistence/Database'
 
 export class CollectionsRepository {
-  public async getAll(): Promise<Collection[]> {
-    return [
-      //@ts-ignore
-      { id: "123", title: "Бхагавад-гита", cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShfakbIGHgEsHovFta0QQ32bgBJ2TyFT6ivQ&s" },
-      //@ts-ignore
-      { id: "123", title: "Шримад Бхагаватам", cover: "https://m.media-amazon.com/images/I/8107kx7HAAL._AC_UF1000,1000_QL80_.jpg" },
-      //@ts-ignore
-      { id: "123", title: "Прогулки", cover: "https://iskconboston.org/sites/default/files/field/image/srila-prabhupada-smile.jpg" },
-      //@ts-ignore
-      { id: "123", title: "Ватсала дас", cover: "https://treningi4you.com/upload/iblock/d61/d611d4bb9bf8b6e34d14ccbffe6217df.jpg" },
-    ]
+  private _db: Repository<Collection>
+
+  constructor() {
+    this._db = new Repository<Collection>(
+      "collection",
+      new Database({ name: 'data' })
+    )
   }
 
-  public async getById(id: string): Promise<Collection> {
+  public async add(
+    collection: Collection
+  ): Promise<void> {
+    await this._db.put({
+      ...collection,
       //@ts-ignore
-    return { id: "123", title: "Бхагавад-гита", cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShfakbIGHgEsHovFta0QQ32bgBJ2TyFT6ivQ&s" }
+      _id: `collection/${collection.title}`,
+    })
+  }
+
+  public async get(
+    trackId: string
+  ): Promise<Collection> {
+    return await this._db.get(`collection/${trackId}`)
+  }
+
+  public async getAll(): Promise<Collection[]> {
+    return this._db.getAll()
   }
 }
+
+export const EmptyCollection = () => Object.assign({}, {
+  id: '',
+  title: '',
+  authors: [],
+  sources: [],
+  languages: [],
+  cover: '',
+})

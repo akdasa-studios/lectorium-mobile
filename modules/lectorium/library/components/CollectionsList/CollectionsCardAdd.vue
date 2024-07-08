@@ -3,7 +3,8 @@
     <IonIcon
       :icon="addCircleOutline"
       color="primary"
-      size="large" />
+      size="large"
+    />
   </CollectionsCardBase>
 </template>
 

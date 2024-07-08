@@ -3,6 +3,12 @@
     :slides-per-view="3.1"
     :space-between="-10"
   >
+    <swiper-slide>
+      <CollectionsCardAll
+        @click="emit('add')"
+      />
+    </swiper-slide>
+
     <swiper-slide
       v-for="item in items"
       @click="onClick(item.id)"
@@ -24,6 +30,7 @@
 
 <script setup lang="ts">
 import CollectionsCard from './CollectionsCard.vue'
+import CollectionsCardAll from './CollectionsCardAll.vue'
 import CollectionsCardAdd from './CollectionsCardAdd.vue'
 
 // ── Interface ───────────────────────────────────────────────────────

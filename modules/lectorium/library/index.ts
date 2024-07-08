@@ -6,4 +6,5 @@ export { default as PlaylistEmpty } from './components/PlaylistEmpty/PlaylistEmp
 
 // containers:
 export { default as UserPlaylist } from './containers/UserPlaylist.vue'
+export { default as UserCollectionsList } from './containers/UserCollectionsList.vue'
 export { default as TracksSearchResult } from './containers/TracksSearchResult.vue'

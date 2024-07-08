@@ -2,9 +2,8 @@
   <PageWithDrawer ref="page">
     <template v-slot:drawer>
       <Searchbar v-model="searchQuery" />
-      <CollectionsList
+      <UserCollectionsList
         v-if="isCollectionsVisible"
-        :items=collections
         @add="isCreateDialogOpen = true"
       />
     </template>
@@ -21,6 +20,7 @@
 
     <CollectionsCreateDialog
       v-model:isOpen="isCreateDialogOpen"
+      @save="onCreateCollection"
     />
   </PageWithDrawer>
 </template>
@@ -28,24 +28,20 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useAsyncState } from '@vueuse/core'
-import { CollectionsList, CollectionsCreateDialog } from '@lectorium/library/components'
+import { CollectionsCreateDialog } from '@lectorium/library/components'
 import { Searchbar } from '@lectorium/shared/components'
-import { useLibrary } from '@lectorium/library/composables'
 import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
-import { TracksSearchResult, UserPlaylist, useUserData } from '@lectorium/library'
+import { TracksSearchResult, UserPlaylist, UserCollectionsList, useUserData } from '@lectorium/library'
+import { Collection } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const library = useLibrary()
 const userData = useUserData()
 const audioPlayer = useAudioPlayer()
 const page = ref(null)
 
 // ── State ───────────────────────────────────────────────────────────
 const searchQuery = ref('')
-const { state: collections } = useAsyncState(() => library.collections.getAll(), [])
-
 const isCollectionsVisible = computed(() => searchQuery.value === '')
 const isCreateDialogOpen = ref(false)
 
@@ -65,5 +61,11 @@ async function onPlaylistItemClicked(trackId: string) {
 function onSearchResultItemClicked(trackId: string) {
   console.log('onSearchResultItemClicked', trackId)
   userData.playlistItems.addTrack(trackId)
+}
+
+async function onCreateCollection(collection: Collection) {
+  console.log('onCreateCollection', collection)
+  await userData.collections.add(collection)
+  isCreateDialogOpen.value = false
 }
 </script>
