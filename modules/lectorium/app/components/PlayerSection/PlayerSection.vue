@@ -59,7 +59,6 @@ const emit = defineEmits<{
   playClicked: [],
   rewind: [position: number],
 }>()
-
 </script>
 
 

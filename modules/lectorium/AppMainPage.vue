@@ -5,12 +5,12 @@
     />
     <PlayerSection
       ref="playerSectionRef"
-      :playing="audioPlayer.playing.value"
-      :position="audioPlayer.position.value"
+      :playing="audioPlayer.state.value.playing"
+      :position="audioPlayer.state.value.position"
       :percentPlayed="percentPlayed"
       :track="currentTrack"
-      @play-clicked="audioPlayer.playing.value = !audioPlayer.playing.value"
-      @rewind="audioPlayer.position.value = $event"
+      @play-clicked="audioPlayer.togglePause()"
+      @rewind="(to) => audioPlayer.rewindTo(to)"
     />
   </IonPage>
 </template>
@@ -40,7 +40,7 @@ const playerSectionState   = ref<BottomDrawerState>("closed")
 const playerSectionGesture = ref<ReturnType<typeof createGesture>>()
 const playerSectionGesture2 = ref<ReturnType<typeof createGesture>>()
 const currentTrack  = ref<Track>()
-const percentPlayed = computed(() => audioPlayer.position.value / audioPlayer.duration.value * 100)
+const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
 const animation = ref("0.5s")
 
 // ── Hooks ───────────────────────────────────────────────────────────
@@ -59,8 +59,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
         mainSectionShrinkSize.value = 75
       } else if (ev.data === "semi-open" && ev.deltaY > 10) {
         playerSectionState.value = "closed";
-        audioPlayer.playing.value = false
-        audioPlayer.currentTrackId.value = ""
+        audioPlayer.stop()
       } else if (pageTranslateOffset.value < -100) {
         playerSectionState.value = "open"
       }
@@ -95,11 +94,11 @@ onUnmounted(() => {
   playerSectionGesture2.value?.destroy()
 })
 
-watch(audioPlayer.currentTrackId, async (value) => {
+watch(() => audioPlayer.state.value.trackId, async (value) => {
   playerSectionState.value = value ? "semi-open" : "closed";
   mainSectionShrinkSize.value = value ? 75 : 0;
   if (!value) return;
-  currentTrack.value = await library.tracks.getLecture(value)
+  currentTrack.value = await library.tracks.getLecture(value || "")
 }, { immediate: true })
 
 </script>

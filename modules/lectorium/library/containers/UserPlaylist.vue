@@ -11,7 +11,7 @@
 
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { Track } from '@core/models'
 import { PlaylistEmpty } from '@lectorium/library'
 import { PlayingStatus, TrackViewModel, TracksList } from '@lectorium/library/components'
@@ -36,14 +36,14 @@ const { state: items, isReady } = useAsyncState<TrackViewModel[]>(
 const playlistEmpty = computed(() => items.value.length === 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
-onMounted(async () => {
-  items.value = await fetchData()
-})
-
 watch([
-  audioPlayer.currentTrackId,
-  audioPlayer.playing
+  () => audioPlayer.state.value.playing,
+  () =>audioPlayer.state.value.trackId,
 ], async () => {
+  /** Refresh playlist if current track or it's state has changed. */
+  // TODO: There is no reason to fetch whole playlist items, just
+  //       update playing status of the current track and previous one
+  //       if it was changed.
   items.value = await fetchData()
 }, { immediate: true })
 
@@ -77,8 +77,8 @@ async function fetchData(): Promise<TrackViewModel[]> {
       location: tracks[i.trackId].location,
       references: tracks[i.trackId].references,
       title: tracks[i.trackId].title,
-      playingStatus: audioPlayer.currentTrackId.value === i.trackId
-        ? audioPlayer.playing.value ? PlayingStatus.Playing : PlayingStatus.Paused
+      playingStatus: audioPlayer.state.value.trackId === i.trackId
+        ? audioPlayer.state.value.playing ? PlayingStatus.Playing : PlayingStatus.Paused
         : PlayingStatus.None,
     }))
 }

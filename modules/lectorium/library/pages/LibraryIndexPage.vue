@@ -47,14 +47,11 @@ const isCreateDialogOpen = ref(false)
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onPlaylistItemClicked(trackId: string) {
-  if (audioPlayer.currentTrackId.value === trackId) {
-    audioPlayer.playing.value = !audioPlayer.playing.value
+  if (audioPlayer.state.value.trackId === trackId) {
+    audioPlayer.togglePause()
   } else {
     const status = await userData.playlistItems.get(trackId)
-    console.log('onPlaylistItemClicked', trackId, status)
-    audioPlayer.playing.value = true
-    audioPlayer.position.value = status?.played
-    audioPlayer.currentTrackId.value = trackId
+    audioPlayer.play(trackId, status.played)
   }
 }
 

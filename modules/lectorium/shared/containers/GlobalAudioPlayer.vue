@@ -1,17 +1,12 @@
 <template>
-  <AudioPlayer
-    v-model:url="url"
-    v-model:playing="audioPlayer.playing.value"
-    v-model:position="audioPlayer.position.value"
-    v-model:duration="audioPlayer.duration.value"
-  />
+  <audio ref="audioRef" />
 </template>
 
 <script setup lang="ts">
 import { useLibrary } from '@lectorium/library/composables'
-import { AudioPlayer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { ref, watch } from 'vue'
+import { useMediaControls } from '@vueuse/core'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
@@ -19,19 +14,45 @@ const library = useLibrary()
 
 // ── State ───────────────────────────────────────────────────────────
 const url = ref<string>("")
+const audioRef = ref()
+const { playing, waiting, duration, currentTime } = useMediaControls(audioRef, { src: url })
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watch(audioPlayer.currentTrackId, onTrackChanged, { immediate: true })
+watch(audioPlayer.state, async (current, previous) => {
+  if (current.trackId !== previous.trackId) {
+    await onTrackChanged(current.trackId, current.position)
+  }
+  if (current.position !== previous.position) {
+    onRewindRequested(current.position)
+  }
+})
+
+watch(waiting, (current, previous) => {
+  if (!current) {
+    playing.value = audioPlayer.state.value.playing
+    audioPlayer.state.value.duration = duration.value
+  }
+})
+
+watch(currentTime, (current) => {
+  audioPlayer.state.value.position = current
+})
+
+watch(() => audioPlayer.state.value.playing, (current) => {
+  if (waiting.value || !url.value) { return }
+  playing.value = current
+})
 
 // ── Handlers ────────────────────────────────────────────────────────
-async function onTrackChanged(
-  trackId: string|undefined
-) {
-  if (!trackId) { return }
+async function onTrackChanged(trackId: string|undefined, position: number) {
+  if (trackId) {
+    const track = await library.tracks.get(trackId)
+    url.value = track.url
+    currentTime.value = position
+  }
+}
 
-  const track = await library.tracks.get(trackId)
-  url.value = track.url
-  // audioPlayer.loading.value = true
-  // audioPlayer.loading.value = false
+function onRewindRequested(position: number) {
+  currentTime.value = position
 }
 </script>
