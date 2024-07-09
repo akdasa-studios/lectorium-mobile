@@ -6,6 +6,7 @@ export const useSafeArea = createGlobalState(() => {
   const left = ref(0)
   const right = ref(0)
   const bottom = ref(0)
+  const statusBarHeight = ref(0)
 
-  return { top, left, right, bottom }
+  return { top, left, right, bottom, statusBarHeight }
 })

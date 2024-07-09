@@ -2,7 +2,7 @@
   <IonPage class="page">
     <MainSection
       :shrink-size="mainSectionShrinkSize"
-      :padding-bottom="playerSectionState === 'closed' ? safeArea.bottom.value : 0"
+      :padding-bottom="playerSectionState === 'closed' ? safeArea.statusBarHeight.value : 0"
     />
     <PlayerSection
       ref="playerSectionRef"
@@ -44,7 +44,7 @@ const playerSectionGesture2 = ref<ReturnType<typeof createGesture>>()
 const currentTrack  = ref<Track>()
 const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
 const animation = ref("0.5s")
-const playerSectionHeight = 75 + safeArea.bottom.value;
+const playerSectionHeight = 75 + safeArea.statusBarHeight.value;
 
 // ── Hooks ───────────────────────────────────────────────────────────
 //@ts-ignore

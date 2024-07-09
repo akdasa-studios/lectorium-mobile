@@ -20,6 +20,8 @@ export async function initNavigationBar() {
 async function updateInsets () {
   const safeArea = useSafeArea()
   const { insets } = await SafeArea.getSafeAreaInsets()
+  const { statusBarHeight } = await SafeArea.getStatusBarHeight();
+
   for (const [key, value] of Object.entries(insets)) {
     document.documentElement.style.setProperty(`--safe-area-${key}`, `${value}px`)
     if (key === 'bottom') { safeArea.bottom.value = value }
@@ -27,4 +29,5 @@ async function updateInsets () {
     if (key === 'left') { safeArea.left.value = value }
     if (key === 'right') { safeArea.right.value = value }
   }
+  safeArea.statusBarHeight.value = statusBarHeight
 }
