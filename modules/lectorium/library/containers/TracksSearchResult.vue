@@ -1,20 +1,29 @@
 <template>
+  <NothingFound
+    v-if="nothingFound"
+  />
   <TracksList
-    :items="tracks"
+    v-else
+    :items="items"
     @click="onTrackClicked"
   />
 </template>
 
 
 <script setup lang="ts">
-import { toRefs, watch } from 'vue'
+import { computed, toRefs, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { Track } from '@core/models'
+import { useSound } from '@vueuse/sound'
 import { useLibrary } from '@lectorium/library/composables'
-import { PlayingStatus, TrackViewModel, TracksList } from '../components';
+import { NothingFound, useUserData } from '@lectorium/library'
+import { TracksList, TrackViewModel, PlayingStatus } from '@lectorium/library/components'
+import itemAddedSfx from '@lectorium/library/assets/item-added.mp3'
+
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
+const userData = useUserData()
+const { play: playItemAdded } = useSound(itemAddedSfx, { volume: .15 })
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
@@ -27,9 +36,9 @@ const emit = defineEmits<{
 
 // ── State ───────────────────────────────────────────────────────────
 const { searchQuery } = toRefs(props)
-
-const { state: tracks, execute } = useAsyncState<TrackViewModel[], [string], true>(
-  async (p) => (await library.tracks.getLecturesList(p)).map(x => mapToVewModel(x)),
+const nothingFound = computed(() => items.value.length === 0)
+const { state: items, execute } = useAsyncState<TrackViewModel[], [string], true>(
+  async (p) => fetchData(p),
   [], { resetOnExecute: false }
 )
 
@@ -39,17 +48,34 @@ watch(searchQuery, async (value) => {
 })
 
 // ── Handlers ────────────────────────────────────────────────────────
-function mapToVewModel(track: Track): TrackViewModel {
-  return {
+function onTrackClicked(track: TrackViewModel) {
+  emit('click', track.trackId)
+  playItemAdded()
+  execute(150, searchQuery.value)
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+async function fetchData(query: string): Promise<TrackViewModel[]> {
+  // TODO: optimization: there is no reason to fetch all playlist items
+  // again and agian, we can cache it
+  const [
+    tracks,
+    playlistItems
+  ] = await Promise.all([
+    library.tracks.getLecturesList(query),
+    userData.playlistItems.getAll()
+  ])
+
+  const playlistItemsId = playlistItems.map(x => x.trackId)
+
+  return tracks.map(track => ({
     trackId: track.id,
     location: track.location,
     references: track.references,
     title: track.title,
-    playingStatus: PlayingStatus.None,
-  }
-}
-
-function onTrackClicked(track: TrackViewModel) {
-  emit('click', track.trackId)
+    playingStatus: playlistItemsId.includes(track.id)
+                    ? PlayingStatus.InQueue
+                    : PlayingStatus.None
+  }))
 }
 </script>

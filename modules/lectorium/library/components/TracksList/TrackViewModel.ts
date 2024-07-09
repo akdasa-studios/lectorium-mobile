@@ -1,5 +1,7 @@
 export enum PlayingStatus {
   None,
+
+  /** Track is in playlist */
   InQueue,
   Loading,
   Playing,

@@ -3,6 +3,7 @@ export * from './composables/useUserData'
 
 // components:
 export { default as PlaylistEmpty } from './components/PlaylistEmpty/PlaylistEmpty.vue'
+export { default as NothingFound } from './components/NothingFound/NothingFound.vue'
 
 // containers:
 export { default as UserPlaylist } from './containers/UserPlaylist.vue'

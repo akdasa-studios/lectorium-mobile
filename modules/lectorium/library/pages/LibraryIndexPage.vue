@@ -9,11 +9,11 @@
     </template>
 
     <UserPlaylist
-      v-if="searchQuery === ''"
+      v-show="searchQuery === ''"
       @click="onPlaylistItemClicked"
     />
     <TracksSearchResult
-      v-else
+      v-show="searchQuery !== ''"
       :searchQuery="searchQuery"
       @click="onSearchResultItemClicked"
     />

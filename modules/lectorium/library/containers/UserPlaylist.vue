@@ -1,23 +1,24 @@
 <template>
   <PlaylistEmpty
-    v-if="playlistEmpty"
+    v-if="playlistEmpty && isReady"
   />
   <TracksList
     v-else
-    :items="playlistItemViews"
+    :items="items"
     @click="onTrackClicked"
   />
 </template>
 
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { Track } from '@core/models'
 import { PlaylistEmpty } from '@lectorium/library'
 import { PlayingStatus, TrackViewModel, TracksList } from '@lectorium/library/components'
 import { useLibrary } from '@lectorium/library/composables'
 import { useUserData } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
+import { useAsyncState } from '@vueuse/core'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -30,16 +31,33 @@ const emit = defineEmits<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const playlistItemViews = ref<TrackViewModel[]>([])
-const playlistEmpty = computed(() => playlistItemViews.value.length === 0)
+const { state: items, isReady } = useAsyncState<TrackViewModel[]>(
+  async () => await fetchData(), [])
+const playlistEmpty = computed(() => items.value.length === 0)
 
-watch([audioPlayer.currentTrackId, audioPlayer.playing], async () => {
-  playlistItemViews.value = await fetchData()
+// ── Hooks ───────────────────────────────────────────────────────────
+onMounted(async () => {
+  items.value = await fetchData()
+})
+
+watch([
+  audioPlayer.currentTrackId,
+  audioPlayer.playing
+], async () => {
+  items.value = await fetchData()
 }, { immediate: true })
 
+// ── Handlers ────────────────────────────────────────────────────────
+function onTrackClicked(playlistItem: TrackViewModel) {
+  emit('click', playlistItem.trackId)
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
 async function fetchData(): Promise<TrackViewModel[]> {
+  // Fetch playlist items
   const playlistItems = await userData.playlistItems.getAll()
 
+  // Load all related tracks
   const tracks =
     (await Promise.all(
       playlistItems
@@ -50,6 +68,7 @@ async function fetchData(): Promise<TrackViewModel[]> {
         return acc
       }, {} as Record<string, Track>)
 
+  // Map playlist items to view models
   return playlistItems
     .sort((a, b) => a.order - b.order)
     .map(i => ({
@@ -62,15 +81,5 @@ async function fetchData(): Promise<TrackViewModel[]> {
         ? audioPlayer.playing.value ? PlayingStatus.Playing : PlayingStatus.Paused
         : PlayingStatus.None,
     }))
-}
-
-// ── Hooks ───────────────────────────────────────────────────────────
-onMounted(async () => {
-  playlistItemViews.value = await fetchData()
-})
-
-// ── Handlers ────────────────────────────────────────────────────────
-function onTrackClicked(playlistItem: TrackViewModel) {
-  emit('click', playlistItem.trackId)
 }
 </script>

@@ -7,7 +7,7 @@
       :color="playingStatusIcon.color"
       slot="end"
     />
-    <IonLabel>
+    <IonLabel class="ion-text-nowrap">
       <h3>
         <b>{{ references[0] }}</b>
         {{ title }}
