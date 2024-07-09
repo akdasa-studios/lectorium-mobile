@@ -29,5 +29,5 @@ async function updateInsets () {
     if (key === 'left') { safeArea.left.value = value }
     if (key === 'right') { safeArea.right.value = value }
   }
-  safeArea.statusBarHeight.value = statusBarHeight + 25
+  safeArea.statusBarHeight.value = statusBarHeight
 }
