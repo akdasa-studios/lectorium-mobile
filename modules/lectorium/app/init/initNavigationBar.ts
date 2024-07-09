@@ -29,5 +29,6 @@ async function updateInsets () {
     if (key === 'left') { safeArea.left.value = value }
     if (key === 'right') { safeArea.right.value = value }
   }
+  document.documentElement.style.setProperty(`--safe-area-status-bar-height`, `${statusBarHeight}px`)
   safeArea.statusBarHeight.value = statusBarHeight
 }
