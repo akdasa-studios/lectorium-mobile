@@ -2,6 +2,7 @@
   <IonPage class="page">
     <MainSection
       :shrink-size="mainSectionShrinkSize"
+      :padding-bottom="playerSectionState === 'closed' ? safeArea.bottom.value : 0"
     />
     <PlayerSection
       ref="playerSectionRef"
@@ -22,12 +23,13 @@ import { IonPage, IonContent, createGesture } from '@ionic/vue'
 import { Track } from '@core/models'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library/composables'
-import { MainSection, PlayerSection, useSwipeVerticallyGesture } from '@lectorium/app'
+import { MainSection, PlayerSection, useSafeArea, useSwipeVerticallyGesture } from '@lectorium/app'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
 const library = useLibrary()
 const swipeVerticalGesture = useSwipeVerticallyGesture()
+const safeArea = useSafeArea()
 
 // ── State ───────────────────────────────────────────────────────────
 type BottomDrawerState = "closed" | "semi-open" | "open"
@@ -42,6 +44,7 @@ const playerSectionGesture2 = ref<ReturnType<typeof createGesture>>()
 const currentTrack  = ref<Track>()
 const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
 const animation = ref("0.5s")
+const playerSectionHeight = 75 + safeArea.bottom.value;
 
 // ── Hooks ───────────────────────────────────────────────────────────
 //@ts-ignore
@@ -56,7 +59,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
       animation.value = "0.5s";
       if (ev.data === "open" && ev.deltaY > 10) {
         playerSectionState.value = "semi-open"
-        mainSectionShrinkSize.value = 75
+        mainSectionShrinkSize.value = playerSectionHeight
       } else if (ev.data === "semi-open" && ev.deltaY > 10) {
         playerSectionState.value = "closed";
         audioPlayer.stop()
@@ -68,7 +71,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
     onMove: ev => {
       pageTranslateOffset.value = Math.min(0, ev.deltaY)
       if (ev.deltaY > 0) {
-        mainSectionShrinkSize.value = Math.max(0, 75 - ev.deltaY)
+        mainSectionShrinkSize.value = Math.max(0, playerSectionHeight - ev.deltaY)
       }
     }
   });
@@ -96,7 +99,7 @@ onUnmounted(() => {
 
 watch(() => audioPlayer.state.value.trackId, async (value) => {
   playerSectionState.value = value ? "semi-open" : "closed";
-  mainSectionShrinkSize.value = value ? 75 : 0;
+  mainSectionShrinkSize.value = value ? playerSectionHeight : 0;
   if (!value) return;
   currentTrack.value = await library.tracks.getLecture(value || "")
 }, { immediate: true })

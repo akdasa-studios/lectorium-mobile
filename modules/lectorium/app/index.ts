@@ -4,6 +4,7 @@ export { default as PlayerSection } from './components/PlayerSection/PlayerSecti
 
 // composables:
 export * from './composables/useSwipeVerticallyGesture'
+export * from './composables/useSafeArea'
 
 // init:
 export { initStatusBar } from './init/initStatusBar'

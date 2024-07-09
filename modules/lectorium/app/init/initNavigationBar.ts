@@ -1,6 +1,7 @@
 import { isPlatform } from '@ionic/vue'
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 import { SafeArea } from 'capacitor-plugin-safe-area'
+import { useSafeArea } from '@lectorium/app'
 
 export async function initNavigationBar() {
   try {
@@ -17,10 +18,13 @@ export async function initNavigationBar() {
 
 
 async function updateInsets () {
-  console.log('updateInsets')
+  const safeArea = useSafeArea()
   const { insets } = await SafeArea.getSafeAreaInsets()
   for (const [key, value] of Object.entries(insets)) {
     document.documentElement.style.setProperty(`--safe-area-${key}`, `${value}px`)
-    console.log(`--safe-area-${key}: ${value+100}px`)
+    if (key === 'bottom') { safeArea.bottom.value = value + 25 }
+    if (key === 'top') { safeArea.top.value = value }
+    if (key === 'left') { safeArea.left.value = value }
+    if (key === 'right') { safeArea.right.value = value }
   }
 }

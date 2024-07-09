@@ -1,5 +1,5 @@
-import { MaybeRef, computed, reactive, ref } from 'vue'
-import { createGlobalState, useMediaControls } from '@vueuse/core'
+import { ref } from 'vue'
+import { createGlobalState } from '@vueuse/core'
 
 export type AudioPlayerSatate = {
   trackId: string|undefined,

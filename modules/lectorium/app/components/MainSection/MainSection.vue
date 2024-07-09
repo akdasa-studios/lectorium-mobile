@@ -14,12 +14,14 @@ import { computed, toRefs } from 'vue';
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
   shrinkSize: number
+  paddingBottom: number
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const { shrinkSize } = toRefs(props)
+const { shrinkSize, paddingBottom } = toRefs(props)
 const styleShrinkSize = computed(() => `${shrinkSize.value}px`)
 const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
+const stylePaddingBottom = computed(() => `${paddingBottom.value}px`)
 </script>
 
 
@@ -35,6 +37,7 @@ const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
 }
 
 .tabs {
-  padding-bottom: var(--safe-area-bottom, 0px);
+  transition: padding 0.5s;
+  padding-bottom: v-bind(stylePaddingBottom);
 }
 </style>
