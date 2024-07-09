@@ -1,7 +1,7 @@
 <template>
   <IonContent class="MainSection">
     <IonRouterOutlet />
-    <TabsBar class="tabs" />
+    <TabsBar class="tabs"/>
   </IonContent>
 </template>
 
@@ -35,6 +35,6 @@ const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
 }
 
 .tabs {
-  margin-bottom: var(--ion-safe-area-bottom, 0);
+  padding-bottom: var(--safe-area-bottom, 0px);
 }
 </style>
