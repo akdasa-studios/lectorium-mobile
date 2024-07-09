@@ -22,7 +22,7 @@ async function updateInsets () {
   const { insets } = await SafeArea.getSafeAreaInsets()
   for (const [key, value] of Object.entries(insets)) {
     document.documentElement.style.setProperty(`--safe-area-${key}`, `${value}px`)
-    if (key === 'bottom') { safeArea.bottom.value = value + 25 }
+    if (key === 'bottom') { safeArea.bottom.value = value }
     if (key === 'top') { safeArea.top.value = value }
     if (key === 'left') { safeArea.left.value = value }
     if (key === 'right') { safeArea.right.value = value }
