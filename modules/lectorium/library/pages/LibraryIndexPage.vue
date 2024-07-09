@@ -8,6 +8,8 @@
       />
     </template>
 
+    <h1 class="ion-padding">Library</h1>
+
     <UserPlaylist
       v-show="searchQuery === ''"
       @click="onPlaylistItemClicked"

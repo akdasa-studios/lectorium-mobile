@@ -4,3 +4,7 @@ export { default as PlayerSection } from './components/PlayerSection/PlayerSecti
 
 // composables:
 export * from './composables/useSwipeVerticallyGesture'
+
+// init:
+export { initStatusBar } from './init/initStatusBar'
+export { initNavigationBar } from './init/initNavigationBar'

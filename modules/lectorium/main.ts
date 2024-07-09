@@ -26,12 +26,16 @@ import './theme.css'
 /* */
 import { runConfigPersistence, runPlaylistPersistence } from '@lectorium/shared/tasks'
 import { register } from 'swiper/element/bundle'
+import { initStatusBar, initNavigationBar } from './app'
 
 async function createAndRunApp() {
   register()
 
   await runPlaylistPersistence()
   await runConfigPersistence()
+
+  await initStatusBar()
+  await initNavigationBar()
 
   const app = createApp(App)
     .use(IonicVue)
