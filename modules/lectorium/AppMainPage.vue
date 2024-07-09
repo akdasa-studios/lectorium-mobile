@@ -36,7 +36,7 @@ type BottomDrawerState = "closed" | "semi-open" | "open"
 const pageTranslate        = computed(() => playerSectionState.value === "open" ? "-50%" : "0%")
 const pageTranslateOffset  = ref(0)
 const pageTranslateOffsetCss = computed(() => `${pageTranslateOffset.value}px`)
-const mainSectionShrinkSize = ref(0)
+const mainSectionShrinkSize = ref(75+20)
 const playerSectionRef     = ref<InstanceType<typeof IonContent>>()
 const playerSectionState   = ref<BottomDrawerState>("closed")
 const playerSectionGesture = ref<ReturnType<typeof createGesture>>()
@@ -44,7 +44,7 @@ const playerSectionGesture2 = ref<ReturnType<typeof createGesture>>()
 const currentTrack  = ref<Track>()
 const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
 const animation = ref("0.5s")
-const playerSectionHeight = 75 + safeArea.statusBarHeight.value;
+const playerSectionHeight = computed(() => 75 + safeArea.statusBarHeight.value);
 
 // ── Hooks ───────────────────────────────────────────────────────────
 //@ts-ignore
@@ -59,7 +59,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
       animation.value = "0.5s";
       if (ev.data === "open" && ev.deltaY > 10) {
         playerSectionState.value = "semi-open"
-        mainSectionShrinkSize.value = playerSectionHeight
+        mainSectionShrinkSize.value = playerSectionHeight.value
       } else if (ev.data === "semi-open" && ev.deltaY > 10) {
         playerSectionState.value = "closed";
         audioPlayer.stop()
@@ -71,7 +71,7 @@ watch(() => playerSectionRef.value?.handleTopRef?.$el, (value) => {
     onMove: ev => {
       pageTranslateOffset.value = Math.min(0, ev.deltaY)
       if (ev.deltaY > 0) {
-        mainSectionShrinkSize.value = Math.max(0, playerSectionHeight - ev.deltaY)
+        mainSectionShrinkSize.value = Math.max(0, playerSectionHeight.value - ev.deltaY)
       }
     }
   });
@@ -99,11 +99,10 @@ onUnmounted(() => {
 
 watch(() => audioPlayer.state.value.trackId, async (value) => {
   playerSectionState.value = value ? "semi-open" : "closed";
-  mainSectionShrinkSize.value = value ? playerSectionHeight : 0;
+  mainSectionShrinkSize.value = value ? playerSectionHeight.value : 0;
   if (!value) return;
   currentTrack.value = await library.tracks.getLecture(value || "")
 }, { immediate: true })
-
 </script>
 
 <style scoped>

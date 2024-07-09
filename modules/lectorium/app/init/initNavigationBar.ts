@@ -9,7 +9,7 @@ export async function initNavigationBar() {
     if (isAndroid) {
       await NavigationBar.setTransparency({ isTransparent: true })
       SafeArea.addListener('safeAreaChanged', updateInsets)
-      updateInsets()
+      await updateInsets()
     }
   } catch (e) {
     console.error('Failed to init navigation bar', e)
@@ -29,5 +29,5 @@ async function updateInsets () {
     if (key === 'left') { safeArea.left.value = value }
     if (key === 'right') { safeArea.right.value = value }
   }
-  safeArea.statusBarHeight.value = statusBarHeight
+  safeArea.statusBarHeight.value = statusBarHeight + 25
 }
