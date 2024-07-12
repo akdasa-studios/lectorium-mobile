@@ -15,7 +15,7 @@
     />
 
     <IonContent
-      class="ion-padding"
+      class="ion-padding prompterContent"
       color="oxford-blue"
       v-if="track"
     >
@@ -71,6 +71,7 @@ const emit = defineEmits<{
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   position: relative;
+  margin-top: 10px;
 }
 
 .PlayerSection::after {
@@ -88,5 +89,14 @@ const emit = defineEmits<{
 .closeHandle {
   margin: 1rem;
   margin-top: calc(1rem + var(--safe-area-top) + var(--safe-area-status-bar-height));
+}
+
+.prompterContent {
+  background-color: red;
+  /* height: calc(100% - 64px - 54px); */
+  /* height: calc(100% - 65px - 21px - 10px); */
+  height: calc(100vh - 16px - 16px - 1rem);
+  /* 1rem + var(--safe-area-top) - var(--safe-area-status-bar-height)); */
+
 }
 </style>

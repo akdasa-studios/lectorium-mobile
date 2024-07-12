@@ -109,7 +109,7 @@ watch(() => audioPlayer.state.value.trackId, async (value) => {
 .page {
   transition: all v-bind(animation);
   transform: translateY(calc(v-bind(pageTranslate) + v-bind(pageTranslateOffsetCss)));
-  gap: 10px;
+  /* gap: 10px; */
   background-color: var(--ion-color-medium);
   height: 200%;
 }

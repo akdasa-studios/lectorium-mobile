@@ -20,9 +20,9 @@ import { homeOutline, settingsOutline } from 'ionicons/icons'
 
 
 <style scoped>
-.bar {
+/* .bar {
   position: absolute;
   bottom: 0;
   width: 100%;
-}
+} */
 </style>
