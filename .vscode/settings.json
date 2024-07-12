@@ -1,0 +1,22 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.exclude": {
+    "**/.git": true,
+    "node_modules/": true,
+    "coverage/": true,
+    "reports/": true,
+    ".stryker-tmp": true
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                                   linter                                   */
+  /* -------------------------------------------------------------------------- */
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ],
+}
