@@ -48,11 +48,11 @@ const animation = ref("0.5s")
 const playerSectionHeight = computed(() => 75 + safeArea.statusBarHeight.value);
 
 
-watch(mainSectionShrinkSize, async (value) => {
-  if (value < 20) {
-      await NavigationBar.setTransparency({ isTransparent: false })
+watch(playerSectionState, async (value) => {
+  if (value === 'closed') {
+    await NavigationBar.setColor({ color: '#ffffff', darkButtons: true })
   } else {
-      await NavigationBar.setTransparency({ isTransparent: true })
+    await NavigationBar.setColor({ color: "1D263B", darkButtons: false  })
   } 
 });
 

@@ -7,7 +7,8 @@ export async function initNavigationBar() {
   try {
     const isAndroid = isPlatform('android')
     if (isAndroid) {
-      await NavigationBar.setTransparency({ isTransparent: false })
+      // await NavigationBar.setTransparency({ isTransparent: false, col })
+      await NavigationBar.setColor({ color: "#ffffff", darkButtons: true })
       SafeArea.addListener('safeAreaChanged', updateInsets)
       await updateInsets()
     }
