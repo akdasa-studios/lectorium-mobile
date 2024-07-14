@@ -14,6 +14,7 @@
       <PlayerSection
         ref="refPlayerSection"
         :playing="audioPlayer.state.value.playing"
+        :loading="audioPlayer.state.value.loading"
         :position="audioPlayer.state.value.position"
         :percentPlayed="percentPlayed"
         :track="currentTrack"

@@ -6,6 +6,7 @@ export type AudioPlayerSatate = {
   position: number
   duration: number
   playing: boolean
+  loading: boolean
 }
 
 export const useAudioPlayer = createGlobalState(() => {
@@ -13,7 +14,8 @@ export const useAudioPlayer = createGlobalState(() => {
     trackId: undefined,
     position: 0,
     duration: 0,
-    playing: false
+    playing: false,
+    loading: false
   })
 
   function play(
@@ -24,7 +26,8 @@ export const useAudioPlayer = createGlobalState(() => {
       trackId: trackId,
       position: position || 0,
       duration: 0,
-      playing: true
+      playing: true,
+      loading: true
     }
   }
 
@@ -40,7 +43,8 @@ export const useAudioPlayer = createGlobalState(() => {
       trackId: undefined,
       position: 0,
       duration: 0,
-      playing: false
+      playing: false,
+      loading: false
     }
   }
 
@@ -55,7 +59,6 @@ export const useAudioPlayer = createGlobalState(() => {
   const position = ref(0)
   const duration = ref(0)
   const playing = ref(false)
-  const loading = ref(false)
 
   return {
     state,
@@ -66,6 +69,5 @@ export const useAudioPlayer = createGlobalState(() => {
     position,
     duration,
     playing,
-    loading,
   }
 })

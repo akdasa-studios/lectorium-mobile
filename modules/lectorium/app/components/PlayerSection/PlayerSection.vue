@@ -5,6 +5,7 @@
       :title="track?.title || ''"
       :author="'Author'"
       :playing="playing"
+      :loading="loading"
       @playClicked="emit('playClicked')"
     />
 
@@ -43,6 +44,7 @@ const closeRef = ref()
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
   playing: boolean
+  loading: boolean
   percentPlayed: number
   position: number
   track: Track | undefined
@@ -89,11 +91,9 @@ const emit = defineEmits<{
 }
 
 .prompterContent {
-  background-color: red;
+  height: calc(100vh - 16px - 16px - 1rem);
   /* height: calc(100% - 64px - 54px); */
   /* height: calc(100% - 65px - 21px - 10px); */
-  height: calc(100vh - 16px - 16px - 1rem);
   /* 1rem + var(--safe-area-top) - var(--safe-area-status-bar-height)); */
-
 }
 </style>

@@ -31,6 +31,7 @@ watch(waiting, (current, previous) => {
   if (!current) {
     playing.value = audioPlayer.state.value.playing
     audioPlayer.state.value.duration = duration.value
+    audioPlayer.state.value.loading = false
   }
 })
 

@@ -4,23 +4,27 @@
       <div class="trackTitle">{{ title }}</div>
       <div>{{ author }}</div>
     </div>
-    <div>
+    <div class="buttons">
       <PlayButton
+        v-if="!loading"
         :playing="playing"
         @click.stop="emit('playClicked')"
       />
+      <IonSpinner class="spinner" v-else />
     </div>
   </div>
 </template>
 
 
 <script setup lang="ts">
+import { IonSpinner } from '@ionic/vue'
 import PlayButton from './PlayButton.vue'
 
 defineProps<{
   title: string,
   author: string,
-  playing: boolean
+  playing: boolean,
+  loading: boolean,
 }>()
 
 const emit = defineEmits<{
@@ -51,5 +55,18 @@ const emit = defineEmits<{
 .trackTitle {
   font-weight: bold;
   color: var(--ion-color-oxford-blue-contrast);
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+}
+
+.spinner {
+  min-width: 32px;
+  min-height: 32px;
+  margin: 4px;
 }
 </style>
