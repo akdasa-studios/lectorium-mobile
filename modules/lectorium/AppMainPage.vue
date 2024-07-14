@@ -55,8 +55,10 @@ watch(playerSectionState, async (value) => {
   }
 
   if (value === 'open') {
+    await StatusBar.setBackgroundColor({ color: "#ffffff" })
     await StatusBar.setStyle({ style: Style.Dark })
   } else {
+    await StatusBar.setBackgroundColor({ color: "#1D263B" })
     await StatusBar.setStyle({ style: Style.Light })
   }
 });
