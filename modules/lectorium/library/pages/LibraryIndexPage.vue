@@ -3,17 +3,10 @@
     ref="page"
     :isDrawerOpen="isDrawerOpen"
   >
-    <template v-slot:header>
-      <ion-header class="ion-no-border" v-show="searchQuery !== ''">
-        <ion-toolbar id="test">
-          <Searchbar v-model="searchQuery" ref="refSearchQueryPinned" />
-        </ion-toolbar>
-      </ion-header>
-    </template>
 
     <template v-slot:drawer>
       <Searchbar
-        v-show="isCollectionsVisible"
+        :class="{'pinnedSearch' : searchQuery !== ''}"
         v-model="searchQuery"
         ref="refSearchBarFloat"
       />
@@ -35,6 +28,7 @@
       @click="onPlaylistItemClicked"
     />
     <TracksSearchResult
+      class="searchResults"
       v-show="searchQuery !== ''"
       :searchQuery="searchQuery"
       @click="onSearchResultItemClicked"
@@ -56,7 +50,6 @@ import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { TracksSearchResult, UserPlaylist, UserCollectionsList, useUserData } from '@lectorium/library'
 import { Collection } from '@core/models'
-import { IonHeader, IonToolbar } from '@ionic/vue'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
@@ -67,18 +60,8 @@ const page = ref(null)
 const searchQuery = ref('')
 const isCollectionsVisible = computed(() => searchQuery.value === '')
 const isCreateDialogOpen = ref(false)
-const refSearchQueryPinned = ref()
 const refSearchBarFloat = ref()
 const isDrawerOpen = ref(false)
-
-watch(searchQuery, (value) => {
-  if (value != '') {
-    isDrawerOpen.value = false
-    setTimeout(() => refSearchQueryPinned.value.setFocus(), 10)
-  } else {
-    setTimeout(() => refSearchBarFloat.value.setFocus(), 10)
-  }
-})
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onPlaylistItemClicked(trackId: string) {
@@ -101,3 +84,17 @@ async function onCreateCollection(collection: Collection) {
   isCreateDialogOpen.value = false
 }
 </script>
+
+<style>
+.pinnedSearch {
+  background-color: white;
+  position: fixed;
+  top: 0px;
+  z-index: 100;
+  width: calc(100% - 20px);
+}
+
+.searchResults {
+  padding-top: 76px;
+}
+</style>
