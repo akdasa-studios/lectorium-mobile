@@ -2,10 +2,10 @@
   "name": "Lectorium",
   "dockerComposeFile": [
     "./docker-compose.yml"
-    // "docker-compose.workspace.yaml"
+    // "docker-compose.local.yaml"
   ],
   "service": "lectorium",
-  "workspaceFolder": "/workspaces",
+  "workspaceFolder": "/akd-stuidos/lectorium",
   "customizations": {
     "vscode": {
       "extensions": [

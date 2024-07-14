@@ -22,6 +22,7 @@
     "@ionic/storage": "^4.0.0",
     "@ionic/vue": "^8.2.5",
     "@ionic/vue-router": "^8.2.5",
+    "@vue/typescript-plugin": "^2.0.26",
     "@vueuse/core": "^10.9.0",
     "@vueuse/sound": "^2.0.1",
     "capacitor-plugin-safe-area": "^3.0.1",
