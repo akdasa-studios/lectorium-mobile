@@ -2,7 +2,6 @@
   <IonPage class="page">
     <MainSection
       :shrink-size="mainSectionShrinkSize"
-      :padding-bottom="playerSectionState === 'closed' ? safeArea.statusBarHeight.value : 0"
     />
     <PlayerSection
       ref="playerSectionRef"
@@ -23,11 +22,10 @@ import { IonPage, IonContent, createGesture } from '@ionic/vue'
 import { Track } from '@core/models'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library/composables'
-import { MainSection, PlayerSection, useSafeArea, useSwipeVerticallyGesture } from '@lectorium/app'
+import { MainSection, PlayerSection, useSwipeVerticallyGesture } from '@lectorium/app'
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const safeArea = useSafeArea()
 const audioPlayer = useAudioPlayer()
 const library     = useLibrary()
 const swipeVerticalGesture = useSwipeVerticallyGesture()
@@ -45,7 +43,7 @@ const playerSectionGesture2 = ref<ReturnType<typeof createGesture>>()
 const currentTrack  = ref<Track>()
 const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
 const animation = ref("0.5s")
-const playerSectionHeight = computed(() => 75 + safeArea.statusBarHeight.value);
+const playerSectionHeight = computed(() => 75);
 
 
 watch(playerSectionState, async (value) => {
@@ -53,7 +51,7 @@ watch(playerSectionState, async (value) => {
     await NavigationBar.setColor({ color: '#ffffff', darkButtons: true })
   } else {
     await NavigationBar.setColor({ color: "#1D263B", darkButtons: false  })
-  } 
+  }
 });
 
 // ── Hooks ───────────────────────────────────────────────────────────

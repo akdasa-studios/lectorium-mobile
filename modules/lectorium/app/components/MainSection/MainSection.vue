@@ -13,7 +13,6 @@
 import { computed, ref, toRefs } from 'vue'
 import { IonRouterOutlet, IonContent } from '@ionic/vue'
 import { useElementSize } from '@vueuse/core'
-import { useSafeArea } from '@lectorium/app'
 import TabsBar from './TabsBar.vue'
 
 // ── Interface ───────────────────────────────────────────────────────
@@ -24,7 +23,6 @@ const props = defineProps<{
 // ── Dependencies ────────────────────────────────────────────────────
 const tabsRef = ref()
 const { height } = useElementSize(tabsRef)
-const safeArea = useSafeArea()
 
 // ── State ───────────────────────────────────────────────────────────
 const { shrinkSize } = toRefs(props)
@@ -45,6 +43,5 @@ const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
   border-bottom-left-radius: v-bind(styleBottomRadius);
   border-bottom-right-radius: v-bind(styleBottomRadius);
   /* box-shadow: 0px 2px 4px var(--ion-color-medium-shade); */
-
 }
 </style>

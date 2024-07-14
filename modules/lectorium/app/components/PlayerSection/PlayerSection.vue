@@ -88,7 +88,6 @@ const emit = defineEmits<{
 
 .closeHandle {
   margin: 1rem;
-  margin-top: calc(1rem + var(--safe-area-top) + var(--safe-area-status-bar-height));
 }
 
 .prompterContent {
