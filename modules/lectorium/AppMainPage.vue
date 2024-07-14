@@ -24,6 +24,7 @@ import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library/composables'
 import { MainSection, PlayerSection, useSwipeVerticallyGesture } from '@lectorium/app'
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
+import { StatusBar, Style } from '@capacitor/status-bar'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
@@ -51,6 +52,12 @@ watch(playerSectionState, async (value) => {
     await NavigationBar.setColor({ color: '#ffffff', darkButtons: true })
   } else {
     await NavigationBar.setColor({ color: "#1D263B", darkButtons: false  })
+  }
+
+  if (value === 'open') {
+    await StatusBar.setStyle({ style: Style.Dark })
+  } else {
+    await StatusBar.setStyle({ style: Style.Light })
   }
 });
 
