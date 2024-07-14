@@ -1,9 +1,8 @@
 <template>
   <div class="PlayerSection">
     <AudioControlsCompact
-      v-if="track"
       ref="audioControlsCompactRef"
-      :title="track.title"
+      :title="track?.title || ''"
       :author="'Author'"
       :playing="playing"
       @playClicked="emit('playClicked')"
@@ -17,10 +16,9 @@
     <IonContent
       class="ion-padding prompterContent"
       color="oxford-blue"
-      v-if="track"
     >
       <Prompter
-        :text="track.text"
+        :text="track?.text || []"
         :time="position"
         @rewind="pos => emit('rewind', pos)"
       />

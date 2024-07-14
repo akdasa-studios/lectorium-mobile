@@ -7,7 +7,7 @@
     <div>
       <PlayButton
         :playing="playing"
-        @click="emit('playClicked')"
+        @click.stop="emit('playClicked')"
       />
     </div>
   </div>

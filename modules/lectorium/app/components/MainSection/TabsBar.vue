@@ -17,12 +17,3 @@
 import { IonTabBar, IonTabButton, IonLabel, IonIcon } from '@ionic/vue'
 import { homeOutline, settingsOutline } from 'ionicons/icons'
 </script>
-
-
-<style scoped>
-/* .bar {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-} */
-</style>

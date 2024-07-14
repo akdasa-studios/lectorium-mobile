@@ -42,17 +42,7 @@ withDefaults(defineProps<{
   headerBorder: true
 })
 
-defineExpose({
-  scrollTo
-})
-
 // ── State ───────────────────────────────────────────────────────────
 const content = ref<InstanceType<typeof IonContent>>()
-
-// ── Helpers ─────────────────────────────────────────────────────────
-function scrollTo(y: number) {
-  content.value?.$el.scrollToPoint(0, y, 500);
-  console.log('scrollTo', y)
-}
 </script>
 

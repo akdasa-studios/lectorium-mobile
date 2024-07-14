@@ -26,7 +26,7 @@ const { height } = useElementSize(tabsRef)
 
 // ── State ───────────────────────────────────────────────────────────
 const { shrinkSize } = toRefs(props)
-const styleShrinkSize = computed(() => `${shrinkSize.value+height.value}px`)
+const styleShrinkSize = computed(() => `${shrinkSize.value + height.value}px`)
 const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
 </script>
 
@@ -39,9 +39,7 @@ const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
 }
 
 .tabs {
-  transition: padding 0.5s;
   border-bottom-left-radius: v-bind(styleBottomRadius);
   border-bottom-right-radius: v-bind(styleBottomRadius);
-  /* box-shadow: 0px 2px 4px var(--ion-color-medium-shade); */
 }
 </style>

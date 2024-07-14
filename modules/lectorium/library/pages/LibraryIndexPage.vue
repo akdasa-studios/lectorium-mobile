@@ -8,7 +8,12 @@
       />
     </template>
 
-    <h1 class="ion-padding">Library</h1>
+    <h1
+      v-if="isCollectionsVisible"
+      class="ion-padding"
+    >
+      My playlist
+    </h1>
 
     <UserPlaylist
       v-show="searchQuery === ''"
