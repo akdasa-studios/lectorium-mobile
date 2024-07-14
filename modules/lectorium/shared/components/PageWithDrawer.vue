@@ -2,6 +2,8 @@
   <IonPage
     class="page"
   >
+    <slot name="header"></slot>
+
     <IonContent
       class="parts topDrawer"
       ref="topDrawerRef"
@@ -52,4 +54,3 @@ function onMoveHandler(ev: GestureDetail): boolean | void {
   }
 }
 </script>
-
