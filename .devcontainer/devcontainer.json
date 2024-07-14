@@ -5,7 +5,7 @@
     // "docker-compose.local.yaml"
   ],
   "service": "lectorium",
-  "workspaceFolder": "/akd-stuidos/lectorium",
+  "workspaceFolder": "/akd-studios/lectorium",
   "customizations": {
     "vscode": {
       "extensions": [
