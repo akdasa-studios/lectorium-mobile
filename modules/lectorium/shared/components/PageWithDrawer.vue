@@ -23,7 +23,6 @@ import { Drawer } from '@lectorium/shared/components'
 
 // ── State ───────────────────────────────────────────────────────────
 const topDrawerRef = ref<InstanceType<typeof IonContent>>()
-
 const isDrawerOpen = defineModel("isDrawerOpen", { type: Boolean, default: false })
 const openDrawerGesture = ref<ReturnType<typeof createGesture>>()
 
@@ -53,3 +52,4 @@ function onMoveHandler(ev: GestureDetail): boolean | void {
   }
 }
 </script>
+

@@ -34,7 +34,7 @@
 
 
 <script setup lang="ts">
-import { reactive, ref, toRaw } from 'vue'
+import { ref, toRaw } from 'vue'
 import { Collection } from '@core/models'
 import { IonModal } from '@ionic/vue'
 import { SelectAuthorDialog, SelectSourcesDialog, SelectLanguagesDialog } from '@lectorium/library/components'

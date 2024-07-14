@@ -7,7 +7,7 @@ export async function initNavigationBar() {
   try {
     const isAndroid = isPlatform('android')
     if (isAndroid) {
-      await NavigationBar.setTransparency({ isTransparent: true })
+      await NavigationBar.setTransparency({ isTransparent: false })
       SafeArea.addListener('safeAreaChanged', updateInsets)
       await updateInsets()
     }
@@ -30,5 +30,5 @@ async function updateInsets () {
     if (key === 'right') { safeArea.right.value = value }
   }
   document.documentElement.style.setProperty(`--safe-area-status-bar-height`, `${statusBarHeight}px`)
-  safeArea.statusBarHeight.value = statusBarHeight
+  safeArea.statusBarHeight.value = statusBarHeight;
 }

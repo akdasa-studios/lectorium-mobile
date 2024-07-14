@@ -24,19 +24,20 @@ import { Track } from '@core/models'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library/composables'
 import { MainSection, PlayerSection, useSafeArea, useSwipeVerticallyGesture } from '@lectorium/app'
+import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const audioPlayer = useAudioPlayer()
-const library = useLibrary()
-const swipeVerticalGesture = useSwipeVerticallyGesture()
 const safeArea = useSafeArea()
+const audioPlayer = useAudioPlayer()
+const library     = useLibrary()
+const swipeVerticalGesture = useSwipeVerticallyGesture()
 
 // ── State ───────────────────────────────────────────────────────────
 type BottomDrawerState = "closed" | "semi-open" | "open"
 const pageTranslate        = computed(() => playerSectionState.value === "open" ? "-50%" : "0%")
 const pageTranslateOffset  = ref(0)
 const pageTranslateOffsetCss = computed(() => `${pageTranslateOffset.value}px`)
-const mainSectionShrinkSize = ref(75+20)
+const mainSectionShrinkSize = ref(0)
 const playerSectionRef     = ref<InstanceType<typeof IonContent>>()
 const playerSectionState   = ref<BottomDrawerState>("closed")
 const playerSectionGesture = ref<ReturnType<typeof createGesture>>()
@@ -45,6 +46,15 @@ const currentTrack  = ref<Track>()
 const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
 const animation = ref("0.5s")
 const playerSectionHeight = computed(() => 75 + safeArea.statusBarHeight.value);
+
+
+watch(mainSectionShrinkSize, async (value) => {
+  if (value < 20) {
+      await NavigationBar.setTransparency({ isTransparent: false })
+  } else {
+      await NavigationBar.setTransparency({ isTransparent: true })
+  } 
+});
 
 // ── Hooks ───────────────────────────────────────────────────────────
 //@ts-ignore
@@ -109,7 +119,6 @@ watch(() => audioPlayer.state.value.trackId, async (value) => {
 .page {
   transition: all v-bind(animation);
   transform: translateY(calc(v-bind(pageTranslate) + v-bind(pageTranslateOffsetCss)));
-  /* gap: 10px; */
   background-color: var(--ion-color-medium);
   height: 200%;
 }

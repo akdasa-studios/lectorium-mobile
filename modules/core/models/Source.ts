@@ -1,4 +1,4 @@
-export interface Source {
-  id: string;
-  title: string;
+export type Source = {
+  id: string
+  title: string
 }

@@ -1,19 +1,19 @@
-export interface Track {
-  id: string;
-  title: string;
-  url: string;
-  location: string;
-  date: string;
-  references: string[];
-  text: TrackTextParagraph[];
+export type Track = {
+  id: string
+  title: string
+  url: string
+  location: string
+  date: string
+  references: string[]
+  text: TrackTextParagraph[]
 }
 
 export type TrackTextParagraph = {
-  blocks: TrackTextBlock[];
+  blocks: TrackTextBlock[]
 }
 
 export type TrackTextBlock = {
-  start: number;
-  end: number;
-  text: string;
+  start: number
+  end: number
+  text: string
 }
