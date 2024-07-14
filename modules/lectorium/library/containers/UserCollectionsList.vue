@@ -10,8 +10,9 @@
 import { useAsyncState } from '@vueuse/core'
 import { CollectionsList  } from '@lectorium/library/components'
 import { useUserData } from '@lectorium/library'
+import { watch } from 'vue';
 
-// ── Emits ───────────────────────────────────────────────────────────
+// ── Interface ───────────────────────────────────────────────────────
 const emit = defineEmits<{
   add: []
 }>()
@@ -20,7 +21,7 @@ const emit = defineEmits<{
 const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
-const { state: collections } = useAsyncState(
+const { state: collections} = useAsyncState(
   async () => await userData.collections.getAll(), [],
 )
 </script>

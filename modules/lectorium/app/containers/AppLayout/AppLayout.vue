@@ -40,7 +40,6 @@ let gestureClosePlayerSection: Gesture|undefined = undefined
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch(openHandle, (value) => {
-  console.log("openHandle", value)
   if (!value) { return }
   gestureOpenPlayerSection = swipeVerticalGesture.create({
     el: value,
@@ -55,7 +54,6 @@ watch(openHandle, (value) => {
 })
 
 watch(closeHanle, (value) => {
-  console.log("closeHanle", value)
   if (!value) { return }
   gestureClosePlayerSection = swipeVerticalGesture.create({
     el: value,

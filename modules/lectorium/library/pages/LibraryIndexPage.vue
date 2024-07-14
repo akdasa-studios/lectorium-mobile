@@ -57,14 +57,14 @@ async function onPlaylistItemClicked(trackId: string) {
   if (audioPlayer.state.value.trackId === trackId) {
     audioPlayer.togglePause()
   } else {
-    const status = await userData.playlistItems.get(trackId)
+    const status = await userData.playlistItems.service.get(trackId)
     audioPlayer.play(trackId, status.played)
   }
 }
 
 function onSearchResultItemClicked(trackId: string) {
   console.log('onSearchResultItemClicked', trackId)
-  userData.playlistItems.addTrack(trackId)
+  userData.playlistItems.service.addTrack(trackId)
 }
 
 async function onCreateCollection(collection: Collection) {

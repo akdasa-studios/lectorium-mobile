@@ -63,7 +63,7 @@ async function fetchData(query: string): Promise<TrackViewModel[]> {
     playlistItems
   ] = await Promise.all([
     library.tracks.getLecturesList(query),
-    userData.playlistItems.getAll()
+    userData.playlistItems.service.getAll()
   ])
 
   const playlistItemsId = playlistItems.map(x => x.trackId)

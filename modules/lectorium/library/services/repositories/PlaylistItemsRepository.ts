@@ -3,12 +3,17 @@ import { Database, Repository } from '@core/persistence/Database'
 
 export class PlaylistItemsRepository {
   private _db: Repository<PlaylistItem>
+  private _onChangeHandlers: Array<() => void> = []
 
   constructor() {
     this._db = new Repository<PlaylistItem>(
       "playlistItem",
       new Database({ name: 'data' })
     )
+  }
+
+  public onChange(handler: () => void) {
+    this._onChangeHandlers.push(handler)
   }
 
   public async get(
@@ -31,6 +36,8 @@ export class PlaylistItemsRepository {
       trackId: trackId,
       order: maxOrder + 1
     })
+
+    this._onChangeHandlers.forEach(x => x())
   }
 
   public async setPlayedTime(

@@ -31,7 +31,7 @@ const emit = defineEmits<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const { state: items, isReady } = useAsyncState<TrackViewModel[]>(
+const { state: items, isReady, execute: refresh } = useAsyncState<TrackViewModel[]>(
   async () => await fetchData(), [])
 const playlistEmpty = computed(() => items.value.length === 0)
 
@@ -47,15 +47,19 @@ watch([
   items.value = await fetchData()
 }, { immediate: true })
 
+
+watch(userData.playlistItems.changedAt, async () => {
+  await refresh()
+})
+
 // ── Handlers ────────────────────────────────────────────────────────
 function onTrackClicked(playlistItem: TrackViewModel) {
   emit('click', playlistItem.trackId)
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────
 async function fetchData(): Promise<TrackViewModel[]> {
   // Fetch playlist items
-  const playlistItems = await userData.playlistItems.getAll()
+  const playlistItems = await userData.playlistItems.service.getAll()
 
   // Load all related tracks
   const tracks =
