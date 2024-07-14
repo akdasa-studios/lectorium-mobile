@@ -52,7 +52,7 @@ watch(playerSectionState, async (value) => {
   if (value === 'closed') {
     await NavigationBar.setColor({ color: '#ffffff', darkButtons: true })
   } else {
-    await NavigationBar.setColor({ color: "1D263B", darkButtons: false  })
+    await NavigationBar.setColor({ color: "#1D263B", darkButtons: false  })
   } 
 });
 
