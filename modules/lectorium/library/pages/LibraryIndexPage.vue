@@ -1,23 +1,24 @@
 <template>
   <PageWithDrawer
     ref="page"
-    :isDrawerOpen="isDrawerOpen"
+    v-model:is-drawer-open="isDrawerOpen"
+    :can-open-drawer="searchQuery === ''"
   >
 
     <template v-slot:drawer>
       <Searchbar
-        :class="{'pinnedSearch' : searchQuery !== ''}"
+        :class="{'pinnedSearch': isSearchBarPinned }"
         v-model="searchQuery"
-        ref="refSearchBarFloat"
+        @focus="(v) => isSearchBarPinned = v || searchQuery !== ''"
       />
+      <div :class="{'ppp': isSearchBarPinned}"></div>
       <UserCollectionsList
-        v-show="isCollectionsVisible"
         @add="isCreateDialogOpen = true"
       />
     </template>
 
     <h1
-      v-if="isCollectionsVisible"
+      v-if="!searchQuery"
       class="ion-padding"
     >
       My playlist
@@ -27,9 +28,10 @@
       v-show="searchQuery === ''"
       @click="onPlaylistItemClicked"
     />
+
     <TracksSearchResult
       class="searchResults"
-      v-show="searchQuery !== ''"
+      v-if="searchQuery !== ''"
       :searchQuery="searchQuery"
       @click="onSearchResultItemClicked"
     />
@@ -43,7 +45,7 @@
 
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { CollectionsCreateDialog } from '@lectorium/library/components'
 import { Searchbar } from '@lectorium/shared/components'
 import { PageWithDrawer } from '@lectorium/shared/components'
@@ -54,14 +56,24 @@ import { Collection } from '@core/models'
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
 const audioPlayer = useAudioPlayer()
-const page = ref(null)
+const page = ref<InstanceType<typeof PageWithDrawer>>()
 
 // ── State ───────────────────────────────────────────────────────────
 const searchQuery = ref('')
-const isCollectionsVisible = computed(() => searchQuery.value === '')
 const isCreateDialogOpen = ref(false)
-const refSearchBarFloat = ref()
 const isDrawerOpen = ref(false)
+const isSearchBarPinned = ref(false)
+
+
+// ── Hooks ───────────────────────────────────────────────────────────
+watch(searchQuery, (value) => {
+  if (value) {
+    isDrawerOpen.value = false
+  } else {
+    isDrawerOpen.value = true
+    page.value?.scrollToTop()
+  }
+})
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onPlaylistItemClicked(trackId: string) {
@@ -95,6 +107,10 @@ async function onCreateCollection(collection: Collection) {
 }
 
 .searchResults {
+  padding-top: 76px;
+}
+
+.ppp {
   padding-top: 76px;
 }
 </style>

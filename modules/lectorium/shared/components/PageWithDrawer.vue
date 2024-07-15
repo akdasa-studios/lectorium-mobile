@@ -5,7 +5,6 @@
     <slot name="header"></slot>
 
     <IonContent
-      class="parts topDrawer"
       ref="topDrawerRef"
     >
       <Drawer :open="isDrawerOpen">
@@ -19,13 +18,26 @@
 
 
 <script setup lang="ts">
-import { IonPage, IonContent, createGesture, GestureDetail } from '@ionic/vue'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { IonPage, IonContent, createGesture, GestureDetail, ScrollDetail } from '@ionic/vue'
+import { onMounted, onUnmounted, ref, toRefs } from 'vue'
 import { Drawer } from '@lectorium/shared/components'
+
+// ── Interface ───────────────────────────────────────────────────────
+const props = defineProps<{
+  canOpenDrawer: boolean,
+}>()
+
+defineExpose({
+  scrollToTop() {
+    topDrawerRef.value?.$el.scrollToTop(500)
+  },
+  scrollY
+})
 
 // ── State ───────────────────────────────────────────────────────────
 const topDrawerRef = ref<InstanceType<typeof IonContent>>()
 const isDrawerOpen = defineModel("isDrawerOpen", { type: Boolean, default: false })
+const { canOpenDrawer } = toRefs(props)
 const openDrawerGesture = ref<ReturnType<typeof createGesture>>()
 
 // ── Hooks ───────────────────────────────────────────────────────────
@@ -47,7 +59,7 @@ onUnmounted(() => {
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onMoveHandler(ev: GestureDetail): boolean | void {
-  if (ev.velocityY > 0 && isDrawerOpen.value === false) {
+  if (ev.velocityY > 0 && isDrawerOpen.value === false && canOpenDrawer.value) {
     isDrawerOpen.value = true
   } else if (ev.velocityY < 0) {
     isDrawerOpen.value = false

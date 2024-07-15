@@ -8,37 +8,43 @@
       placeholder="Search"
       :clear-input="true"
       v-model="searchQuery"
-      ref="refInput"
-    />
+      @ion-focus="onFocus"
+      @ion-blur="onBlur"
+    >
+      <!-- <ion-icon v-if="!searchQuery" slot="end" :icon="lockClosed" aria-hidden="true"></ion-icon> -->
+    </IonInput>
   </div>
   <IonSearchbar
     v-else
     placeholder="Search"
     @input="(e) => searchQuery = e.target.value"
     v-model="searchQuery"
-    ref="refInput"
   />
 </template>
 
 
 <script setup lang="ts">
 import { IonInput, IonSearchbar, isPlatform } from '@ionic/vue'
-import { ref } from 'vue'
+import { lockClosed } from 'ionicons/icons'
 
 // ── Interface ───────────────────────────────────────────────────────
 const searchQuery = defineModel<string>({ type: String, default: '' })
 
-defineExpose({
-  setFocus: setFocus
-})
-
-async function setFocus() {
-  refInput.value?.$el.setFocus()
-}
+const emit = defineEmits<{
+  focus: [value: boolean]
+}>()
 
 // ── State ───────────────────────────────────────────────────────────
 const isAndroid = isPlatform('android')
-const refInput = ref<InstanceType<typeof IonInput>>()
+
+// ── Handlers ────────────────────────────────────────────────────────
+function onFocus() {
+  emit('focus', true)
+}
+
+function onBlur() {
+  emit('focus', false)
+}
 </script>
 
 

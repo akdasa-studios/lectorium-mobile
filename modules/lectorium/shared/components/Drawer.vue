@@ -1,8 +1,9 @@
 <template>
   <div :class="[
-    open ? 'open' : 'closed',
-    initialized ? 'initialized' : ''
-  ]" ref="drawer">
+      open ? 'open' : 'closed',
+      initialized ? 'initialized' : ''
+    ]" ref="drawer"
+  >
     <slot></slot>
   </div>
 </template>
