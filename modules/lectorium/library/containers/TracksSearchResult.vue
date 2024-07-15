@@ -49,6 +49,7 @@ watch(searchQuery, async (value) => {
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onTrackClicked(track: TrackViewModel) {
+  if (track.playingStatus == PlayingStatus.InQueue) { return }
   emit('click', track.trackId)
   playItemAdded()
   execute(150, searchQuery.value)

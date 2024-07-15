@@ -107,7 +107,7 @@ async function onCreateCollection(collection: Collection) {
 }
 
 .searchResults {
-  padding-top: 76px;
+  padding-top: 86px;
 }
 
 .ppp {
