@@ -99,11 +99,10 @@ async function onCreateCollection(collection: Collection) {
 
 <style>
 .pinnedSearch {
-  background-color: white;
   position: fixed;
   top: 0px;
   z-index: 100;
-  width: calc(100% - 20px);
+  width: 100%;
 }
 
 .searchResults {

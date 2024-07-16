@@ -10,9 +10,7 @@
       v-model="searchQuery"
       @ion-focus="onFocus"
       @ion-blur="onBlur"
-    >
-      <!-- <ion-icon v-if="!searchQuery" slot="end" :icon="lockClosed" aria-hidden="true"></ion-icon> -->
-    </IonInput>
+    />
   </div>
   <IonSearchbar
     v-else
@@ -25,7 +23,6 @@
 
 <script setup lang="ts">
 import { IonInput, IonSearchbar, isPlatform } from '@ionic/vue'
-import { lockClosed } from 'ionicons/icons'
 
 // ── Interface ───────────────────────────────────────────────────────
 const searchQuery = defineModel<string>({ type: String, default: '' })
@@ -50,6 +47,9 @@ function onBlur() {
 
 <style scoped>
 .search {
+  /* background-color: var(--ion-color-light); */
   margin: 10px;
+  backdrop-filter: blur(500px);
+  width: calc(100% - 20px);
 }
 </style>

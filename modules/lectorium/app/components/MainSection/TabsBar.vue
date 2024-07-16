@@ -1,5 +1,5 @@
 <template>
-  <IonTabBar class="bar">
+  <IonTabBar>
     <IonTabButton tab="library" href="/app/library">
       <IonIcon aria-hidden="true" :icon="homeOutline" />
       <IonLabel>Home</IonLabel>
