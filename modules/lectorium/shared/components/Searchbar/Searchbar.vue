@@ -49,7 +49,7 @@ function onBlur() {
 .search {
   /* background-color: var(--ion-color-light); */
   margin: 10px;
-  backdrop-filter: blur(500px);
+  backdrop-filter: blur(10px);
   width: calc(100% - 20px);
 }
 </style>
