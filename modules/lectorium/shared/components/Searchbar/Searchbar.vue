@@ -48,8 +48,9 @@ function onBlur() {
 <style scoped>
 .search {
   /* background-color: var(--ion-color-light); */
-  margin: 10px;
+  /* margin: 10px;
   backdrop-filter: blur(10px);
-  width: calc(100% - 20px);
+  width: calc(100% - 20px); */
+  margin: 10px;
 }
 </style>

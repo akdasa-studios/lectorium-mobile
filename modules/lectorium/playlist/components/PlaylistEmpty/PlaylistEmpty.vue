@@ -1,7 +1,7 @@
 <template>
   <div class="PlaylistEmpty">
     <img
-      src="@lectorium/library/assets/empty.png"
+      src="@lectorium/playlist/assets/empty.png"
       class="image"
       alt="Playlist is empty"
     />

@@ -8,9 +8,8 @@
 
 <script setup lang="ts">
 import { useAsyncState } from '@vueuse/core'
-import { CollectionsList  } from '@lectorium/library/components'
-import { useUserData } from '@lectorium/library'
-import { watch } from 'vue';
+import { CollectionsList, useUserData } from '@lectorium/playlist'
+import { watch } from 'vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 const emit = defineEmits<{

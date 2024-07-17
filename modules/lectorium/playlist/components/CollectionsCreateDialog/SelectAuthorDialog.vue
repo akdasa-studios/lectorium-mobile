@@ -1,7 +1,7 @@
 <template>
   <SelectorDialog
     v-model:open="open"
-    title="Languages"
+    title="Authors"
     :items="items"
     @select="onSelect"
   />
@@ -11,8 +11,8 @@
 <script setup lang="ts">
 import { useAsyncState } from '@vueuse/core'
 import { SelectorDialog } from '@lectorium/shared/components'
-import { useLibrary } from '@lectorium/library/composables'
-import { Language } from '@core/models'
+import { useLibrary } from '@lectorium/library'
+import { Author } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -21,12 +21,12 @@ const library = useLibrary()
 const open = defineModel('open', { type: Boolean, default: false, })
 
 const emit = defineEmits<{
-  select: [ids: string[]]
+  select: [item: string[]]
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
 const { state: items } = useAsyncState(
-  async () => map2(await library.languages.getAll()), [])
+  async () => map2(await library.authors.getAll()), [])
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onSelect(ids: string[]) {
@@ -34,10 +34,10 @@ function onSelect(ids: string[]) {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
-function map2(languages: Language[]) {
-  return languages.map((language) => ({
-    id: language.code,
-    title: language.name,
+function map2(authors: Author[]) {
+  return authors.map((author) => ({
+    id: author.id,
+    title: author.name,
     checked: false,
   }))
 }

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLibrary } from '@lectorium/library/composables'
+import { useLibrary } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { ref, watch } from 'vue'
 import { useMediaControls } from '@vueuse/core'

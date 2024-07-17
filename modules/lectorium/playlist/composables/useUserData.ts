@@ -1,4 +1,4 @@
-import { CollectionsRepository, PlaylistItemsRepository } from '@lectorium/library/services'
+import { CollectionsRepository, PlaylistItemsRepository } from '@lectorium/playlist/services'
 import { createGlobalState } from '@vueuse/core'
 import { ref } from 'vue'
 

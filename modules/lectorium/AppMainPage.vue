@@ -31,7 +31,7 @@
 import { ref, computed, watch } from 'vue'
 import { Track } from '@core/models'
 import { useAudioPlayer } from '@lectorium/shared/composables'
-import { useLibrary } from '@lectorium/library/composables'
+import { useLibrary } from '@lectorium/library'
 import { MainSection, PlayerSection, useAppLayout } from '@lectorium/app'
 import { AppLayout } from '@lectorium/app'
 
@@ -44,8 +44,6 @@ const library     = useLibrary()
 const refPlayerSection   = ref<InstanceType<typeof PlayerSection>>()
 const currentTrack  = ref<Track|undefined>()
 const percentPlayed = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
-
-
 
 // ── State ───────────────────────────────────────────────────────────
 watch(() => audioPlayer.state.value.trackId, async (value) => {

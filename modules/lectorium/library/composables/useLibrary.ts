@@ -1,7 +1,7 @@
 import {
   AuthorsRepository, CollectionsRepository, LanguagesRepository,
   LibraryRepository, SourcesRepository
-} from '@lectorium/library/services'
+} from '@lectorium/playlist/services'
 
 export function useLibrary() {
   return {

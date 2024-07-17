@@ -1,6 +1,6 @@
 import { watch } from "vue"
 import { useAudioPlayer } from "../composables"
-import { useUserData } from "@lectorium/library";
+import { useUserData } from "@lectorium/playlist"
 
 export async function runPlaylistPersistence() {
   const audioPlayer = useAudioPlayer()

@@ -37,8 +37,10 @@
 import { ref, toRaw } from 'vue'
 import { Collection } from '@core/models'
 import { IonModal } from '@ionic/vue'
-import { SelectAuthorDialog, SelectSourcesDialog, SelectLanguagesDialog } from '@lectorium/library/components'
-import { EmptyCollection } from '@lectorium/library/services/repositories/CollectionsRepository'
+
+import SelectAuthorDialog from './SelectAuthorDialog.vue'
+import SelectSourcesDialog from './SelectSourcesDialog.vue'
+import SelectLanguagesDialog from './SelectLanguagesDialog.vue'
 import CollectionsDialogHeader from './CollectionsDialogHeader.vue'
 import CollectionsDialogForm from './CollectionsDialogForm.vue'
 
@@ -77,5 +79,17 @@ function onSourcesSelected(sourceIds: string[]) {
 
 function onLanguagesSelected(languageIds: string[]) {
   collection.value.languages = languageIds
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function EmptyCollection() {
+  return {
+    id: '',
+    title: '',
+    authors: [],
+    sources: [],
+    languages: [],
+    cover: '',
+  }
 }
 </script>

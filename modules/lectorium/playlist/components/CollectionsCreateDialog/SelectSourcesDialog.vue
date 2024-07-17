@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { useAsyncState } from '@vueuse/core'
 import { SelectorDialog } from '@lectorium/shared/components'
-import { useLibrary } from '@lectorium/library/composables'
+import { useLibrary } from '@lectorium/library'
 import { Source } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────

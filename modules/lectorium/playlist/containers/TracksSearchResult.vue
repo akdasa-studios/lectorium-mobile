@@ -14,10 +14,9 @@
 import { computed, toRefs, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { useSound } from '@vueuse/sound'
-import { useLibrary } from '@lectorium/library/composables'
-import { NothingFound, useUserData } from '@lectorium/library'
-import { TracksList, TrackViewModel, PlayingStatus } from '@lectorium/library/components'
-import itemAddedSfx from '@lectorium/library/assets/item-added.mp3'
+import { useLibrary } from '@lectorium/library'
+import { NothingFound, TracksList, TrackViewModel, PlayingStatus, useUserData } from '@lectorium/playlist'
+import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
 
 
 // ── Dependencies ────────────────────────────────────────────────────

@@ -1,11 +1,13 @@
 <template>
   <IonPage>
     <IonHeader :class="{'ion-no-border': !headerBorder}">
-      <IonToolbar>
+      <!-- <IonToolbar>
         <IonButtons slot="start">
           <IonBackButton />
         </IonButtons>
+      </IonToolbar> -->
 
+      <IonToolbar>
         <slot name="header">
           <IonTitle>{{ title }}</IonTitle>
         </slot>
