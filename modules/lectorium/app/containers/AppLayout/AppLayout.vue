@@ -29,11 +29,14 @@ const { openHandle, closeHanle } = toRefs(props)
 const layoutShift = ref(0)
 const animation = computed(() => layoutShift.value === 0 ? "0.5s" : "0.1s")
 const mainSectionShrinkSize = computed(() =>
-  (appLayout.layoutState.value !== 'closed' ? 75 : 0) -
-  (Math.max(0, layoutShift.value))
+  appLayout.layoutState.value === 'semi-open'
+    ? 75 - Math.max(0, layoutShift.value)
+    : appLayout.layoutState.value === 'open' ? 75 : 0
 )
 const stylePageTranslate = computed(() =>
-  `calc(${appLayout.layoutState.value === "open" ? "-50%" : "0%"} + ${Math.min(0, layoutShift.value)}px)`
+  `calc(${appLayout.layoutState.value === "open"
+    ? `-50% + ${Math.max(0, layoutShift.value)}px`
+    : `0% + ${Math.min(0, layoutShift.value)}px`})`
 )
 let gestureOpenPlayerSection: Gesture|undefined = undefined
 let gestureClosePlayerSection: Gesture|undefined = undefined
