@@ -21,7 +21,12 @@ const emit = defineEmits<{
 const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
-const { state: collections} = useAsyncState(
-  async () => await userData.collections.getAll(), [],
+const { state: collections, execute: refresh } = useAsyncState(
+  async () => await userData.collections.service.getAll(), [],
 )
+
+// ── Hooks ───────────────────────────────────────────────────────────
+watch(userData.collections.changedAt, async () => {
+  await refresh()
+})
 </script>

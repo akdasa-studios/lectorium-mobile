@@ -7,18 +7,19 @@ const COLLECTIONS_REPOSITORY = new CollectionsRepository()
 
 export const useUserData = createGlobalState(() => {
   const playlistItemsChangedAt = ref<number>(0)
+  const collectionsChangedAt = ref<number>(0)
 
-  PLAYLIST_ITEMS_REPOSITORY.onChange(
-    () => {
-      playlistItemsChangedAt.value = Date.now()
-    }
-  )
+  PLAYLIST_ITEMS_REPOSITORY.onChange(() => { playlistItemsChangedAt.value = Date.now() })
+  COLLECTIONS_REPOSITORY.onChange(() => { collectionsChangedAt.value = Date.now() })
 
   return {
     playlistItems: {
       service: PLAYLIST_ITEMS_REPOSITORY,
-      changedAt: playlistItemsChangedAt
+      changedAt: playlistItemsChangedAt,
     },
-    collections: COLLECTIONS_REPOSITORY,
+    collections: {
+      service: COLLECTIONS_REPOSITORY,
+      changedAt: collectionsChangedAt,
+    }
   }
 })

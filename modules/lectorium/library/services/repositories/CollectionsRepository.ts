@@ -3,12 +3,17 @@ import { Database, Repository } from '@core/persistence/Database'
 
 export class CollectionsRepository {
   private _db: Repository<Collection>
+  private _onChangeHandlers: Array<() => void> = []
 
   constructor() {
     this._db = new Repository<Collection>(
       "collection",
       new Database({ name: 'data' })
     )
+  }
+
+  public onChange(handler: () => void) {
+    this._onChangeHandlers.push(handler)
   }
 
   public async add(
@@ -19,6 +24,8 @@ export class CollectionsRepository {
       //@ts-ignore
       _id: `collection/${collection.title}`,
     })
+
+    this._onChangeHandlers.forEach(x => x())
   }
 
   public async get(

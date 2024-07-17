@@ -92,7 +92,7 @@ function onSearchResultItemClicked(trackId: string) {
 
 async function onCreateCollection(collection: Collection) {
   console.log('onCreateCollection', collection)
-  await userData.collections.add(collection)
+  await userData.collections.service.add(collection)
   isCreateDialogOpen.value = false
 }
 </script>
