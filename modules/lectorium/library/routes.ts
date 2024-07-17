@@ -2,9 +2,9 @@ import { RouteRecordRaw } from 'vue-router'
 
 export const routes: Array<RouteRecordRaw> = [
   {
-    path: '/app/player',
-    name: 'player',
-    component: () => import('./pages/PlayerPage.vue'),
+    path: '/app/library',
+    name: 'library',
+    component: () => import('./pages/LibraryIndexPage.vue'),
   },
 ]
 

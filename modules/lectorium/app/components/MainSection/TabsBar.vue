@@ -1,11 +1,11 @@
 <template>
   <IonTabBar>
-    <IonTabButton tab="library" href="/app/library">
+    <IonTabButton tab="playlist" href="/app/playlist">
       <IonIcon aria-hidden="true" :icon="homeOutline" />
       <IonLabel>Home</IonLabel>
     </IonTabButton>
 
-    <IonTabButton tab="player" href="/app/player">
+    <IonTabButton tab="library" href="/app/library">
       <IonIcon aria-hidden="true" :icon="libraryOutline" />
       <IonLabel>Library</IonLabel>
     </IonTabButton>
