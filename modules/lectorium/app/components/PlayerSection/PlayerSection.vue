@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { IonContent } from '@ionic/vue'
-import { Track } from '@core/models'
+import { Track, TrackTranscript } from '@core/models'
 import AudioControlsCompact from './AudioControlsCompact.vue'
 import Prompter from './Prompter.vue'
 import CloseHandle from './CloseHandle.vue'

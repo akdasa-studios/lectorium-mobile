@@ -14,6 +14,7 @@ export class LibraryRepository {
   async get(id: string): Promise<Track> {
     const entity = await this._db.get(`track::${id}::info`)
     return {
+      //@ts-ignore
       id: entity._id.replace('track::', '').replace('::info', ''),
       title: entity.title,
       url: entity.url,
@@ -26,7 +27,9 @@ export class LibraryRepository {
   async getAll(): Promise<Track[]> {
     // TODO: filter on DB side instead of in memory
 
+    //@ts-ignore
     const result = (await this._db.getAll()).filter(x => x._id.endsWith('::info')).map(x => ({
+      //@ts-ignore
       id: x._id.replace('track::', '').replace('::info', ''),
       title: x.title,
       url: x.url,
@@ -43,6 +46,8 @@ export class LibraryRepository {
   ): Promise<TrackTranscript> {
     const entity = await this._db.get(`track::${trackId}::transcript::${language}`)
     return {
+      // TODO
+      //@ts-ignore
       text: entity.text
     }
   }

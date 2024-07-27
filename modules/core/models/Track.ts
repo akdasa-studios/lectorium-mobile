@@ -8,6 +8,7 @@ export type Track = {
 }
 
 export type TrackTranscriptBlock = {
+  type: string
   start: number
   end: number
   text: string
