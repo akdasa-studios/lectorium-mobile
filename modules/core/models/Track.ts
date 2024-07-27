@@ -4,16 +4,19 @@ export type Track = {
   url: string
   location: string
   date: string
-  references: string[]
-  text: TrackTextParagraph[]
+  references: Array<string[]>
 }
 
-export type TrackTextParagraph = {
-  blocks: TrackTextBlock[]
-}
-
-export type TrackTextBlock = {
+export type TrackTranscriptBlock = {
   start: number
   end: number
   text: string
+}
+
+export type TrackTranscriptText = {
+  blocks: TrackTranscriptBlock[]
+}
+
+export type TrackTranscript = {
+  text: TrackTranscriptText
 }

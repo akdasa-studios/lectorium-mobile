@@ -9,7 +9,7 @@
     />
     <IonLabel class="ion-text-nowrap">
       <h3>
-        <b>{{ references[0] }}</b>
+        <b>{{ formatReference(references[0]) }}</b>
         {{ title }}
       </h3>
       <p>{{ location }}</p>
@@ -54,5 +54,10 @@ const playingStatusIcon = computed(
 // ── Handlers ────────────────────────────────────────────────────────
 function onItemClicked() {
   emit('click')
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function formatReference(reference: string[]): string {
+  return reference[0] + " " + (reference.slice(1).join('.'));
 }
 </script>

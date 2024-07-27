@@ -19,7 +19,7 @@
       color="oxford-blue"
     >
       <Prompter
-        :text="track?.text || []"
+        :blocks="transcript?.text?.blocks || []"
         :time="position"
         @rewind="pos => emit('rewind', pos)"
       />
@@ -48,6 +48,7 @@ const props = defineProps<{
   percentPlayed: number
   position: number
   track: Track | undefined
+  transcript: TrackTranscript | undefined
 }>()
 
 defineExpose({

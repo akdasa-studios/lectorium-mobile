@@ -36,7 +36,7 @@ const playlistEmpty = computed(() => items.value.length === 0)
 // ── Hooks ───────────────────────────────────────────────────────────
 watch([
   () => audioPlayer.state.value.playing,
-  () =>audioPlayer.state.value.trackId,
+  () => audioPlayer.state.value.trackId,
 ], async () => {
   /** Refresh playlist if current track or it's state has changed. */
   // TODO: There is no reason to fetch whole playlist items, just

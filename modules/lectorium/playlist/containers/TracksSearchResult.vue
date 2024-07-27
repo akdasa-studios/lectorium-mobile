@@ -62,7 +62,7 @@ async function fetchData(query: string): Promise<TrackViewModel[]> {
     tracks,
     playlistItems
   ] = await Promise.all([
-    library.tracks.getLecturesList(query),
+    library.tracks.getAll(), // TODO: filter by query
     userData.playlistItems.service.getAll()
   ])
 

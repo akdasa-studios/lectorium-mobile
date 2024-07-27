@@ -1,44 +1,45 @@
 <template>
   <p lang="ru"
-    v-for="paragraph in text"
-    :key="paragraph.blocks[0].start"
+    v-for="(paragraph, idx) in paragraps"
+    :key="idx"
     class="Prompter"
     :class="{
-      'paragraph': paragraph.blocks[0].start <= time && paragraph.blocks[paragraph.blocks.length-1].end >= time
+      'paragraph': paragraph[0].start <= time && paragraph[paragraph.length-1].end >= time
     }"
   >
-    <div class="timestamp">
-      {{ formatTime(paragraph.blocks[0].start) }}
-    </div>
-
-    <span
-      v-for="block in paragraph.blocks"
-      :key="block.start"
+    <Paragraph
+      :start="paragraph[0].start"
+    />
+    <component
+      v-for="(block, idx) in paragraph"
+      :key="idx"
+      :is="block.type === 'sentence' ? Sentence : Paragraph"
+      :text="block.text"
+      :start="block.start"
       :class="{
         'highlight': block.start <= time && block.end >= time
       }"
       @click="emit('rewind', block.start)"
-    >
-      {{ block.text }}&nbsp;
-    </span>
+    />
   </p>
 </template>
 
 
 <script setup lang="ts">
-// ── Interface ───────────────────────────────────────────────────────
-export type Paragraph = {
-  blocks: Block[]
-}
+import { ref, toRefs, watch } from 'vue'
+import Sentence from './Sentence.vue'
+import Paragraph from './Paragraph.vue'
 
+// ── Interface ───────────────────────────────────────────────────────
 export type Block = {
+  type: string
   text: string
   start: number
   end: number
 }
 
-defineProps<{
-  text: Paragraph[]
+const props = defineProps<{
+  blocks: Block[]
   time: number
 }>()
 
@@ -46,25 +47,24 @@ const emit = defineEmits<{
   rewind: [time: number]
 }>()
 
-// ── Computed ───────────────────────────────────────────────────────
-function formatTime(ms: number) {
-  const seconds = Math.floor(ms % 60);
-  const minutes = Math.floor((ms / 60) % 60);
-  const hours = Math.floor((ms / 60 / 60));
+// ── State ───────────────────────────────────────────────────────────
+const { blocks } = toRefs(props)
+const paragraps = ref<Array<Block[]>>([])
 
-  let formattedTime;
+// ── Hooks ───────────────────────────────────────────────────────────
+watch(blocks, update, { immediate: true })
 
-  if (ms < 60000) {
-    formattedTime = [minutes.toString().padStart(2, "0"), seconds.toString().padStart(2, "0")].join(":");
-  } else {
-    if (hours === 0) {
-      formattedTime = [minutes.toString(), seconds.toString().padStart(2, "0")].join(":");
+// ── Helpers ─────────────────────────────────────────────────────────
+function update() {
+  let lastParagraph: Block[] = []
+  for (var block of props.blocks) {
+    if (block.type === 'paragraph') {
+      paragraps.value.push(lastParagraph)
+      lastParagraph = []
     } else {
-      formattedTime = [hours.toString(), minutes.toString().padStart(2, "0"), seconds.toString().padStart(2, "0")].join(":");
+      lastParagraph.push(block)
     }
   }
-
-  return formattedTime;
 }
 </script>
 
@@ -72,17 +72,10 @@ function formatTime(ms: number) {
 <style scoped>
 .Prompter {
   color: rgba(var(--ion-color-oxford-blue-contrast-rgb), .3);
-  /* word-wrap: break-word; */
-  /* word-break: break-all; */
   hyphens: auto;
   -moz-hyphens: auto;
   /* text-align: justify; */
-  /* text-justify: inter-word; */
 }
-.timestamp {
-  font-size: .6rem;
-}
-
 .paragraph {
   transition: all 0.5s;
   color: rgba(var(--ion-color-oxford-blue-contrast-rgb), .7);
@@ -90,9 +83,7 @@ function formatTime(ms: number) {
 }
 
 .highlight {
-  word-wrap: break-word;
   transition: all 0.5s;
-  /* color: var(--ion-color-oxford-blue-contrast-tint); */
   color: rgba(var(--ion-color-success-rgb), 1);
 }
 </style>
