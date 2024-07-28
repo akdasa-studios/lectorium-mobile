@@ -41,6 +41,7 @@ export const useSync = createGlobalState(() => {
           }
         }
       )
+      config.lastSyncedAt.value = Date.now()
     } finally {
       inProgress.value = false
     }
