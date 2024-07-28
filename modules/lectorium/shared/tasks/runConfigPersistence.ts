@@ -11,9 +11,10 @@ export async function runConfigPersistence() {
   await storage.create()
 
   // Bind config to storage
-  await bind(config.currentTrackId,       'player.current.id',       '')
+  await bind(config.currentTrackId,       'player.current.id',      '')
   await bind(config.currentTrackPosition, 'player.current.position', 0)
   await bind(config.tracksQueue,          'player.queue', [])
+  await bind(config.lastSyncedAt,         'sync.lastSyncedAt',       0)
 
   // --- Helpers ----------------------------------------
   async function bind<T>(config: Ref<T>, key: string, defaultValue: T) {
