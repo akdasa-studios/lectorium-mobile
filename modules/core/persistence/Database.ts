@@ -5,6 +5,11 @@ export interface DatabaseConfig {
   adapter?: string,
 }
 
+export interface DatabaseReplicationOptions {
+  filter: string,
+  query_params?: Record<string, any>
+}
+
 export class Database {
   private _db: PouchDB.Database
   private _config: DatabaseConfig
@@ -26,8 +31,11 @@ export class Database {
    * Replicate the local database from a remote database
    * @param remote Remote database URL
    */
-  async replicateFrom(remote: string) {
-    const result = await this._db.replicate.from(remote)
+  async replicateFrom(
+    source: Database,
+    options?: DatabaseReplicationOptions
+  ) {
+    await this._db.replicate.from(source.db, options)
   }
 
   /**
