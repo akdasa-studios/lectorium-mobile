@@ -24,5 +24,5 @@ fs.writeFile('./modules/core/env.ts', finalContent, (err) => {
     console.error('Config: Error writing to file:', err);
     process.exit(0);
   }
-  console.log('Config: File written updated.');
+  console.log('Config: File updated.');
 });
