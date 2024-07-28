@@ -35,22 +35,17 @@ import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library'
 import { MainSection, PlayerSection, useAppLayout } from '@lectorium/app'
 import { AppLayout } from '@lectorium/app'
-import { useLibrarySync } from './library/composables/useLibrarySync'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const appLayout   = useAppLayout()
 const audioPlayer = useAudioPlayer()
 const library     = useLibrary()
-const librarySync = useLibrarySync()
 
 // ── State ───────────────────────────────────────────────────────────
 const refPlayerSection  = ref<InstanceType<typeof PlayerSection>>()
 const currentTrack      = ref<Track|undefined>()
 const currentTranscript = ref<TrackTranscript|undefined>()
 const percentPlayed     = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
-
-
-librarySync.sync() // TODO: move somewhere else
 
 // ── State ───────────────────────────────────────────────────────────
 watch(() => audioPlayer.state.value.trackId, async (value) => {
@@ -67,5 +62,4 @@ watch(appLayout.layoutState, (value) => {
 function onPlayerClicked() {
   appLayout.layoutState.value = 'open'
 }
-
 </script>
