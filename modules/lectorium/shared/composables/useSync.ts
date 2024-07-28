@@ -1,22 +1,26 @@
 import { ref } from 'vue'
 import { Database } from '@core/persistence'
 import { createGlobalState } from '@vueuse/core'
+import { useConfig } from './useConfig'
 
 interface SyncParams {
   trackIds: string[]
 }
 
 export const useSync = createGlobalState(() => {
+
+  // ── Dependencies ────────────────────────────────────────────────────
+  const config     = useConfig()
+
+  // ── State ───────────────────────────────────────────────────────────
+  const collectionName = 'library'
   const inProgress = ref(false)
   const context = {
-    local:  new Database({ name: 'library' }),
-    remote: new Database({ name: 'http://localhost:5984/library' })
+    local:  new Database({ name: collectionName }),
+    remote: new Database({ name: config.serverBaseUrl.value + "/" + collectionName })
   }
 
-  /**
-   * Executes the synchronization process.
-   * @param params The synchronization parameters.
-   */
+  // ── Helpers ─────────────────────────────────────────────────────────
   async function execute(
     params: SyncParams
   ) {
@@ -42,8 +46,6 @@ export const useSync = createGlobalState(() => {
     }
   }
 
-  return {
-    execute,
-    inProgress
-  }
+  // ── Interface ─────────────────────────────────────────────────────────
+  return { execute, inProgress }
 })
