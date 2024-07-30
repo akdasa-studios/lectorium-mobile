@@ -71,7 +71,7 @@ async function fetchData(
   const playlistItemsId = playlistItems.map(x => x.trackId)
   return await Promise.all(tracks.map(async track => ({
     trackId: track.id,
-    location: track.location,
+    location: await library.locations.getLocalizedName(track.location, 'ru'),
     references: await Promise.all(
       track.references.map(async x => await library.sources.getLocalizedReference(x, 'ru'))),
     title: track.title,

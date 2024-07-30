@@ -76,6 +76,7 @@ async function fetchData(): Promise<TrackViewModel[]> {
     .map(async i => ({
       order: i.order,
       trackId: tracks[i.trackId].id,
+      location: await library.locations.getLocalizedName(tracks[i.trackId].location, 'ru'),
       references: await Promise.all(
         tracks[i.trackId].references.map(
           async x => await library.sources.getLocalizedReference(x, 'ru'))),
