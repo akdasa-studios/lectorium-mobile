@@ -30,7 +30,6 @@ const searchQuery = ref('')
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onSearchResultItemClicked(trackId: string) {
-  console.log('onSearchResultItemClicked', trackId)
   userData.playlistItems.service.addTrack(trackId)
 }
 </script>

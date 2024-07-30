@@ -18,7 +18,6 @@ import { useLibrary } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus, useUserData } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
 
-
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
 const userData = useUserData()

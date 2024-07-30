@@ -40,7 +40,7 @@ import {
 } from '@ionic/vue'
 import { Header, Searchbar } from '@lectorium/shared/components'
 import { useArrayFilter } from '@vueuse/core'
-import { reactive, ref, toRef, unref } from 'vue'
+import { reactive, ref, toRef } from 'vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 export type ItemId = string
