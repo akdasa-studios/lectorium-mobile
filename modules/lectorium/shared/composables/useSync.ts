@@ -27,6 +27,10 @@ export const useSync = createGlobalState(() => {
     try {
       inProgress.value = true
 
+      // Replicate dictionary data from remote database
+      await context.local.replicateFrom(
+        context.remote, { filter: 'library/dictionaryData' })
+
       // Replicate track information documents from remote database
       await context.local.replicateFrom(
         context.remote, { filter: 'library/trackInfos' })
