@@ -5,10 +5,10 @@ export type Track = {
   location: string
   date: string
   references: Array<string[]>
-  languages: Language[]
+  languages: TrackLanguage[]
 }
 
-export type Language = {
+export type TrackLanguage = {
   language: string
   source: 'track' | 'transcript'
   type: 'original' | 'generated' | 'redacted'

@@ -21,6 +21,7 @@ export class LibraryRepository {
       location: entity.location,
       date: entity.date,
       references: entity.references,
+      languages: entity.languages
     }
   }
 
@@ -36,6 +37,7 @@ export class LibraryRepository {
       location: x.location,
       date: x.date,
       references: x.references,
+      languages: x.languages
     }))
     return result
   }
