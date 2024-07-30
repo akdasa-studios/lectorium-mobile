@@ -37,7 +37,7 @@ function onSelect(ids: string[]) {
 function map2(sources: Source[]) {
   return sources.map((source) => ({
     id: source.id,
-    title: source.title,
+    title: source.name['ru'].short,
     checked: false,
   }))
 }

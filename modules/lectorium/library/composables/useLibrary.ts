@@ -1,11 +1,12 @@
 import {
   AuthorsRepository, CollectionsRepository, LanguagesRepository,
-  LibraryRepository, SourcesRepository
+  LibraryRepository
 } from '@lectorium/playlist/services'
+import { SourcesService } from '@lectorium/shared'
 
 export function useLibrary() {
   return {
-    sources: new SourcesRepository(),
+    sources: new SourcesService(),
     collections: new CollectionsRepository(),
     authors: new AuthorsRepository(),
     tracks: new LibraryRepository(),

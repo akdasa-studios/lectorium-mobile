@@ -23,7 +23,7 @@ export interface TrackViewModel {
   location: string
 
   /** Track references */
-  references: Array<string[]>
+  references: string[]
 
   /** Is track playing? */
   playingStatus: PlayingStatus

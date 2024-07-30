@@ -37,7 +37,7 @@ const emit = defineEmits<{
 const { searchQuery } = toRefs(props)
 const nothingFound = computed(() => items.value.length === 0)
 const { state: items, execute } = useAsyncState<TrackViewModel[], [string], true>(
-  async (p) => fetchData(p),
+  async (p) => await fetchData(p),
   [], { resetOnExecute: false }
 )
 
@@ -55,7 +55,9 @@ function onTrackClicked(track: TrackViewModel) {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
-async function fetchData(query: string): Promise<TrackViewModel[]> {
+async function fetchData(
+  query: string
+): Promise<TrackViewModel[]> {
   // TODO: optimization: there is no reason to fetch all playlist items
   // again and agian, we can cache it
   const [
@@ -67,15 +69,16 @@ async function fetchData(query: string): Promise<TrackViewModel[]> {
   ])
 
   const playlistItemsId = playlistItems.map(x => x.trackId)
-
-  return tracks.map(track => ({
+  return await Promise.all(tracks.map(async track => ({
     trackId: track.id,
     location: track.location,
-    references: track.references,
+    references: await Promise.all(
+      track.references.map(async x => await library.sources.getLocalizedReference(x, 'ru'))),
     title: track.title,
     playingStatus: playlistItemsId.includes(track.id)
                     ? PlayingStatus.InQueue
                     : PlayingStatus.None
-  }))
+
+  })))
 }
 </script>

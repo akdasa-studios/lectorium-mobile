@@ -71,17 +71,18 @@ async function fetchData(): Promise<TrackViewModel[]> {
       }, {} as Record<string, Track>)
 
   // Map playlist items to view models
-  return playlistItems
+  return await Promise.all(playlistItems
     .sort((a, b) => a.order - b.order)
-    .map(i => ({
+    .map(async i => ({
       order: i.order,
       trackId: tracks[i.trackId].id,
-      location: tracks[i.trackId].location,
-      references: tracks[i.trackId].references,
+      references: await Promise.all(
+        tracks[i.trackId].references.map(
+          async x => await library.sources.getLocalizedReference(x, 'ru'))),
       title: tracks[i.trackId].title,
       playingStatus: audioPlayer.state.value.trackId === i.trackId
         ? audioPlayer.state.value.playing ? PlayingStatus.Playing : PlayingStatus.Paused
         : PlayingStatus.None,
-    }))
+    })))
 }
 </script>
