@@ -5,6 +5,13 @@ export type Track = {
   location: string
   date: string
   references: Array<string[]>
+  languages: Language[]
+}
+
+export type Language = {
+  language: string
+  source: 'track' | 'transcript'
+  type: 'original' | 'generated' | 'redacted'
 }
 
 export type TrackTranscriptBlock = {
