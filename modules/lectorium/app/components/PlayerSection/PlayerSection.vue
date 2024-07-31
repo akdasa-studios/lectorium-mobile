@@ -29,7 +29,7 @@
 
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { IonContent } from '@ionic/vue'
 import { Track, TrackTranscript } from '@core/models'
 import AudioControlsCompact from './AudioControlsCompact.vue'
@@ -60,6 +60,8 @@ const emit = defineEmits<{
   playClicked: [],
   rewind: [position: number],
 }>()
+
+const { transcript } = toRefs(props)
 </script>
 
 
