@@ -56,6 +56,7 @@ watch(blocks, update, { immediate: true })
 
 // ── Helpers ─────────────────────────────────────────────────────────
 function update() {
+  paragraps.value = []
   let lastParagraph: Block[] = []
   for (var block of props.blocks) {
     if (block.type === 'paragraph') {
