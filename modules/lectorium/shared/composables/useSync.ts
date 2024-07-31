@@ -24,6 +24,7 @@ export const useSync = createGlobalState(() => {
   async function execute(
     params: SyncParams
   ) {
+    console.log('Syncing data...', params)
     try {
       inProgress.value = true
 
@@ -46,6 +47,8 @@ export const useSync = createGlobalState(() => {
         }
       )
       config.lastSyncedAt.value = Date.now()
+    } catch (error) {
+      console.error("Unable to sync data", error)
     } finally {
       inProgress.value = false
     }
