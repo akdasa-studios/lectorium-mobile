@@ -27,6 +27,7 @@ import './theme.css'
 import { runConfigPersistence, runPlaylistPersistence } from '@lectorium/shared/tasks'
 import { register } from 'swiper/element/bundle'
 import { initStatusBar, initNavigationBar, runNavigationBarStyle, runStatusBarStyle } from './app'
+import { runSync } from './shared'
 
 async function createAndRunApp() {
   register()
@@ -39,6 +40,7 @@ async function createAndRunApp() {
 
   await runStatusBarStyle()
   await runNavigationBarStyle()
+  await runSync()
 
   const app = createApp(App)
     .use(IonicVue)

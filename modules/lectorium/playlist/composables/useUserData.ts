@@ -1,8 +1,9 @@
-import { CollectionsRepository, PlaylistItemsRepository } from '@lectorium/playlist/services'
+import { CollectionsRepository } from '@lectorium/playlist/services'
+import { PlaylistService } from '@lectorium/shared'
 import { createGlobalState } from '@vueuse/core'
 import { ref } from 'vue'
 
-const PLAYLIST_ITEMS_REPOSITORY = new PlaylistItemsRepository()
+const PLAYLIST_ITEMS_REPOSITORY = new PlaylistService()
 const COLLECTIONS_REPOSITORY = new CollectionsRepository()
 
 export const useUserData = createGlobalState(() => {
