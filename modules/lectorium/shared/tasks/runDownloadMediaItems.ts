@@ -9,10 +9,11 @@ export async function runDownloadMediaItems() {
   watch(data.media.changedAt, async () => {
     const mediaItems = await data.media.service.getAll()
     const fileToDownload = mediaItems.find(item => item.state === 'pending')
+    const downloadingFile = mediaItems.find(item => item.state === 'downloading')
 
-    if (!fileToDownload) { return }
+    if (!fileToDownload || downloadingFile) { return }
 
-    data.media.service.update(fileToDownload.id, { state: 'downloading' })
+    await data.media.service.update(fileToDownload.id, { state: 'downloading' })
     try {
       const result = await Filesystem.downloadFile({
         webFetchExtra: {
@@ -27,7 +28,6 @@ export async function runDownloadMediaItems() {
       if (result.path) {
         const stat = await Filesystem.stat({
           path: result.path,
-          directory: Directory.Data
         })
         await data.media.service.update(fileToDownload.id, {
           state: 'downloaded',
@@ -36,7 +36,7 @@ export async function runDownloadMediaItems() {
         })
       }
     } catch (error) {
-      // TODO: set error state
+      console.error('Error downloading file', error instanceof Error ? error.message : error)
       await data.media.service.update(fileToDownload.id, {
         state: 'failed',
       })
