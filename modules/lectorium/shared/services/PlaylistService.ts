@@ -19,6 +19,7 @@ export class PlaylistService {
   private database = new Database({ name: 'data' })
   private _onChangeHandlers: Array<() => void> = []
 
+  // TODO: unsubscribe
   public onChange(handler: () => void) {
     this._onChangeHandlers.push(handler)
   }
