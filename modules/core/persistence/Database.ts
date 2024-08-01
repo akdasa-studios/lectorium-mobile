@@ -5,9 +5,15 @@ export interface DatabaseConfig {
   adapter?: string,
 }
 
+export interface DatabaseReplicationChangeEvent {
+  documentsPending: number
+}
+
 export interface DatabaseReplicationOptions {
   filter: string,
   query_params?: Record<string, any>
+  style?: string
+  onChange?: (event: DatabaseReplicationChangeEvent) => void
 }
 
 export class Database {
@@ -33,9 +39,14 @@ export class Database {
    */
   async replicateFrom(
     source: Database,
-    options?: DatabaseReplicationOptions
+    options?: DatabaseReplicationOptions,
   ) {
-    await this._db.replicate.from(source.db, options)
+    await this._db.replicate.from(source.db, options).on('change', info => {
+      options?.onChange && options.onChange({
+        // @ts-ignore
+        documentsPending: info.pending || 0
+      })
+    })
   }
 
   /**
