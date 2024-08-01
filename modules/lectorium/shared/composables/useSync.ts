@@ -15,6 +15,7 @@ export const useSync = createGlobalState(() => {
   // ── State ───────────────────────────────────────────────────────────
   const collectionName = 'library'
   const inProgress = ref(false)
+  const documentsPendingToSync = ref(0)
   const context = {
     local:  new Database({ name: collectionName }),
     remote: new Database({ name: config.serverBaseUrl.value + "/" + collectionName })
@@ -28,23 +29,16 @@ export const useSync = createGlobalState(() => {
     try {
       inProgress.value = true
 
-      // Replicate dictionary data from remote database
-      await context.local.replicateFrom(
-        context.remote, { filter: 'library/dictionaryData' })
-
-      // Replicate track information documents from remote database
-      await context.local.replicateFrom(
-        context.remote, { filter: 'library/trackInfos' })
-
-      // Replicate transcripts for tracks added to playlist
       await context.local.replicateFrom(
         context.remote,
         {
-          filter: 'library/trackTranscripts',
-          query_params: {
-            trackIds: params.trackIds
+          filter: 'library/sync',
+          style: 'main_only',
+          query_params: { trackIds: params.trackIds },
+          onChange(v) {
+            documentsPendingToSync.value = v.documentsPending
           }
-        }
+        },
       )
       config.lastSyncedAt.value = Date.now()
     } catch (error) {
@@ -55,5 +49,5 @@ export const useSync = createGlobalState(() => {
   }
 
   // ── Interface ─────────────────────────────────────────────────────────
-  return { execute, inProgress }
+  return { execute, inProgress, documentsPendingToSync }
 })

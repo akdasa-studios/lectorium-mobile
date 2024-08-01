@@ -5,14 +5,14 @@
 
     <IonLoading
       :is-open="sync.inProgress.value && !config.lastSyncedAt.value"
-      message="Loading data..."
+      :message="syncMessage"
     />
   </IonApp>
 </template>
 
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { IonApp, IonRouterOutlet, IonLoading } from '@ionic/vue'
 import { GlobalAudioPlayer } from '@lectorium/shared/containers'
 import { useConfig } from '@lectorium/shared/composables'
@@ -24,10 +24,22 @@ const sync = useSync()
 const config = useConfig()
 const data = useUserData()
 
+// ── State ───────────────────────────────────────────────────────────
+const documentsPendingToSync = ref(0);
+const syncMessage = computed(() => {
+  return  documentsPendingToSync.value > 0 ?
+    `${documentsPendingToSync.value} remains...` : "Loading data."
+})
+
 // ── Hooks ───────────────────────────────────────────────────────────
 onMounted(async () => {
   await sync.execute({
     trackIds: await data.playlistItems.service.getTrackIds()
   })
 })
+
+watch(sync.documentsPendingToSync, async (value) => {
+  documentsPendingToSync.value = value
+})
+
 </script>
