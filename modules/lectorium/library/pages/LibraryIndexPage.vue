@@ -36,6 +36,7 @@ async function onSearchResultItemClicked(trackId: string) {
   if (!track) return
 
   function get_url_extension(url: string) {
+    // @ts-ignore
     return url.split(/[#?]/)[0].split('.').pop().trim()
   }
 
