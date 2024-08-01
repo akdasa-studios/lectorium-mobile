@@ -1,6 +1,7 @@
 import { watch } from "vue"
 import { useUserData } from "@lectorium/playlist"
 import { Directory, Filesystem } from "@capacitor/filesystem"
+import { Capacitor } from "@capacitor/core"
 
 export async function runDownloadMediaItems() {
   const data = useUserData()
@@ -28,7 +29,7 @@ export async function runDownloadMediaItems() {
       if (result.path) {
         await data.media.service.update(fileToDownload.id, {
           state: 'downloaded',
-          path: result.path
+          path: Capacitor.convertFileSrc(result.path)
         })
         console.log('downloaded', fileToDownload)
       }

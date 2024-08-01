@@ -42,7 +42,7 @@ async function onSearchResultItemClicked(trackId: string) {
 
   await userData.playlistItems.service.addTrack(trackId)
   await userData.media.service.queueDownload(
-    track.url, "tracks/" + track.id +  "." + get_url_extension(track.url))
+    track.url, track.id +  "." + get_url_extension(track.url))
 }
 </script>
 
