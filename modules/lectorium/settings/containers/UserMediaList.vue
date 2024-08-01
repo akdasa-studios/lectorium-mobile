@@ -19,7 +19,7 @@ const { state: items, execute: refresh } = useAsyncState<MediaItemViewModel[]>(a
   const mediaItems = await userData.media.service.getAll()
   return mediaItems.map((item) => ({
     title: item.url,
-    size: "0",
+    size: item.error || "0" ,
     status: item.state,
   }))
 }, [], { resetOnExecute: false })

@@ -88,13 +88,12 @@ export class MediaService {
    * @param id - The ID of the media item to mark as downloaded.
    * @returns A Promise that resolves when the media item is successfully marked as downloaded.
    */
-  async setState(
+  async update(
     id: string,
-    state: 'downloaded' | 'downloading' | 'pending',
-    path?: string
+    item: Partial<Omit<MediaItem, "id">>
   ): Promise<void> {
     const document = await this.database.db.get<MediaDBSchema>(id)
-    await this.database.db.put({ ...document, state, path })
+    await this.database.db.put({ ...document, ...item })
 
     this._onChangeHandlers.forEach(x => x())
   }

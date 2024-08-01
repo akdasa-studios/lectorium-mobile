@@ -23,7 +23,7 @@ import { cloudDownloadOutline, cloudOutline } from 'ionicons/icons'
 import { computed } from 'vue';
 
 // ── Interface ───────────────────────────────────────────────────────
-export type DownloadingStatus = 'downloaded' | 'downloading' | 'pending'
+export type DownloadingStatus = 'downloaded' | 'downloading' | 'pending' | 'failed'
 export type MediaItemViewModel = {
   title: string
   size: string
@@ -40,7 +40,8 @@ type StatusIconMap = {
 const statusIconMaps: StatusIconMap = {
   'downloaded':  { icon: undefined },
   'downloading': { icon: cloudDownloadOutline, color: 'primary' },
-  'pending':     { icon: cloudOutline,         color: 'dark' },
+  'pending':     { icon: cloudOutline,         color: 'dark'    },
+  'failed':      { icon: cloudOutline,         color: 'danger'  },
 }
 const statusIcon = computed(
   () => statusIconMaps[props.status]

@@ -13,7 +13,7 @@ export async function runDownloadMediaItems() {
 
     if (!fileToDownload) { return }
 
-    data.media.service.setState(fileToDownload!.id, 'downloading')
+    data.media.service.update(fileToDownload.id, { state: 'downloading' })
     try {
       const result = await Filesystem.downloadFile({
         webFetchExtra: {
@@ -26,13 +26,19 @@ export async function runDownloadMediaItems() {
       })
 
       if (result.path) {
-        await data.media.service.setState(fileToDownload!.id, 'downloaded', result.path)
+        await data.media.service.update(fileToDownload.id, {
+          state: 'downloaded',
+          path: result.path
+        })
         console.log('downloaded', fileToDownload)
       }
     } catch (error) {
       // TODO: set error state
-      console.error('error downloading', error)
-      await data.media.service.setState(fileToDownload!.id, 'pending')
+      console.error('Error downloading', error)
+      await data.media.service.update(fileToDownload.id, {
+        state: 'failed',
+        error: error instanceof Error ? error.message : `Unknown error: ${error}`
+      })
     }
   }, { immediate: true })
 }
