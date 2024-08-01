@@ -56,7 +56,7 @@ async function onTrackChanged(
     const media = await userData.media.service.getByUrl(track.url)
 
     if (media?.state === "downloaded") {
-      url.value = media.path
+      url.value = media.localUrl
     } else {
       url.value = track.url
     }

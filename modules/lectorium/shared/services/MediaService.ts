@@ -4,9 +4,11 @@ import { cyrb53 } from '@core/utils'
 
 type MediaDBSchema = {
   _id: string
-  url: string
-  path: string
-  state: 'downloaded' | 'downloading' | 'pending'
+  remoteUrl: string
+  localUrl: string
+  localPath: string
+  state: 'downloaded' | 'downloading' | 'pending' | 'failed'
+  size?: number
 }
 
 /**
@@ -32,9 +34,11 @@ export class MediaService {
     const document = await this.database.db.get<MediaDBSchema>(id)
     return {
       id: document._id,
-      url: document.url,
-      path: document.path,
-      state: document.state
+      remoteUrl: document.remoteUrl,
+      localUrl: document.localUrl,
+      localPath: document.localPath,
+      state: document.state,
+      size: document.size
     }
   }
 
@@ -56,9 +60,11 @@ export class MediaService {
       include_docs: true
     })).rows.map(row => ({
       id: row.doc!._id,
-      url: row.doc!.url,
-      path: row.doc!.path,
-      state: row.doc!.state
+      remoteUrl: row.doc!.remoteUrl,
+      localUrl: row.doc!.localUrl,
+      localPath: row.doc!.localPath,
+      state: row.doc!.state,
+      size: row.doc!.size
     }))
   }
 
@@ -69,14 +75,14 @@ export class MediaService {
    * @returns A promise that resolves when the download is queued.
    */
   async queueDownload(
-    url: string,
-    path: string,
+    remoteUrl: string,
+    localPath: string,
   ): Promise<void> {
-    const urlHash = cyrb53(url)
+    const urlHash = cyrb53(remoteUrl)
     await this.database.db.put({
       _id: `media::${urlHash}`,
-      url,
-      path,
+      remoteUrl,
+      localPath,
       state: 'pending'
     })
 
