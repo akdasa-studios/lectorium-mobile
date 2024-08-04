@@ -7,10 +7,12 @@ import { useLibrary } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { ref, watch } from 'vue'
 import { useMediaControls } from '@vueuse/core'
+import { useUserData } from '@lectorium/playlist'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
 const library = useLibrary()
+const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
 const url = ref<string>("")
@@ -45,10 +47,21 @@ watch(() => audioPlayer.state.value.playing, (current) => {
 })
 
 // ── Handlers ────────────────────────────────────────────────────────
-async function onTrackChanged(trackId: string|undefined, position: number) {
+async function onTrackChanged(
+  trackId: string | undefined,
+  position: number
+) {
   if (trackId) {
     const track = await library.tracks.get(trackId)
-    url.value = track.url
+    const media = await userData.media.service.getByUrl(track.url)
+
+    if (media?.state === "downloaded") {
+      url.value = media.localUrl
+    } else {
+      url.value = track.url
+    }
+
+    console.log("playing", url.value)
     currentTime.value = position
   }
 }
