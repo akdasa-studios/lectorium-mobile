@@ -8,6 +8,7 @@ import { useAudioPlayer } from '@lectorium/shared/composables'
 import { ref, watch } from 'vue'
 import { useMediaControls } from '@vueuse/core'
 import { useUserData } from '@lectorium/playlist'
+import { NativeAudio } from '@capacitor-community/native-audio'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
@@ -56,7 +57,17 @@ async function onTrackChanged(
     const media = await userData.media.service.getByUrl(track.url)
 
     if (media?.state === "downloaded") {
-      url.value = media.localUrl
+      // url.value = media.localUrl
+      NativeAudio.preload({
+          assetId: "local",
+          assetPath: media.localUrl,
+          audioChannelNum: 1,
+          isUrl: false
+      });
+      NativeAudio.play({
+        assetId: 'local',
+        // time: 6.0 - seek time
+      });
     } else {
       url.value = track.url
     }
