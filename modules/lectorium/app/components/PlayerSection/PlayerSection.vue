@@ -5,7 +5,7 @@
       :title="track?.title || ''"
       :author="'Author'"
       :playing="playing"
-      :loading="loading"
+      :loading="false"
       @playClicked="emit('playClicked')"
     />
 

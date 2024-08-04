@@ -108,28 +108,6 @@ public class AudioPlayerPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void changeAudioSource(PluginCall call) {
-        try {
-            if (!audioSourceExists("changeAudioSource", call)) {
-                return;
-            }
-
-            new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.changeAudioSource(audioId(call), call.getString("source"));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue changing the audio source (1).", ex);
-                    }
-                }
-            );
-        } catch (Exception ex) {
-            call.reject("There was an issue changing the audio source (2).", ex);
-        }
-    }
-
-    @PluginMethod
     public void getDuration(PluginCall call) {
         try {
             if (!audioSourceExists("getDuration", call)) {
@@ -234,7 +212,7 @@ public class AudioPlayerPlugin extends Plugin {
             new Handler(Looper.getMainLooper()).post(
                 () -> {
                     try {
-                        audioPlayerService.seek(audioId(call), call.getInt("timeInSeconds"));
+                        audioPlayerService.seek(audioId(call), Math.round(call.getFloat("position")));
                         call.resolve();
                     } catch (Exception ex) {
                         call.reject("There was an issue seeking the audio (2).", ex);
@@ -265,30 +243,6 @@ public class AudioPlayerPlugin extends Plugin {
             );
         } catch (Exception ex) {
             call.reject("There was an issue stopping the audio (2).", ex);
-        }
-    }
-
-    @PluginMethod
-    public void setVolume(PluginCall call) {
-        try {
-            if (!audioSourceExists("setVolume", call)) {
-                Log.i(TAG, "No audio source");
-                Log.i(TAG, audioId(call));
-                return;
-            }
-
-            new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.setVolume(audioId(call), call.getFloat("volume"));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue setting the audio volume (1).", ex);
-                    }
-                }
-            );
-        } catch (Exception ex) {
-            call.reject("There was an issue setting the audio volume (2).", ex);
         }
     }
 
@@ -362,58 +316,6 @@ public class AudioPlayerPlugin extends Plugin {
         } catch (Exception ex) {
             call.reject("There was an issue cleaning up the audio player (2).", ex);
         }
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onAppGainsFocus(PluginCall call) {
-        call.setKeepAlive(true);
-        getBridge().saveCall(call);
-
-        appOnStartCallbackIds.put(audioId(call), call.getCallbackId());
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onAppLosesFocus(PluginCall call) {
-        call.setKeepAlive(true);
-        getBridge().saveCall(call);
-
-        appOnStopCallbackIds.put(audioId(call), call.getCallbackId());
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onAudioReady(PluginCall call) {
-        if (!audioSourceExists("onAudioReady", call)) {
-            return;
-        }
-
-        call.setKeepAlive(true);
-        getBridge().saveCall(call);
-
-        audioPlayerService.setOnAudioReady(audioId(call), call.getCallbackId());
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onAudioEnd(PluginCall call) {
-        if (!audioSourceExists("onAudioEnd", call)) {
-            return;
-        }
-
-        call.setKeepAlive(true);
-        getBridge().saveCall(call);
-
-        audioPlayerService.setOnAudioEnd(audioId(call), call.getCallbackId());
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onPlaybackStatusChange(PluginCall call) {
-        if (!audioSourceExists("onPlaybackStatusChange", call)) {
-            return;
-        }
-
-        call.setKeepAlive(true);
-        getBridge().saveCall(call);
-
-        audioPlayerService.setOnPlaybackStatusChange(audioId(call), call.getCallbackId());
     }
 
     @Override

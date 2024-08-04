@@ -68,26 +68,18 @@ public class AudioSource {
         player.prepare();
     }
 
-    public void changeAudioSource(String newSource) {
-        source = newSource;
-
-        player.setMediaItem(buildMediaItem());
-        player.setPlayWhenReady(false);
-        player.prepare();
-    }
-
-    public float getDuration() {
+    public long getDuration() {
         long duration = player.getDuration();
 
         if (duration == C.TIME_UNSET) {
             return -1;
         }
 
-        return duration / 1000;
+        return duration;
     }
 
-    public float getCurrentTime() {
-        return player.getCurrentPosition() / 1000;
+    public long getCurrentTime() {
+        return player.getCurrentPosition();
     }
 
     public void play() {
@@ -104,8 +96,8 @@ public class AudioSource {
         player.pause();
     }
 
-    public void seek(long timeInSeconds) {
-        player.seekTo(timeInSeconds * 1000);
+    public void seek(long position) {
+        player.seekTo(position);
     }
 
     public void stop() {
@@ -120,24 +112,12 @@ public class AudioSource {
         serviceOwner.stop(id);
     }
 
-    public void setVolume(float volume) {
-        player.setVolume(volume);
-    }
-
     public void setRate(float rate) {
         player.setPlaybackSpeed(rate);
     }
 
-    public void setOnReady(String callbackId) {
-        onReadyCallbackId = callbackId;
-    }
-
     public void setOnEnd(String callbackId) {
         onEndCallbackId = callbackId;
-    }
-
-    public void setOnPlaybackStatusChange(String callbackId) {
-        onPlaybackStatusChangeCallbackId = callbackId;
     }
 
     public boolean isPlaying() {

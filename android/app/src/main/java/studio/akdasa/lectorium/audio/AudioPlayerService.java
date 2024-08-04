@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -56,12 +55,6 @@ public class AudioPlayerService extends Service {
         return audioSources.containsKey(audioSourceId);
     }
 
-    public void changeAudioSource(String audioSourceId, String newSource) {
-        Log.i(TAG, String.format("Changing audio source for ID %s to %s", audioSourceId, newSource));
-
-        getAudioSource(audioSourceId).changeAudioSource(newSource);
-    }
-
     public float getDuration(String audioSourceId) {
         Log.i(TAG, String.format("Getting duration for audio source ID %s", audioSourceId));
 
@@ -90,9 +83,9 @@ public class AudioPlayerService extends Service {
         getAudioSource(audioSourceId).pause();
     }
 
-    public void seek(String audioSourceId, long timeInSeconds) {
+    public void seek(String audioSourceId, long position) {
         Log.i(TAG, String.format("Seeking audio source ID %s", audioSourceId));
-        getAudioSource(audioSourceId).seek(timeInSeconds);
+        getAudioSource(audioSourceId).seek(position);
     }
 
     public void stop(String audioSourceId) {
@@ -105,11 +98,6 @@ public class AudioPlayerService extends Service {
         }
 
         getAudioSource(audioSourceId).stop();
-    }
-
-    public void setVolume(String audioSourceId, float volume) {
-        Log.i(TAG, String.format("Setting volume for audio source ID %s", audioSourceId));
-        getAudioSource(audioSourceId).setVolume(volume);
     }
 
     public void setRate(String audioSourceId, float rate) {
@@ -144,18 +132,6 @@ public class AudioPlayerService extends Service {
             Log.i(TAG, String.format("Stopping service, audio source ID %s was the last source to be destroyed", audioSourceId));
             stopService();
         }
-    }
-
-    public void setOnAudioReady(String audioSourceId, String callbackId) {
-        getAudioSource(audioSourceId).setOnReady(callbackId);
-    }
-
-    public void setOnAudioEnd(String audioSourceId, String callbackId) {
-        getAudioSource(audioSourceId).setOnEnd(callbackId);
-    }
-
-    public void setOnPlaybackStatusChange(String audioSourceId, String callbackId) {
-        getAudioSource(audioSourceId).setOnPlaybackStatusChange(callbackId);
     }
 
     public boolean isRunning() {
