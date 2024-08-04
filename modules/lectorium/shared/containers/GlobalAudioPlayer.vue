@@ -1,12 +1,10 @@
 <template>
-  <audio ref="audioRef" />
 </template>
 
 <script setup lang="ts">
 import { useLibrary } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { ref, watch } from 'vue'
-import { useMediaControls } from '@vueuse/core'
 import { useUserData } from '@lectorium/playlist'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { AudioPlayer } from '@core/plugins'
@@ -17,9 +15,7 @@ const library = useLibrary()
 const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
-const url = ref<string>("")
-const audioRef = ref()
-const { playing, waiting, duration, currentTime } = useMediaControls(audioRef, { src: url })
+const trackId = ref<string>("")
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch(audioPlayer.state, async (current, previous) => {
@@ -32,21 +28,14 @@ watch(audioPlayer.state, async (current, previous) => {
   }
 })
 
-watch(waiting, (current, previous) => {
-  if (!current) {
-    playing.value = audioPlayer.state.value.playing
-    audioPlayer.state.value.duration = duration.value
-    audioPlayer.state.value.loading = false
-  }
-})
-
-watch(currentTime, (current) => {
-  audioPlayer.state.value.position = current
-})
 
 watch(() => audioPlayer.state.value.playing, (current) => {
-  if (waiting.value || !url.value) { return }
-  playing.value = current
+  if (!trackId.value) { return }
+  if (current) {
+    AudioPlayer.play({ audioId: trackId.value })
+  } else {
+    AudioPlayer.pause({ audioId: trackId.value })
+  }
 })
 
 // ── Handlers ────────────────────────────────────────────────────────
@@ -64,46 +53,52 @@ async function onTrackChanged(
   trackId: string | undefined,
   position: number
 ) {
-  try {
   if (trackId) {
     const track = await library.tracks.get(trackId)
     const media = await userData.media.service.getByUrl(track.url)
+    if (!media || media.state !== "downloaded") { return }
 
-    if (media?.state === "downloaded") {
-      const finalPath = (await Filesystem.getUri({
-        directory: Directory.Data,
-        path: media.localPath
-      })).uri
+    const finalPath = (await Filesystem.getUri({
+      directory: Directory.Data,
+      path: media.localPath
+    })).uri
 
-      await AudioPlayer.create({
-        audioId: track.id,
-        useForNotification: true,
-        audioSource: finalPath,
-        friendlyTitle: track.title,
-        isBackgroundMusic: true,
-        loop: false
-      })
-      await AudioPlayer.initialize({
-        audioId: track.id,
-      })
-      await AudioPlayer.play({
-        audioId: track.id,
-      })
-
-    } else {
-      // url.value = track.url
-    }
-
-    console.log("playing", url.value)
-    currentTime.value = position
-  }
-  } catch (error) {
-    // @ts-ignore
-    console.error("Error onTrackChanged", error.message)
+    await AudioPlayer.create({
+      audioId: track.id,
+      useForNotification: true,
+      audioSource: finalPath,
+      friendlyTitle: track.title,
+      isBackgroundMusic: true,
+      loop: false
+    })
+    await AudioPlayer.initialize({
+      audioId: track.id,
+    })
+    audioPlayer.duration.value = (await AudioPlayer.getDuration({
+      audioId: track.id
+    })).duration
+    await AudioPlayer.seek({
+      audioId: track.id,
+      timeInSeconds: position
+    })
+    await AudioPlayer.play({
+      audioId: track.id,
+    })
   }
 }
 
-function onRewindRequested(position: number) {
-  currentTime.value = position
+async function onRewindRequested(
+  position: number
+) {
+  await AudioPlayer.seek({
+    audioId: trackId.value,
+    timeInSeconds: position
+  })
 }
+
+setInterval(async () => {
+  if (trackId.value) {
+    audioPlayer.position.value = (await AudioPlayer.getCurrentTime({ audioId: trackId.value })).currentTime
+  }
+}, 1000)
 </script>
