@@ -7,15 +7,15 @@
     <template #main="props">
       <MainSection
         :shrink-size="props.shrink"
-      />
+    />
     </template>
 
     <template #player>
       <PlayerSection
         ref="refPlayerSection"
-        :playing="audioPlayer.state.value.playing"
+        :playing="audioPlayer.playing.value"
         :loading="false"
-        :position="audioPlayer.state.value.position"
+        :position="audioPlayer.position.value"
         :percentPlayed="percentPlayed"
         :track="currentTrack"
         :transcript="currentTranscript"
@@ -45,10 +45,10 @@ const library     = useLibrary()
 const refPlayerSection  = ref<InstanceType<typeof PlayerSection>>()
 const currentTrack      = ref<Track|undefined>()
 const currentTranscript = ref<TrackTranscript|undefined>()
-const percentPlayed     = computed(() => audioPlayer.state.value.position / audioPlayer.state.value.duration * 100)
+const percentPlayed     = computed(() => audioPlayer.position.value / audioPlayer.duration.value * 100)
 
 // ── State ───────────────────────────────────────────────────────────
-watch(() => audioPlayer.state.value.trackId, async (value) => {
+watch(audioPlayer.trackId, async (value) => {
   // TODO: change language for transcript
   currentTrack.value      = value ? await library.tracks.get(value) : currentTrack.value
   currentTranscript.value = value ? await library.tracks.getTranscript(value, 'ru') : currentTranscript.value

@@ -6,15 +6,21 @@ export async function runPlaylistPersistence() {
   const audioPlayer = useAudioPlayer()
   const data = useUserData()
 
-  watch(audioPlayer.state, async (current, previous) => {
-    if (current.trackId !== previous.trackId) {
-      if (!previous.trackId) { return }
-      data.playlistItems.service.setPlayedTime(previous.trackId, previous.position)
-      console.log('Track has changed', previous.trackId, previous.position)
-    } else if (current.trackId === previous.trackId && !current.playing) {
-      if (!current.trackId) { return }
-      data.playlistItems.service.setPlayedTime(current.trackId, current.position)
-      console.log('Track is paused', current.trackId, current.position)
+  watch([
+    audioPlayer.trackId,
+    audioPlayer.playing,
+    audioPlayer.position,
+  ], async (current, previous) => {
+    const c = { trackId: current[0], playing: current[1], position: current[2] }
+    const p = { trackId: previous[0], playing: previous[1], position: previous[2] }
+
+    if (c.trackId !== p.trackId && p.trackId) {
+      await data.playlistItems.service.setPlayedTime(p.trackId, p.position)
+      console.log('Track has changed', p.trackId, p.position)
+    }
+    if (c.trackId === p.trackId && !c.playing && c.trackId) {
+      await data.playlistItems.service.setPlayedTime(c.trackId, c.position)
+      console.log('Track is paused', c.trackId, c.position)
     }
   })
 }

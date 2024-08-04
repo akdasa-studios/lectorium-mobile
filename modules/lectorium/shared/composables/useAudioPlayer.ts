@@ -1,73 +1,60 @@
 import { ref } from 'vue'
-import { createGlobalState } from '@vueuse/core'
+import { createGlobalState, useEventBus } from '@vueuse/core'
+import type { EventBusKey } from '@vueuse/core'
 
-export type AudioPlayerSatate = {
-  trackId: string|undefined,
-  position: number
-  duration: number
-  playing: boolean
-  loading: boolean
+export const Rewind: EventBusKey<{ position: number }> = Symbol('rewind')
+export const Playing: EventBusKey<{ trackId: string, position?: number }> = Symbol('playing')
+export const Close: EventBusKey<{ trackId: string }> = Symbol('close')
+export const AudioPlayerEventBus = {
+  rewind: useEventBus(Rewind),
+  open: useEventBus(Playing),
+  close: useEventBus(Close)
 }
 
 export const useAudioPlayer = createGlobalState(() => {
-  const state = ref<AudioPlayerSatate>({
-    trackId: undefined,
-    position: 0,
-    duration: 0,
-    playing: false,
-    loading: false
-  })
-
   function play(
     trackId: string,
     position?: number
   ) {
-    state.value = {
-      trackId: trackId,
-      position: position || 0,
-      duration: 0,
-      playing: true,
-      loading: true
-    }
+    console.log('play', trackId, position)
+
+    AudioPlayerEventBus.open.emit({ trackId, position })
+    _trackId.value = trackId
+    _position.value = position || 0
+    _playing.value = true
   }
 
   function togglePause() {
-    state.value = {
-      ...state.value,
-      playing: !state.value.playing
-    }
+    _playing.value = !_playing.value
   }
 
   function stop() {
-    state.value = {
-      trackId: undefined,
-      position: 0,
-      duration: 0,
-      playing: false,
-      loading: false
-    }
+    console.log('stop')
+
+    if (!_trackId.value) return
+    AudioPlayerEventBus.close.emit({ trackId: _trackId.value })
+    _playing.value = false
+    _trackId.value = undefined
   }
 
   function rewindTo(position: number) {
-    state.value = {
-      ...state.value,
-      position
-    }
+    AudioPlayerEventBus.rewind.emit({ position })
   }
 
-
-  const position = ref(0)
-  const duration = ref(0)
-  const playing = ref(false)
+  const _trackId = ref<string|undefined>(undefined)
+  const _position = ref(0)
+  const _duration = ref(0)
+  const _playing = ref(false)
 
   return {
-    state,
+    bus: AudioPlayerEventBus,
     play,
     togglePause,
     stop,
     rewindTo,
-    position,
-    duration,
-    playing,
+    position: _position,
+    duration: _duration,
+    playing: _playing,
+    trackId: _trackId
   }
 })

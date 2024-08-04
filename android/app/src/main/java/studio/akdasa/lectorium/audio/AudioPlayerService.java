@@ -55,7 +55,7 @@ public class AudioPlayerService extends Service {
         return audioSources.containsKey(audioSourceId);
     }
 
-    public float getDuration(String audioSourceId) {
+    public long getDuration(String audioSourceId) {
         Log.i(TAG, String.format("Getting duration for audio source ID %s", audioSourceId));
 
         return getAudioSource(audioSourceId).getDuration();
@@ -64,7 +64,7 @@ public class AudioPlayerService extends Service {
     public float getCurrentTime(String audioSourceId) {
         Log.i(TAG, String.format("Getting current time for audio source ID %s", audioSourceId));
 
-        return getAudioSource(audioSourceId).getCurrentTime();
+        return getAudioSource(audioSourceId).getCurrentTime() / 1000;
     }
 
     public void play(String audioSourceId) {

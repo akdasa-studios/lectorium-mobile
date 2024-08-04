@@ -75,7 +75,7 @@ onUnmounted(() => {
   gestureClosePlayerSection?.destroy()
 })
 
-watch(() => audioPlayer.state.value.trackId, async (value) => {
+watch(audioPlayer.trackId, async (value) => {
   appLayout.layoutState.value = value ? "semi-open" : "closed";
   if (!value) return;
 }, { immediate: true })

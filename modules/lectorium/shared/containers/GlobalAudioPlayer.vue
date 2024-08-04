@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useLibrary } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import { useUserData } from '@lectorium/playlist'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { AudioPlayer } from '@core/plugins'
+import { Capacitor } from '@capacitor/core'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const audioPlayer = useAudioPlayer()
@@ -12,49 +13,52 @@ const library = useLibrary()
 const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
-const trackId = ref<string>("")
+let currentTrackId = ""
 let positionRefreshTimer: NodeJS.Timeout | null = null
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watch(audioPlayer.state, async (current, previous) => {
-  if (current.trackId !== previous.trackId) {
-    if (previous.trackId) {
-      await onPreviousTrackUnload(previous.trackId)
-    }
-    if (current.trackId)  {
-      await onTrackChanged(current.trackId, current.position)
-      trackId.value = current.trackId
-    }
-  }
-  if (current.position !== previous.position) {
-    onRewindRequested(current.position)
-  }
-})
-
-
-watch(() => audioPlayer.state.value.playing, (current) => {
-  if (!trackId.value) { return }
-  if (current) {
-    AudioPlayer.play({ audioId: trackId.value })
-  } else {
-    AudioPlayer.pause({ audioId: trackId.value })
-  }
-})
+watch(() => audioPlayer.playing.value, async (current) => await onPlaying(current))
+audioPlayer.bus.rewind.on(async ({ position }) => await onRewind(position))
+audioPlayer.bus.open.on(async ({ trackId, position }) => await open(trackId, position))
+audioPlayer.bus.close.on(async ({ trackId }) => await close(trackId))
 
 // ── Handlers ────────────────────────────────────────────────────────
-async function onPreviousTrackUnload(trackId: string) {
-  try {
-    await AudioPlayer.stop({ audioId: trackId })
-    await AudioPlayer.destroy({ audioId: trackId })
-  } catch (error) {
-    // @ts-ignore
-    console.error("Error onPreviousTrackUnload", error.message)
+async function close(trackId: string) {
+  await onPreviousTrackUnload(trackId)
+  currentTrackId = ""
+}
+
+async function open(trackId: string, position?: number) {
+  if (trackId !== currentTrackId) {
+    await onPreviousTrackUnload(currentTrackId)
   }
+  currentTrackId = trackId
+  await onTrackChanged(trackId, position)
+}
+
+async function onPlaying(playing: boolean) {
+  if (playing) {
+    AudioPlayer.play({ audioId: currentTrackId })
+  } else {
+    AudioPlayer.pause({ audioId: currentTrackId })
+  }
+}
+
+async function onRewind(position: number) {
+  await AudioPlayer.seek({
+    audioId: currentTrackId,
+    position: position
+  })
+}
+
+async function onPreviousTrackUnload(trackId: string) {
+  await AudioPlayer.stop({ audioId: trackId })
+  await AudioPlayer.destroy({ audioId: trackId })
 }
 
 async function onTrackChanged(
   trackId: string,
-  position: number
+  position?: number
 ) {
   const track = await library.tracks.get(trackId)
   const media = await userData.media.service.getByUrl(track.url)
@@ -68,7 +72,7 @@ async function onTrackChanged(
   await AudioPlayer.create({
     audioId: track.id,
     useForNotification: true,
-    audioSource: finalPath,
+    audioSource: Capacitor.getPlatform() === "web" ? media.remoteUrl : finalPath,
     friendlyTitle: track.title,
     isBackgroundMusic: true,
     loop: false
@@ -76,39 +80,29 @@ async function onTrackChanged(
   await AudioPlayer.initialize({
     audioId: track.id,
   })
-  await AudioPlayer.seek({
-    audioId: track.id,
-    position: position
-  })
   await AudioPlayer.play({
     audioId: track.id,
   })
-  audioPlayer.state.value.duration = (await AudioPlayer.getDuration({
-    audioId: track.id
-  })).duration / 1000
+  if (position) {
+    await AudioPlayer.seek({
+      audioId: track.id,
+      position: position
+    })
+  }
 }
 
-async function onRewindRequested(
-  position: number
-) {
-  startPositionRefreshTimer()
-  audioPlayer.state.value.position = position
-  await AudioPlayer.seek({
-    audioId: trackId.value,
-    position: position * 1000
-  })
-}
 
 function startPositionRefreshTimer() {
-  if (positionRefreshTimer) {
-    clearInterval(positionRefreshTimer)
-  }
   positionRefreshTimer = setInterval(async () => {
-    if (trackId.value) {
-      const res = await AudioPlayer.getCurrentTime({ audioId: trackId.value })
-      audioPlayer.state.value.position = res.currentTime / 1000
-    }
+    if (!currentTrackId) { return }
+    if (audioPlayer.playing.value === false) { return }
+
+    const res = await AudioPlayer.getCurrentTime({ audioId: currentTrackId })
+    const dur = await AudioPlayer.getDuration({ audioId: currentTrackId })
+    audioPlayer.position.value = res.currentTime
+    audioPlayer.duration.value = dur.duration
   }, 500)
 }
 
+startPositionRefreshTimer()
 </script>
