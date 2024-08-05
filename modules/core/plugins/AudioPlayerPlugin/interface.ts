@@ -8,8 +8,6 @@ export interface AudioPlayerPrepareParams extends AudioPlayerDefaultParams {
   audioSource: string
   friendlyTitle: string
   useForNotification: boolean
-  isBackgroundMusic?: boolean
-  loop?: boolean
 }
 
 export interface AudioPlayerPlugin extends Plugin {

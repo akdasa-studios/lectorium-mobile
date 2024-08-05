@@ -103,8 +103,6 @@ async function loadTrack(
     useForNotification: true,
     audioSource: audioSource,
     friendlyTitle: track.title,
-    isBackgroundMusic: true,
-    loop: false
   })
   await AudioPlayer.initialize({
     audioId: track.id,

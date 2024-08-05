@@ -7,14 +7,11 @@ export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
 
 
   async create(params: AudioPlayerPrepareParams): Promise<{ success: boolean }> {
-    // Create a new audio element
-    console.log('create', params);
     this.audio = new Audio(params.audioSource);
     return { success: true };
   }
 
   async initialize(params: AudioPlayerDefaultParams): Promise<{ success: boolean }> {
-    // Initialize the audio player
     if (this.audio) {
       return { success: true };
     }
@@ -49,14 +46,12 @@ export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
 
   async seek(params: AudioPlayerDefaultParams & { position: number }): Promise<void> {
     if (this.audio) {
-      console.log('seek!!!', params.position);
       this.audio.currentTime = params.position;
     }
   }
 
   async stop(params: AudioPlayerDefaultParams): Promise<void> {
     if (this.audio) {
-      console.log('stop!!!');
       this.audio.pause();
       this.audio.remove();
 
