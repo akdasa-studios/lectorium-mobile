@@ -14,8 +14,6 @@ public class AudioSource {
     public String id;
     public String source;
     public String friendlyTitle;
-    public boolean useForNotification;
-    public boolean isBackgroundMusic;
     public String onPlaybackStatusChangeCallbackId;
     public String onReadyCallbackId;
     public String onEndCallbackId;
@@ -30,16 +28,12 @@ public class AudioSource {
         AudioPlayerPlugin pluginOwner,
         String id,
         String source,
-        String friendlyTitle,
-        boolean useForNotification,
-        boolean isBackgroundMusic,
+        String friendlyTitle
     ) {
         this.pluginOwner = pluginOwner;
         this.id = id;
         this.source = source;
         this.friendlyTitle = friendlyTitle;
-        this.useForNotification = useForNotification;
-        this.isBackgroundMusic = isBackgroundMusic;
     }
 
     public void initialize(Context context) {
@@ -53,8 +47,8 @@ public class AudioSource {
         player = new ExoPlayer.Builder(context)
             .setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
-                .setContentType(isBackgroundMusic ? C.AUDIO_CONTENT_TYPE_SPEECH : C.AUDIO_CONTENT_TYPE_SPEECH)
-                .build(), useForNotification)
+                .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                .build(), false /*useForNotification*/)
             .setWakeMode(C.WAKE_MODE_NETWORK)
             .build();
         player.setMediaItem(buildMediaItem());
