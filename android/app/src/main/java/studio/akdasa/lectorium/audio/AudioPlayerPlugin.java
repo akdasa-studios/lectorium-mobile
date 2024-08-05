@@ -32,7 +32,10 @@ public class AudioPlayerPlugin extends Plugin {
 
     @Override
     public void load() {
+        Log.i(TAG, "Handling load");
+
         super.load();
+
         createNotificationChannel();
         initializePlugin();
     }
@@ -43,12 +46,16 @@ public class AudioPlayerPlugin extends Plugin {
             String sourceId = audioId(call);
 
             if (audioPlayerService == null) {
-                call.reject("Audio service is not created");
+                Log.e(TAG, "audioPlayerService is null");
+                call.reject("There was an issue creating the audio player (1).");
+
                 return;
             }
 
             if (audioPlayerService.audioSourceExists(sourceId)) {
-                call.reject(String.format("An audio source with the ID %s already exists.", audioId(call)));
+                Log.w(TAG, String.format("An audio source with the ID %s already exists.", audioId(call)));
+                call.reject("There was an issue creating the audio player (2).");
+
                 return;
             }
 
@@ -59,6 +66,7 @@ public class AudioPlayerPlugin extends Plugin {
                 call.getString("friendlyTitle"),
                 call.getBoolean("useForNotification", false),
                 call.getBoolean("isBackgroundMusic", false),
+                call.getBoolean("loop", false)
             );
 
             new Handler(Looper.getMainLooper()).post(
@@ -79,6 +87,7 @@ public class AudioPlayerPlugin extends Plugin {
     @PluginMethod
     public void initialize(PluginCall call) {
         try {
+
             if (!audioSourceExists("initialize", call)) {
                 return;
             }
@@ -108,7 +117,7 @@ public class AudioPlayerPlugin extends Plugin {
             new Handler(Looper.getMainLooper()).post(
                 () -> {
                     try {
-                        float duration = audioPlayerService.getDuration(audioId(call)) / 1000;
+                        float duration = audioPlayerService.getDuration(audioId(call));
 
                         call.resolve(new JSObject().put("duration", duration));
                     } catch (Exception ex) {
@@ -203,7 +212,7 @@ public class AudioPlayerPlugin extends Plugin {
             new Handler(Looper.getMainLooper()).post(
                 () -> {
                     try {
-                        audioPlayerService.seek(audioId(call), Math.round(call.getFloat("position") * 1000));
+                        audioPlayerService.seek(audioId(call), Math.round(call.getFloat("position")));
                         call.resolve();
                     } catch (Exception ex) {
                         call.reject("There was an issue seeking the audio (2).", ex);
