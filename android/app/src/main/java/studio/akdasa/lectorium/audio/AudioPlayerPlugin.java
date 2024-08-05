@@ -1,9 +1,12 @@
 package studio.akdasa.lectorium.audio;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -15,16 +18,22 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import java.util.HashMap;
+
 import studio.akdasa.lectorium.audio.AudioPlayerService.AudioPlayerServiceBinder;
 
 @CapacitorPlugin(name = "AudioPlayer")
 public class AudioPlayerPlugin extends Plugin {
     private static final String TAG = "AudioPlayerPlugin";
+
     private AudioPlayerService audioPlayerService;
+    private HashMap<String, String> appOnStartCallbackIds = new HashMap<>();
+    private HashMap<String, String> appOnStopCallbackIds = new HashMap<>();
 
     @Override
     public void load() {
         super.load();
+        createNotificationChannel();
         initializePlugin();
     }
 
@@ -47,7 +56,9 @@ public class AudioPlayerPlugin extends Plugin {
                 this,
                 sourceId,
                 call.getString("audioSource"),
-                call.getString("friendlyTitle")
+                call.getString("friendlyTitle"),
+                call.getBoolean("useForNotification", false),
+                call.getBoolean("isBackgroundMusic", false),
             );
 
             new Handler(Looper.getMainLooper()).post(
@@ -276,6 +287,9 @@ public class AudioPlayerPlugin extends Plugin {
         try {
             String audioId = audioId(call);
 
+            appOnStartCallbackIds.remove(audioId);
+            appOnStopCallbackIds.remove(audioId);
+
             if (!audioSourceExists("destroy", call)) {
                 return;
             }
@@ -298,13 +312,19 @@ public class AudioPlayerPlugin extends Plugin {
     @Override
     protected void handleOnStart() {
         Log.i(TAG, "Handling onStart");
+
         super.handleOnStart();
+
         initializePlugin();
+        makeAppStatusChangeCallbacks(appOnStartCallbackIds);
     }
 
     @Override
     protected void handleOnStop() {
         Log.i(TAG, "Handling onStop");
+
+        makeAppStatusChangeCallbacks(appOnStopCallbackIds);
+
         super.handleOnStop();
     }
 
@@ -365,6 +385,7 @@ public class AudioPlayerPlugin extends Plugin {
         if (audioPlayerService == null) {
             Log.e(TAG, "audioPlayerService is null");
             call.reject(String.format("There was an issue trying to play the audio (%s [1])", methodName));
+
             return false;
         }
 
@@ -380,5 +401,30 @@ public class AudioPlayerPlugin extends Plugin {
 
     private Context getContextForAudioService() {
         return getBridge().getActivity().getApplicationContext();
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel playbackChannel = new NotificationChannel(
+                AudioPlayerService.PLAYBACK_CHANNEL_ID,
+                "Audio playback",
+                NotificationManager.IMPORTANCE_LOW
+            );
+
+            NotificationManager manager = getContext().getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(playbackChannel);
+        }
+    }
+
+    private void makeAppStatusChangeCallbacks(HashMap<String, String> callbackIds) {
+        for (String callbackId : callbackIds.values()) {
+            PluginCall call = getBridge().getSavedCall(callbackId);
+
+            if (call == null) {
+                continue;
+            }
+
+            call.resolve();
+        }
     }
 }
