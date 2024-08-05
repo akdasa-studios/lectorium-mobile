@@ -1,7 +1,10 @@
 import { watch } from "vue"
-import { useAudioPlayer } from "../composables"
+import { useAudioPlayer } from "@lectorium/shared/composables"
 import { useUserData } from "@lectorium/playlist"
 
+/**
+ * Saves the position when the track is changed or paused.
+ */
 export async function runPlaylistPersistence() {
   const audioPlayer = useAudioPlayer()
   const data = useUserData()
@@ -11,16 +14,18 @@ export async function runPlaylistPersistence() {
     audioPlayer.playing,
     audioPlayer.position,
   ], async (current, previous) => {
-    const c = { trackId: current[0], playing: current[1], position: current[2] }
-    const p = { trackId: previous[0], playing: previous[1], position: previous[2] }
+    const cur  = { trackId: current[0],  playing: current[1],  position: current[2] }
+    const prev = { trackId: previous[0], playing: previous[1], position: previous[2] }
 
-    if (c.trackId !== p.trackId && p.trackId) {
-      await data.playlistItems.service.setPlayedTime(p.trackId, p.position)
-      console.log('Track has changed', p.trackId, p.position)
-    }
-    if (c.trackId === p.trackId && !c.playing && c.trackId) {
-      await data.playlistItems.service.setPlayedTime(c.trackId, c.position)
-      console.log('Track is paused', c.trackId, c.position)
+    const isTrackChanged = cur.trackId !== prev.trackId
+    const isCurentTrackPaused = cur.trackId && !cur.playing
+
+    if (isTrackChanged && prev.trackId) {
+      // Track has changed. Save the position of the previous track.
+      await data.playlistItems.service.setPlayedTime(prev.trackId, prev.position)
+    } else if (!isTrackChanged && isCurentTrackPaused) {
+      // Track is paused. Save the position of the current track.
+      await data.playlistItems.service.setPlayedTime(cur.trackId!, cur.position)
     }
   })
 }
