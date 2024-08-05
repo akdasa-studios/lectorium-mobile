@@ -29,7 +29,7 @@ async function close(trackId: string) {
 }
 
 async function open(trackId: string, position?: number) {
-  if (trackId !== currentTrackId) {
+  if (trackId !== currentTrackId && currentTrackId) {
     await onPreviousTrackUnload(currentTrackId)
   }
   currentTrackId = trackId
