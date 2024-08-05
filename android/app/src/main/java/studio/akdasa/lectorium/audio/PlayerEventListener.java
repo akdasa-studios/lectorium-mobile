@@ -12,7 +12,10 @@ public class PlayerEventListener implements Player.Listener {
     private AudioPlayerPlugin plugin;
     private AudioSource audioSource;
 
-    public PlayerEventListener(AudioPlayerPlugin plugin, AudioSource audioSource) {
+    public PlayerEventListener(
+      AudioPlayerPlugin plugin,
+      AudioSource audioSource
+    ) {
         this.plugin = plugin;
         this.audioSource = audioSource;
     }

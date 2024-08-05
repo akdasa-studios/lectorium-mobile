@@ -25,7 +25,6 @@ public class AudioSource {
     private ExoPlayer player;
     private boolean isPlaying = false;
     private boolean isStopped = true;
-    private boolean loopAudio = false;
 
     public AudioSource(
         AudioPlayerPlugin pluginOwner,
@@ -34,7 +33,6 @@ public class AudioSource {
         String friendlyTitle,
         boolean useForNotification,
         boolean isBackgroundMusic,
-        boolean loopAudio
     ) {
         this.pluginOwner = pluginOwner;
         this.id = id;
@@ -42,7 +40,6 @@ public class AudioSource {
         this.friendlyTitle = friendlyTitle;
         this.useForNotification = useForNotification;
         this.isBackgroundMusic = isBackgroundMusic;
-        this.loopAudio = loopAudio;
     }
 
     public void initialize(Context context) {
@@ -61,7 +58,6 @@ public class AudioSource {
             .setWakeMode(C.WAKE_MODE_NETWORK)
             .build();
         player.setMediaItem(buildMediaItem());
-        player.setRepeatMode(loopAudio ? ExoPlayer.REPEAT_MODE_ONE : ExoPlayer.REPEAT_MODE_OFF);
 
         player.addListener(new PlayerEventListener(pluginOwner, this));
 
