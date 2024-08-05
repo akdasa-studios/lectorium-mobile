@@ -27,8 +27,6 @@ public class AudioPlayerPlugin extends Plugin {
     private static final String TAG = "AudioPlayerPlugin";
 
     private AudioPlayerService audioPlayerService;
-    private HashMap<String, String> appOnStartCallbackIds = new HashMap<>();
-    private HashMap<String, String> appOnStopCallbackIds = new HashMap<>();
 
     @Override
     public void load() {
@@ -60,24 +58,21 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             AudioSource audioSource = new AudioSource(
-                this,
-                sourceId,
-                call.getString("audioSource"),
-                call.getString("friendlyTitle"),
-                call.getBoolean("useForNotification", false),
-                call.getBoolean("isBackgroundMusic", false),
-                call.getBoolean("loop", false)
+                    this,
+                    sourceId,
+                    call.getString("audioSource"),
+                    call.getString("friendlyTitle")
             );
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.createAudioSource(audioSource);
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue creating the audio player (3).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.createAudioSource(audioSource);
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue creating the audio player (3).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue creating the audio player (4).", ex);
@@ -93,14 +88,14 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.initializeAudioSource(audioId(call));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue initializing the audio player (1).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.initializeAudioSource(audioId(call));
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue initializing the audio player (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue initializing the audio player (2).", ex);
@@ -115,15 +110,15 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        float duration = audioPlayerService.getDuration(audioId(call));
+                    () -> {
+                        try {
+                            float duration = audioPlayerService.getDuration(audioId(call));
 
-                        call.resolve(new JSObject().put("duration", duration));
-                    } catch (Exception ex) {
-                        call.reject("There was an issue getting the duration for the audio source (1).", ex);
+                            call.resolve(new JSObject().put("duration", duration));
+                        } catch (Exception ex) {
+                            call.reject("There was an issue getting the duration for the audio source (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue getting the duration for the audio source (2).", ex);
@@ -138,15 +133,15 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        float currentTime = audioPlayerService.getCurrentTime(audioId(call));
+                    () -> {
+                        try {
+                            float currentTime = audioPlayerService.getCurrentTime(audioId(call));
 
-                        call.resolve(new JSObject().put("currentTime", currentTime));
-                    } catch (Exception ex) {
-                        call.reject("There was an issue getting the current time for the audio source (1).", ex);
+                            call.resolve(new JSObject().put("currentTime", currentTime));
+                        } catch (Exception ex) {
+                            call.reject("There was an issue getting the current time for the audio source (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue getting the current time for the audio source (2).", ex);
@@ -166,14 +161,14 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.play(audioId(call));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue playing the audio (1).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.play(audioId(call));
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue playing the audio (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue playing the audio (2).", ex);
@@ -188,14 +183,14 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.pause(audioId(call));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue pausing the audio (1).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.pause(audioId(call));
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue pausing the audio (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue pausing the audio (2).", ex);
@@ -210,14 +205,14 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.seek(audioId(call), Math.round(call.getFloat("position")));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue seeking the audio (2).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.seek(audioId(call), Math.round(call.getFloat("position")));
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue seeking the audio (2).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue seeking the audio (2).", ex);
@@ -232,14 +227,14 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.stop(audioId(call));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue stopping the audio (1).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.stop(audioId(call));
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue stopping the audio (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue stopping the audio (2).", ex);
@@ -254,14 +249,14 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.setRate(audioId(call), call.getFloat("rate"));
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue setting the rate of the audio (1).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.setRate(audioId(call), call.getFloat("rate"));
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue setting the rate of the audio (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue setting the rate of the audio (2).", ex);
@@ -276,15 +271,15 @@ public class AudioPlayerPlugin extends Plugin {
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        boolean isPlaying = audioPlayerService.isPlaying(audioId(call));
+                    () -> {
+                        try {
+                            boolean isPlaying = audioPlayerService.isPlaying(audioId(call));
 
-                        call.resolve(new JSObject().put("isPlaying", isPlaying));
-                    } catch (Exception ex) {
-                        call.reject("There was an issue getting the playing status of the audio (1).", ex);
+                            call.resolve(new JSObject().put("isPlaying", isPlaying));
+                        } catch (Exception ex) {
+                            call.reject("There was an issue getting the playing status of the audio (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue getting the playing status of the audio (2).", ex);
@@ -296,22 +291,19 @@ public class AudioPlayerPlugin extends Plugin {
         try {
             String audioId = audioId(call);
 
-            appOnStartCallbackIds.remove(audioId);
-            appOnStopCallbackIds.remove(audioId);
-
             if (!audioSourceExists("destroy", call)) {
                 return;
             }
 
             new Handler(Looper.getMainLooper()).post(
-                () -> {
-                    try {
-                        audioPlayerService.destroyAudioSource(audioId);
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("There was an issue cleaning up the audio player (1).", ex);
+                    () -> {
+                        try {
+                            audioPlayerService.destroyAudioSource(audioId);
+                            call.resolve();
+                        } catch (Exception ex) {
+                            call.reject("There was an issue cleaning up the audio player (1).", ex);
+                        }
                     }
-                }
             );
         } catch (Exception ex) {
             call.reject("There was an issue cleaning up the audio player (2).", ex);
@@ -325,14 +317,11 @@ public class AudioPlayerPlugin extends Plugin {
         super.handleOnStart();
 
         initializePlugin();
-        makeAppStatusChangeCallbacks(appOnStartCallbackIds);
     }
 
     @Override
     protected void handleOnStop() {
         Log.i(TAG, "Handling onStop");
-
-        makeAppStatusChangeCallbacks(appOnStopCallbackIds);
 
         super.handleOnStop();
     }
@@ -415,25 +404,13 @@ public class AudioPlayerPlugin extends Plugin {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel playbackChannel = new NotificationChannel(
-                AudioPlayerService.PLAYBACK_CHANNEL_ID,
-                "Audio playback",
-                NotificationManager.IMPORTANCE_LOW
+                    AudioPlayerService.PLAYBACK_CHANNEL_ID,
+                    "Audio playback",
+                    NotificationManager.IMPORTANCE_LOW
             );
 
             NotificationManager manager = getContext().getSystemService(NotificationManager.class);
             manager.createNotificationChannel(playbackChannel);
-        }
-    }
-
-    private void makeAppStatusChangeCallbacks(HashMap<String, String> callbackIds) {
-        for (String callbackId : callbackIds.values()) {
-            PluginCall call = getBridge().getSavedCall(callbackId);
-
-            if (call == null) {
-                continue;
-            }
-
-            call.resolve();
         }
     }
 }

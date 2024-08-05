@@ -37,9 +37,7 @@ public class AudioPlayerService extends Service {
 
         Log.i(TAG, String.format("Initializing audio source ID %s (%s)", audioSource.id, audioSource.source));
 
-        if (audioSource.useForNotification) {
-            notificationAudioSource = audioSource;
-        }
+        notificationAudioSource = audioSource;
 
         audioSource.setServiceOwner(this);
         audioSources.put(audioSource.id, audioSource);
@@ -56,14 +54,10 @@ public class AudioPlayerService extends Service {
     }
 
     public long getDuration(String audioSourceId) {
-        Log.i(TAG, String.format("Getting duration for audio source ID %s", audioSourceId));
-
         return getAudioSource(audioSourceId).getDuration();
     }
 
     public float getCurrentTime(String audioSourceId) {
-        Log.i(TAG, String.format("Getting current time for audio source ID %s", audioSourceId));
-
         return getAudioSource(audioSourceId).getCurrentTime() / 1000;
     }
 
@@ -188,13 +182,6 @@ public class AudioPlayerService extends Service {
                 }
             )
             .build();
-
-        playerNotificationManager.setUsePreviousAction(false);
-        playerNotificationManager.setUseNextAction(false);
-        playerNotificationManager.setUseChronometer(true);
-        // playerNotificationManager.setSmallIcon(
-        //     getResources().getIdentifier("ic_stat_icon_default", "drawable", getPackageName())
-        // );
     }
 
     @Override

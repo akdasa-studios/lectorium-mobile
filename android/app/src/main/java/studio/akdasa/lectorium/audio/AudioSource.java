@@ -9,40 +9,29 @@ import com.google.android.exoplayer2.MediaMetadata;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 
 public class AudioSource {
-    private static final String TAG = "AudioSource";
-
     public String id;
     public String source;
     public String friendlyTitle;
-    public boolean useForNotification;
-    public boolean isBackgroundMusic;
+
     public String onPlaybackStatusChangeCallbackId;
     public String onReadyCallbackId;
     public String onEndCallbackId;
-
     private AudioPlayerService serviceOwner;
     private AudioPlayerPlugin pluginOwner;
     private ExoPlayer player;
     private boolean isPlaying = false;
     private boolean isStopped = true;
-    private boolean loopAudio = false;
 
     public AudioSource(
-        AudioPlayerPlugin pluginOwner,
-        String id,
-        String source,
-        String friendlyTitle,
-        boolean useForNotification,
-        boolean isBackgroundMusic,
-        boolean loopAudio
+            AudioPlayerPlugin pluginOwner,
+            String id,
+            String source,
+            String friendlyTitle
     ) {
         this.pluginOwner = pluginOwner;
         this.id = id;
         this.source = source;
         this.friendlyTitle = friendlyTitle;
-        this.useForNotification = useForNotification;
-        this.isBackgroundMusic = isBackgroundMusic;
-        this.loopAudio = loopAudio;
     }
 
     public void initialize(Context context) {
@@ -54,17 +43,14 @@ public class AudioSource {
         isStopped = true;
 
         player = new ExoPlayer.Builder(context)
-            .setAudioAttributes(new AudioAttributes.Builder()
-                .setUsage(C.USAGE_MEDIA)
-                .setContentType(isBackgroundMusic ? C.AUDIO_CONTENT_TYPE_SPEECH : C.AUDIO_CONTENT_TYPE_SPEECH)
-                .build(), useForNotification)
-            .setWakeMode(C.WAKE_MODE_NETWORK)
-            .build();
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(C.USAGE_MEDIA)
+                        .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                        .build(), true)
+                .setWakeMode(C.WAKE_MODE_NETWORK)
+                .build();
         player.setMediaItem(buildMediaItem());
-        player.setRepeatMode(loopAudio ? ExoPlayer.REPEAT_MODE_ONE : ExoPlayer.REPEAT_MODE_OFF);
-
         player.addListener(new PlayerEventListener(pluginOwner, this));
-
         player.prepare();
     }
 
@@ -161,11 +147,11 @@ public class AudioSource {
 
     private MediaItem buildMediaItem() {
         return new MediaItem.Builder()
-            .setMediaMetadata(new MediaMetadata.Builder()
-                .setArtist("")
-                .setTitle(friendlyTitle)
-                .build())
-            .setUri(source)
-            .build();
+                .setMediaMetadata(new MediaMetadata.Builder()
+                        .setArtist("")
+                        .setTitle(friendlyTitle)
+                        .build())
+                .setUri(source)
+                .build();
     }
 }
