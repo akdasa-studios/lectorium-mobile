@@ -17,26 +17,42 @@ let currentTrackId = ""
 let positionRefreshTimer: NodeJS.Timeout | null = null
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watch(() => audioPlayer.playing.value, async (current) => await onPlaying(current))
-audioPlayer.bus.rewind.on(async ({ position }) => await onRewind(position))
+watch(() => audioPlayer.playing.value, async (current) => await play(current))
+audioPlayer.bus.rewind.on(async ({ position }) => await rewind(position))
 audioPlayer.bus.open.on(async ({ trackId, position }) => await open(trackId, position))
-audioPlayer.bus.close.on(async ({ trackId }) => await close(trackId))
+audioPlayer.bus.close.on(async () => await closeCurrentTrack())
 
 // ── Handlers ────────────────────────────────────────────────────────
-async function close(trackId: string) {
-  await onPreviousTrackUnload(trackId)
+/**
+ * Open track in the player. Close the current track if needed.
+ * @param trackId Track ID to open.
+ * @param position Position to seek in seconds.
+ */
+async function open(
+  trackId: string,
+  position?: number
+) {
+  if (currentTrackId && trackId !== currentTrackId) {
+    await closeCurrentTrack()
+  }
+  currentTrackId = await loadTrack(trackId, position)
+}
+
+/**
+ * Close curent track in the player.
+ */
+async function closeCurrentTrack() {
+  await unloadTrack(currentTrackId)
   currentTrackId = ""
 }
 
-async function open(trackId: string, position?: number) {
-  if (trackId !== currentTrackId && currentTrackId) {
-    await onPreviousTrackUnload(currentTrackId)
-  }
-  currentTrackId = trackId
-  await onTrackChanged(trackId, position)
-}
-
-async function onPlaying(playing: boolean) {
+/**
+ * Set playing state of the player.
+ * @param playing Playing state.
+ */
+async function play(
+  playing: boolean
+) {
   if (playing) {
     AudioPlayer.play({ audioId: currentTrackId })
   } else {
@@ -44,35 +60,48 @@ async function onPlaying(playing: boolean) {
   }
 }
 
-async function onRewind(position: number) {
+/**
+ * Seek to the position in the current track.
+ * @param position Position in seconds.
+ */
+async function rewind(
+  position: number
+) {
   await AudioPlayer.seek({
     audioId: currentTrackId,
     position: position
   })
 }
 
-async function onPreviousTrackUnload(trackId: string) {
-  await AudioPlayer.stop({ audioId: trackId })
-  await AudioPlayer.destroy({ audioId: trackId })
-}
-
-async function onTrackChanged(
+/**
+ * Load track into the player.
+ * @param trackId Track ID to load.
+ * @param position Seek position in seconds.
+ */
+async function loadTrack(
   trackId: string,
   position?: number
-) {
+): Promise<string> {
+  // Gets information about the track. Skip it if the track is not found
+  // or not downloaded.
   const track = await library.tracks.get(trackId)
   const media = await userData.media.service.getByUrl(track.url)
-  if (!media || media.state !== "downloaded") { return }
+  if (!media || media.state !== "downloaded") { return "" }
 
-  const finalPath = (await Filesystem.getUri({
-    directory: Directory.Data,
-    path: media.localPath
-  })).uri
+  // Get path to the media file according to the platform.
+  const isWeb = Capacitor.getPlatform() === "web"
+  const audioSource = isWeb
+    ? media.remoteUrl
+    : (await Filesystem.getUri({
+        directory: Directory.Data,
+        path: media.localPath
+      })).uri
 
+  // Initialize track in the player.
   await AudioPlayer.create({
     audioId: track.id,
     useForNotification: true,
-    audioSource: Capacitor.getPlatform() === "web" ? media.remoteUrl : finalPath,
+    audioSource: audioSource,
     friendlyTitle: track.title,
     isBackgroundMusic: true,
     loop: false
@@ -80,6 +109,8 @@ async function onTrackChanged(
   await AudioPlayer.initialize({
     audioId: track.id,
   })
+
+  // Play the track and seek to the position if needed.
   await AudioPlayer.play({
     audioId: track.id,
   })
@@ -89,9 +120,22 @@ async function onTrackChanged(
       position: position
     })
   }
+
+  return track.id
 }
 
+/**
+ * Unload track from the player.
+ * @param trackId Track ID
+ */
+async function unloadTrack(
+  trackId: string
+) {
+  await AudioPlayer.stop({ audioId: trackId })
+  await AudioPlayer.destroy({ audioId: trackId })
+}
 
+// https://github.com/akdasa-studios/lectorium-mobile/issues/30
 function startPositionRefreshTimer() {
   positionRefreshTimer = setInterval(async () => {
     if (!currentTrackId) { return }
