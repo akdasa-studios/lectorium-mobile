@@ -9,10 +9,15 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.ui.DefaultMediaDescriptionAdapter;
 import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 
-import java.util.HashMap;
+import com.getcapacitor.PluginCall;
+
 
 import studio.akdasa.lectorium.MainActivity;
 
@@ -22,118 +27,48 @@ public class AudioPlayerService extends Service {
     public static final int PLAYBACK_NOTIFICATION_ID = 1;
 
     private final IBinder serviceBinder = new AudioPlayerServiceBinder();
-    private static boolean isRunning = false;
-
+    private ExoPlayer player;
+    private ProgressTracker progressTracker;
     private PlayerNotificationManager playerNotificationManager;
-    private AudioSource notificationAudioSource;
-    private HashMap<String, AudioSource> audioSources = new HashMap<>();
-
-    public boolean createAudioSource(AudioSource audioSource) {
-        if (audioSources.containsKey(audioSource.id)) {
-            Log.w(TAG, String.format("There is already an audio source with ID %s", audioSource.id));
-
-            return false;
-        }
-
-        Log.i(TAG, String.format("Initializing audio source ID %s (%s)", audioSource.id, audioSource.source));
-
-        notificationAudioSource = audioSource;
-
-        audioSource.setServiceOwner(this);
-        audioSources.put(audioSource.id, audioSource);
-
-        return true;
+    
+    public void createAudioSource(String audioId, String audioSource) {
+        player = new ExoPlayer.Builder(this)
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(C.USAGE_MEDIA)
+                        .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                        .build(), true)
+                .setWakeMode(C.WAKE_MODE_NETWORK)
+                .build();
+        player.setMediaItem(MediaItem.fromUri(audioSource));
+        player.prepare();
+        playerNotificationManager.setPlayer(player);
+        progressTracker = new ProgressTracker(player);
     }
 
-    public void initializeAudioSource(String audioSourceId) {
-        getAudioSource(audioSourceId).initialize(this);
+    public void play() {
+        player.play();
     }
 
-    public boolean audioSourceExists(String audioSourceId) {
-        return audioSources.containsKey(audioSourceId);
+    public void pause() {
+        player.pause();
     }
 
-    public long getDuration(String audioSourceId) {
-        return getAudioSource(audioSourceId).getDuration();
+    public void seek(long position) {
+        player.seekTo(position);
     }
 
-    public float getCurrentTime(String audioSourceId) {
-        return getAudioSource(audioSourceId).getCurrentTime() / 1000;
-    }
-
-    public void play(String audioSourceId) {
-        Log.i(TAG, String.format("Playing audio source ID %s", audioSourceId));
-
-        if (notificationAudioSource.id.equals(audioSourceId)) {
-            Log.i(TAG, String.format("Setting notification player to audio source ID %s", audioSourceId));
-            playerNotificationManager.setPlayer(getAudioSource(audioSourceId).getPlayer());
-        }
-
-        getAudioSource(audioSourceId).play();
-    }
-
-    public void pause(String audioSourceId) {
-        Log.i(TAG, String.format("Pausing audio source ID %s", audioSourceId));
-        getAudioSource(audioSourceId).pause();
-    }
-
-    public void seek(String audioSourceId, long position) {
-        Log.i(TAG, String.format("Seeking audio source ID %s", audioSourceId));
-        getAudioSource(audioSourceId).seek(position);
-    }
-
-    public void stop(String audioSourceId) {
-        Log.i(TAG, String.format("Stopping audio source ID %s", audioSourceId));
-
-        if (notificationAudioSource.id.equals(audioSourceId)) {
-            Log.i(TAG, String.format("Clearing notification for audio source ID %s", audioSourceId));
-            clearNotification();
-            stopService();
-        }
-
-        getAudioSource(audioSourceId).stop();
-    }
-
-    public void setRate(String audioSourceId, float rate) {
-        Log.i(TAG, String.format("Setting rate for audio source ID %s", audioSourceId));
-        getAudioSource(audioSourceId).setRate(rate);
-    }
-
-    public boolean isPlaying(String audioSourceId) {
-        return getAudioSource(audioSourceId).isPlaying();
-    }
-
-    public void destroyAudioSource(String audioSourceId) throws DestroyNotAllowedException {
-        Log.i(TAG, String.format("Destroying audio source ID %s", audioSourceId));
-
-        if (notificationAudioSource != null) {
-            if (notificationAudioSource.id.equals(audioSourceId)) {
-                if (audioSources.size() > 1) {
-                    throw new DestroyNotAllowedException(String.format("Audio source ID %s is the current notification and cannot be destroyed. Destroy other audio sources first.", audioSourceId));
-                } else {
-                    Log.i(TAG, String.format("Clearing notification while destroying audio source ID %s", audioSourceId));
-                    clearNotification();
-                }
-            }
-        }
-
-        AudioSource audioSource = getAudioSource(audioSourceId);
-        audioSource.releasePlayer();
-
-        audioSources.remove(audioSourceId);
-
-        if (audioSources.isEmpty()) {
-            Log.i(TAG, String.format("Stopping service, audio source ID %s was the last source to be destroyed", audioSourceId));
-            stopService();
-        }
-    }
-
-    public boolean isRunning() {
-        return isRunning;
+    public void stop() {
+        clearNotification();
+        stopService();
+        player.stop();
     }
 
     public static Intent newIntent(Context context) {
         return new Intent(context, AudioPlayerService.class);
+    }
+
+    public void addOnStatusChangeListener(PluginCall call) {
+        this.progressTracker.setCall(call);
     }
 
     public class AudioPlayerServiceBinder extends Binder {
@@ -190,37 +125,15 @@ public class AudioPlayerService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Service starting");
-        isRunning = true;
-
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public void onDestroy() {
         Log.i(TAG, "Service being destroyed");
         clearNotification();
         playerNotificationManager = null;
 
-        for (AudioSource audioSource : audioSources.values()) {
-            audioSource.releasePlayer();
-        }
-
-        audioSources.clear();
-        isRunning = false;
+        player.release();
+        player = null;
 
         super.onDestroy();
-    }
-
-    private AudioSource getAudioSource(String id) {
-        AudioSource source = audioSources.get(id);
-
-        if (source == null) {
-            Log.w(TAG, String.format("Audio source with ID %s was not found.", id));
-        }
-
-        return source;
     }
 
     private void clearNotification() {
@@ -233,6 +146,5 @@ public class AudioPlayerService extends Service {
     private void stopService() {
         stopForeground(true);
         stopSelf();
-        isRunning = false;
     }
 }

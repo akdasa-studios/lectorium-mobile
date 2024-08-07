@@ -53,6 +53,7 @@ async function closeCurrentTrack() {
 async function play(
   playing: boolean
 ) {
+  if (!currentTrackId) { return }
   if (playing) {
     AudioPlayer.play({ audioId: currentTrackId })
   } else {
@@ -67,6 +68,7 @@ async function play(
 async function rewind(
   position: number
 ) {
+  if (!currentTrackId) { return }
   await AudioPlayer.seek({
     audioId: currentTrackId,
     position: position
@@ -100,12 +102,13 @@ async function loadTrack(
   // Initialize track in the player.
   await AudioPlayer.create({
     audioId: track.id,
-    useForNotification: true,
     audioSource: audioSource,
-    friendlyTitle: track.title,
   })
-  await AudioPlayer.initialize({
-    audioId: track.id,
+  await AudioPlayer.onProgressChanged({
+    audioId: track.id
+  }, (v) => {
+    audioPlayer.position.value = v.position
+    audioPlayer.duration.value = v.duration
   })
 
   // Play the track and seek to the position if needed.
@@ -130,21 +133,5 @@ async function unloadTrack(
   trackId: string
 ) {
   await AudioPlayer.stop({ audioId: trackId })
-  await AudioPlayer.destroy({ audioId: trackId })
 }
-
-// https://github.com/akdasa-studios/lectorium-mobile/issues/30
-function startPositionRefreshTimer() {
-  positionRefreshTimer = setInterval(async () => {
-    if (!currentTrackId) { return }
-    if (audioPlayer.playing.value === false) { return }
-
-    const res = await AudioPlayer.getCurrentTime({ audioId: currentTrackId })
-    const dur = await AudioPlayer.getDuration({ audioId: currentTrackId })
-    audioPlayer.position.value = res.currentTime
-    audioPlayer.duration.value = dur.duration
-  }, 500)
-}
-
-startPositionRefreshTimer()
 </script>

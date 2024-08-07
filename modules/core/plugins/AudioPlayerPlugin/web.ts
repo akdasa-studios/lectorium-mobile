@@ -1,35 +1,20 @@
 import { PluginListenerHandle } from "@capacitor/core";
-import { AudioPlayerPlugin, AudioPlayerDefaultParams, AudioPlayerPrepareParams } from "./interface";
+import { AudioPlayerPlugin, AudioPlayerDefaultParams, AudioPlayerPrepareParams, AudioPlayerListenerResult } from "./interface";
 
 
 export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
+  onProgressChanged(params: AudioPlayerDefaultParams, callback: (result: { position: number; playing: boolean; duration: number; }) => void): Promise<AudioPlayerListenerResult> {
+    return new Promise((resolve, reject) => {
+      resolve({ callbackId: "123" });
+    });
+    // throw new Error("Method not implemented.");
+  }
   private audio: HTMLAudioElement | null = null;
 
 
   async create(params: AudioPlayerPrepareParams): Promise<{ success: boolean }> {
     this.audio = new Audio(params.audioSource);
     return { success: true };
-  }
-
-  async initialize(params: AudioPlayerDefaultParams): Promise<{ success: boolean }> {
-    if (this.audio) {
-      return { success: true };
-    }
-    return { success: false };
-  }
-
-  async getDuration(params: AudioPlayerDefaultParams): Promise<{ duration: number }> {
-    if (this.audio) {
-      return { duration: this.audio.duration};
-    }
-    return { duration: 0 };
-  }
-
-  async getCurrentTime(params: AudioPlayerDefaultParams): Promise<{ currentTime: number }> {
-    if (this.audio) {
-      return { currentTime: this.audio.currentTime };
-    }
-    return { currentTime: 0 };
   }
 
   async play(params: AudioPlayerDefaultParams): Promise<void> {
@@ -56,26 +41,6 @@ export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
       this.audio.remove();
 
       // this.audio.currentTime = 0;
-    }
-  }
-
-  async setRate(params: AudioPlayerDefaultParams & { rate: number }): Promise<void> {
-    if (this.audio) {
-      this.audio.playbackRate = params.rate;
-    }
-  }
-
-  async isPlaying(params: AudioPlayerDefaultParams): Promise<{ isPlaying: boolean }> {
-    if (this.audio) {
-      return { isPlaying: !this.audio.paused };
-    }
-    return { isPlaying: false };
-  }
-
-  async destroy(params: AudioPlayerDefaultParams): Promise<void> {
-    if (this.audio) {
-      this.audio.pause();
-      this.audio = null;
     }
   }
 
