@@ -39,7 +39,7 @@ async function open(
 }
 
 /**
- * Close curent track in the player.
+ * Close current track in the player.
  */
 async function closeCurrentTrack() {
   await unloadTrack(currentTrackId)
@@ -55,9 +55,9 @@ async function play(
 ) {
   if (!currentTrackId) { return }
   if (playing) {
-    AudioPlayer.play({ audioId: currentTrackId })
+    await AudioPlayer.play({ audioId: currentTrackId })
   } else {
-    AudioPlayer.pause({ audioId: currentTrackId })
+    await AudioPlayer.pause({ audioId: currentTrackId })
   }
 }
 
