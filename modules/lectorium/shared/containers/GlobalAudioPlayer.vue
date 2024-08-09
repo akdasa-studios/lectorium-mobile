@@ -46,7 +46,7 @@ async function open(
  * Close current track in the player.
  */
 async function closeCurrentTrack() {
-  await unloadTrack(currentTrackId)
+  await unloadTrack()
   currentTrackId = ""
 }
 
@@ -59,9 +59,9 @@ async function play(
 ) {
   if (!currentTrackId) { return }
   if (playing) {
-    await AudioPlayer.play({ audioId: currentTrackId })
+    await AudioPlayer.play()
   } else {
-    await AudioPlayer.pause({ audioId: currentTrackId })
+    await AudioPlayer.pause()
   }
 }
 
@@ -73,10 +73,7 @@ async function rewind(
   position: number
 ) {
   if (!currentTrackId) { return }
-  await AudioPlayer.seek({
-    audioId: currentTrackId,
-    position: position
-  })
+  await AudioPlayer.seek({ position: position })
 }
 
 /**
@@ -105,17 +102,13 @@ async function loadTrack(
 
   // Initialize track in the player.
   await AudioPlayer.create({
-    audioId: track.id,
     audioSource: audioSource,
   })
 
   // Play the track and seek to the position if needed.
-  await AudioPlayer.play({
-    audioId: track.id,
-  })
+  await AudioPlayer.play()
   if (position) {
     await AudioPlayer.seek({
-      audioId: track.id,
       position: position
     })
   }
@@ -125,11 +118,8 @@ async function loadTrack(
 
 /**
  * Unload track from the player.
- * @param trackId Track ID
  */
-async function unloadTrack(
-  trackId: string
-) {
-  await AudioPlayer.stop({ audioId: trackId })
+async function unloadTrack() {
+  await AudioPlayer.stop()
 }
 </script>
