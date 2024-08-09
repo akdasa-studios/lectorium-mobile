@@ -1,9 +1,11 @@
 import { PluginListenerHandle } from "@capacitor/core";
-import { AudioPlayerPlugin, AudioPlayerDefaultParams, AudioPlayerPrepareParams, AudioPlayerListenerResult } from "./interface";
+import { AudioPlayerPlugin, AudioPlayerPrepareParams, AudioPlayerListenerResult } from "./interface";
 
 
 export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
-  onProgressChanged(params: AudioPlayerDefaultParams, callback: (result: { position: number; playing: boolean; duration: number; }) => void): Promise<AudioPlayerListenerResult> {
+  onProgressChanged(
+      callback: (result: { position: number; playing: boolean; duration: number; }) => void
+  ): Promise<AudioPlayerListenerResult> {
     return new Promise((resolve, reject) => {
       resolve({ callbackId: "123" });
     });
@@ -17,25 +19,25 @@ export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
     return { success: true };
   }
 
-  async play(params: AudioPlayerDefaultParams): Promise<void> {
+  async play(): Promise<void> {
     if (this.audio) {
       await this.audio.play();
     }
   }
 
-  async pause(params: AudioPlayerDefaultParams): Promise<void> {
+  async pause(): Promise<void> {
     if (this.audio) {
       this.audio.pause();
     }
   }
 
-  async seek(params: AudioPlayerDefaultParams & { position: number }): Promise<void> {
+  async seek(options: { position: number }): Promise<void> {
     if (this.audio) {
-      this.audio.currentTime = params.position;
+      this.audio.currentTime = options.position;
     }
   }
 
-  async stop(params: AudioPlayerDefaultParams): Promise<void> {
+  async stop(): Promise<void> {
     if (this.audio) {
       this.audio.pause();
       this.audio.remove();

@@ -14,13 +14,17 @@ const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
 let currentTrackId = ""
-let positionRefreshTimer: NodeJS.Timeout | null = null
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch(() => audioPlayer.playing.value, async (current) => await play(current))
 audioPlayer.bus.rewind.on(async ({ position }) => await rewind(position))
 audioPlayer.bus.open.on(async ({ trackId, position }) => await open(trackId, position))
 audioPlayer.bus.close.on(async () => await closeCurrentTrack())
+
+await AudioPlayer.onProgressChanged((v) => {
+  audioPlayer.position.value = v.position
+  audioPlayer.duration.value = v.duration
+})
 
 // ── Handlers ────────────────────────────────────────────────────────
 /**
@@ -103,12 +107,6 @@ async function loadTrack(
   await AudioPlayer.create({
     audioId: track.id,
     audioSource: audioSource,
-  })
-  await AudioPlayer.onProgressChanged({
-    audioId: track.id
-  }, (v) => {
-    audioPlayer.position.value = v.position
-    audioPlayer.duration.value = v.duration
   })
 
   // Play the track and seek to the position if needed.
