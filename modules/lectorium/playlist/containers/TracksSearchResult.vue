@@ -59,6 +59,7 @@ async function fetchData(
 ): Promise<TrackViewModel[]> {
   // TODO: optimization: there is no reason to fetch all playlist items
   // again and agian, we can cache it
+  // https://github.com/akdasa-studios/lectorium-mobile/issues/32
   const [
     tracks,
     playlistItems

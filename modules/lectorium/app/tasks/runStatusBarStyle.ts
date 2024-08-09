@@ -1,10 +1,10 @@
 import { watch } from "vue"
 import { useAppLayout } from "@lectorium/app"
 import { StatusBar, Style } from "@capacitor/status-bar"
-import { isPlatform } from "@ionic/vue";
+import { Capacitor } from "@capacitor/core"
 
 export async function runStatusBarStyle() {
-  if (!isPlatform("android")) { return }
+  if (!Capacitor.isPluginAvailable('StatusBar')) { return }
 
   const layout = useAppLayout()
 

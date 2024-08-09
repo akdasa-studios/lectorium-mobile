@@ -41,5 +41,4 @@ onMounted(async () => {
 watch(sync.documentsPendingToSync, async (value) => {
   documentsPendingToSync.value = value
 })
-
 </script>

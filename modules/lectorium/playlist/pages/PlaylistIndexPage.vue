@@ -41,7 +41,7 @@ const isDrawerOpen = ref(false)
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onPlaylistItemClicked(trackId: string) {
-  if (audioPlayer.state.value.trackId === trackId) {
+  if (audioPlayer.trackId.value === trackId) {
     audioPlayer.togglePause()
   } else {
     const status = await userData.playlistItems.service.get(trackId)

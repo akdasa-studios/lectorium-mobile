@@ -29,22 +29,22 @@ const emit = defineEmits<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const { state: items, isReady, execute: refresh } = useAsyncState<TrackViewModel[]>(
-  async () => await fetchData(), [])
+const { state: items, isReady, execute: refresh } = useAsyncState<TrackViewModel[], [], false>(
+  async () => await fetchData(), [], { shallow: false })
 const playlistEmpty = computed(() => items.value.length === 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watch([
-  () => audioPlayer.state.value.playing,
-  () => audioPlayer.state.value.trackId,
-], async () => {
-  /** Refresh playlist if current track or it's state has changed. */
-  // TODO: There is no reason to fetch whole playlist items, just
-  //       update playing status of the current track and previous one
-  //       if it was changed.
-  items.value = await fetchData()
-}, { immediate: true })
+watch(audioPlayer.trackId, async (current, previous) => {
+  const trackCurrent = items.value.find(x => x.trackId === current)
+  const trackPrevious = items.value.find(x => x.trackId === previous)
+  if (trackCurrent)  { trackCurrent.playingStatus = PlayingStatus.Playing }
+  if (trackPrevious) { trackPrevious.playingStatus = PlayingStatus.None }
+})
 
+watch(audioPlayer.playing, async (current) => {
+  const trackCurrent = items.value.find(x => audioPlayer.trackId.value === x.trackId)
+  if (trackCurrent) { trackCurrent.playingStatus = current ? PlayingStatus.Playing : PlayingStatus.Paused }
+})
 
 watch(userData.playlistItems.changedAt, async () => {
   await refresh()
@@ -81,8 +81,8 @@ async function fetchData(): Promise<TrackViewModel[]> {
         tracks[i.trackId].references.map(
           async x => await library.sources.getLocalizedReference(x, 'ru'))),
       title: tracks[i.trackId].title,
-      playingStatus: audioPlayer.state.value.trackId === i.trackId
-        ? audioPlayer.state.value.playing ? PlayingStatus.Playing : PlayingStatus.Paused
+      playingStatus: audioPlayer.trackId.value === i.trackId
+        ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused
         : PlayingStatus.None,
     })))
 }
