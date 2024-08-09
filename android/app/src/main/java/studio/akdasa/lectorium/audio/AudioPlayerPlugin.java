@@ -26,7 +26,7 @@ public class AudioPlayerPlugin extends Plugin {
     private static final String TAG = "AudioPlayerPlugin";
     private AudioPlayerService audioPlayerService;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i(TAG, "Service connected");
@@ -79,7 +79,6 @@ public class AudioPlayerPlugin extends Plugin {
 
     @PluginMethod
     public void create(@NonNull PluginCall call) {
-        String audioId = call.getString("audioId");
         String audioSource = call.getString("audioSource");
 
         if (audioPlayerService == null) {
@@ -88,13 +87,9 @@ public class AudioPlayerPlugin extends Plugin {
         }
 
         runInMainThread(() -> {
-            audioPlayerService.createAudioSource(audioId, audioSource);
+            audioPlayerService.createAudioSource(audioSource);
             call.resolve();
         });
-    }
-
-    private void runInMainThread(Runnable r) {
-        new Handler(Looper.getMainLooper()).post(r);
     }
 
     @PluginMethod
@@ -117,7 +112,7 @@ public class AudioPlayerPlugin extends Plugin {
     public void seek(@NonNull PluginCall call) {
         long position = call.getInt("position");
         runInMainThread(() -> {
-            audioPlayerService.seek(position);
+            audioPlayerService.seek(position * 1000);
             call.resolve();
         });
     }
@@ -134,11 +129,12 @@ public class AudioPlayerPlugin extends Plugin {
     public void onProgressChanged(@NonNull PluginCall call) {
         call.setKeepAlive(true);
         getBridge().saveCall(call);
-        // PluginCall call = plugin.getBridge().getSavedCall(audioSource.onProgressChangedCallbackId);
-        // audioPlayerService.addOnStatusChangeListener(call.getCallbackId());
         audioPlayerService.addOnStatusChangeListener(call);
     }
 
+    private void runInMainThread(Runnable r) {
+        new Handler(Looper.getMainLooper()).post(r);
+    }
 //    @PluginMethod
 //    public void destroy(PluginCall call) {
 //        try {

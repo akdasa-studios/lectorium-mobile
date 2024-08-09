@@ -28,21 +28,24 @@ public class AudioPlayerService extends Service {
 
     private final IBinder serviceBinder = new AudioPlayerServiceBinder();
     private ExoPlayer player;
-    private ProgressTracker progressTracker;
+    private final AudioPlayerProgressTracker progressTracker = new AudioPlayerProgressTracker();
     private PlayerNotificationManager playerNotificationManager;
     
-    public void createAudioSource(String audioId, String audioSource) {
-        player = new ExoPlayer.Builder(this)
-                .setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(C.USAGE_MEDIA)
-                        .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
-                        .build(), true)
-                .setWakeMode(C.WAKE_MODE_NETWORK)
-                .build();
+    public void createAudioSource(String audioSource) {
+        if (player == null) {
+            player = new ExoPlayer.Builder(this)
+                    .setAudioAttributes(new AudioAttributes.Builder()
+                            .setUsage(C.USAGE_MEDIA)
+                            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                            .build(), true)
+                    .setWakeMode(C.WAKE_MODE_NETWORK)
+                    .build();
+            playerNotificationManager.setPlayer(player);
+            progressTracker.setPlayer(player);
+        }
+
         player.setMediaItem(MediaItem.fromUri(audioSource));
         player.prepare();
-        playerNotificationManager.setPlayer(player);
-        progressTracker = new ProgressTracker(player);
     }
 
     public void play() {
