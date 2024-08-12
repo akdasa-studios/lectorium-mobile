@@ -13,6 +13,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { Track } from '@core/models'
+import { formatDate } from '@core/utils'
 import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksList, useUserData } from '@lectorium/playlist'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useAsyncState } from '@vueuse/core'
@@ -77,9 +78,8 @@ async function fetchData(): Promise<TrackViewModel[]> {
       order: i.order,
       trackId: tracks[i.trackId].id,
       location: await library.locations.getLocalizedName(tracks[i.trackId].location, 'ru'),
-      references: await Promise.all(
-        tracks[i.trackId].references.map(
-          async x => await library.sources.getLocalizedReference(x, 'ru'))),
+      date: formatDate(tracks[i.trackId].date),
+      references: await library.sources.getLocalizedReferences(tracks[i.trackId].references, 'ru'),
       title: tracks[i.trackId].title,
       playingStatus: audioPlayer.trackId.value === i.trackId
         ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused

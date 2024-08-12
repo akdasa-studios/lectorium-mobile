@@ -1,6 +1,6 @@
 import { watch } from "vue"
 import { useUserData } from "@lectorium/playlist"
-import { useSync } from "../composables/useSync"
+import { useSync } from "@lectorium/shared"
 
 export async function runSync() {
   const data = useUserData()

@@ -59,7 +59,7 @@ onUnmounted(() => {
 
 // ── Handlers ────────────────────────────────────────────────────────
 function onMoveHandler(ev: GestureDetail): boolean | void {
-  if (ev.velocityY > 0 && isDrawerOpen.value === false && canOpenDrawer.value) {
+  if (ev.velocityY > 0 && !isDrawerOpen.value && canOpenDrawer.value) {
     isDrawerOpen.value = true
   } else if (ev.velocityY < 0) {
     isDrawerOpen.value = false
