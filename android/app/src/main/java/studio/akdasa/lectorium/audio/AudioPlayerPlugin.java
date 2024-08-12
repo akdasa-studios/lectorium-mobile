@@ -110,9 +110,11 @@ public class AudioPlayerPlugin extends Plugin {
 
     @PluginMethod
     public void seek(@NonNull PluginCall call) {
-        long position = call.getInt("position");
+        Float position = call.getFloat("position", 0.0f);
+        if (position == null) { return; }
+
         runInMainThread(() -> {
-            audioPlayerService.seek(position * 1000);
+            audioPlayerService.seek(position.longValue() * 1000);
             call.resolve();
         });
     }
