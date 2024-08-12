@@ -18,7 +18,10 @@ export const useSync = createGlobalState(() => {
   const documentsPendingToSync = ref(0)
   const context = {
     local:  new Database({ name: collectionName }),
-    remote: new Database({ name: config.serverBaseUrl.value + "/" + collectionName })
+    remote: new Database({ name: config.serverBaseUrl.value + "/" + collectionName }),
+
+    localLibraryIndex:  new Database({ name: "library-v0001-index" }),
+    remoteLibraryIndex: new Database({ name: config.serverBaseUrl.value + "/library-v0001-index" }),
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────
@@ -29,6 +32,7 @@ export const useSync = createGlobalState(() => {
     try {
       inProgress.value = true
 
+      // Replicate Library database
       await context.local.replicateFrom(
         context.remote,
         {
@@ -40,6 +44,12 @@ export const useSync = createGlobalState(() => {
           }
         },
       )
+
+      // Replicate Library Index database
+      await context.localLibraryIndex.replicateFrom(
+          context.remoteLibraryIndex
+      )
+
       config.lastSyncedAt.value = Date.now()
     } catch (error) {
       console.error("Unable to sync data", error)

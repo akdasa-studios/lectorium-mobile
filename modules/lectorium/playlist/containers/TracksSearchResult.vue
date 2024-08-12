@@ -14,6 +14,7 @@
 import { computed, toRefs, watch } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { useSound } from '@vueuse/sound'
+import { formatDate } from '@core/utils'
 import { useLibrary } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus, useUserData } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
@@ -57,28 +58,23 @@ function onTrackClicked(track: TrackViewModel) {
 async function fetchData(
   query: string
 ): Promise<TrackViewModel[]> {
-  // TODO: optimization: there is no reason to fetch all playlist items
-  // again and agian, we can cache it
+  // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
   // https://github.com/akdasa-studios/lectorium-mobile/issues/32
-  const [
-    tracks,
-    playlistItems
-  ] = await Promise.all([
-    library.tracks.getAll(), // TODO: filter by query
-    userData.playlistItems.service.getAll()
-  ])
+  const playlistItems = (await userData.playlistItems.service.getAll()).map(x => x.trackId)
+  const foundTrackIds = await library.search.search(query, 'Russian');
+  const foundTracks = await library.tracks.getMany(foundTrackIds.ids)
 
-  const playlistItemsId = playlistItems.map(x => x.trackId)
-  return await Promise.all(tracks.map(async track => ({
-    trackId: track.id,
-    location: await library.locations.getLocalizedName(track.location, 'ru'),
-    references: await Promise.all(
-      track.references.map(async x => await library.sources.getLocalizedReference(x, 'ru'))),
-    title: track.title,
-    playingStatus: playlistItemsId.includes(track.id)
-                    ? PlayingStatus.InQueue
-                    : PlayingStatus.None
-
-  })))
+  return await Promise.all(
+    foundTracks.map(async i => ({
+      trackId: i.id,
+      title: i.title,
+      date: formatDate(i.date),
+      location: await library.locations.getLocalizedName(i.location, 'ru'),
+      references: await library.sources.getLocalizedReferences(i.references, 'ru'),
+      playingStatus: playlistItems.includes(i.id)
+          ? PlayingStatus.InQueue
+          : PlayingStatus.None,
+    }))
+  )
 }
 </script>

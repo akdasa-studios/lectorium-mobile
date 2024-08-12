@@ -12,7 +12,7 @@
         <b>{{ references[0] }}</b>
         {{ title }}
       </h3>
-      <p>{{ location }}</p>
+      <p>{{ location }} • {{ date }}</p>
     </IonLabel>
   </IonItem>
 </template>
@@ -26,7 +26,7 @@ import { computed } from 'vue';
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<
-  Omit<TrackViewModel, 'trackId'>
+  TrackViewModel
 >()
 
 const emit = defineEmits<{
@@ -43,7 +43,7 @@ const statusIconMaps: StatusIconMap = {
   [PlayingStatus.Loading]: { icon: caretDownCircle,     color: 'primary' },
   [PlayingStatus.Playing]: { icon: headset,             color: 'primary' },
   [PlayingStatus.Paused]:  { icon: headset,             color: 'medium' },
-  [PlayingStatus.Stoped]:  { icon: headset,             color: 'primary' },
+  [PlayingStatus.Stopped]:  { icon: headset,             color: 'primary' },
   [PlayingStatus.Played]:  { icon: checkmarkDoneCircle, color: 'success' },
   [PlayingStatus.None]:    { icon: undefined,           color: undefined }
 }

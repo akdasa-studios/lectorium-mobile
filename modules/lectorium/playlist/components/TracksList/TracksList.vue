@@ -3,8 +3,10 @@
     <TracksListItem
       v-for="item in items"
       :key="item.trackId"
+      :track-id="item.trackId"
       :title="item.title"
       :location="item.location"
+      :date="item.date"
       :references="item.references"
       :playing-status="item.playingStatus"
       @click="onTrackClicked(item)"

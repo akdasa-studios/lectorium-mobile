@@ -3,6 +3,7 @@ import { Database, Repository } from '@core/persistence/Database'
 
 export class LibraryRepository {
   private _db: Repository<Track>
+  private database: Database = new Database({ name: 'library'})
 
   constructor() {
     this._db = new Repository<Track>(
@@ -25,6 +26,30 @@ export class LibraryRepository {
     }
   }
 
+  async getMany(ids: string[]): Promise<Track[]> {
+    const entities = await this.database.db.allDocs<Track>({
+      keys: ids.map(id => `track::${id}::info`),
+      include_docs: true,
+      limit: 25,
+      skip: 0,
+    })
+    return entities.rows.map((entity) => ({
+      // @ts-ignore
+      id: entity.doc!._id.replace('track::', '').replace('::info', ''),
+      // @ts-ignore
+      title: entity.doc!.title,
+      // @ts-ignore
+      url: entity.doc!.url,
+      // @ts-ignore
+      location: entity.doc!.location,
+      // @ts-ignore
+      date: entity.doc!.date,
+      // @ts-ignore
+      references: entity.doc!.references,
+      // @ts-ignore
+      languages: entity.doc!.languages
+    }))
+  }
   async getAll(): Promise<Track[]> {
     // TODO: filter on DB side instead of in memory
 

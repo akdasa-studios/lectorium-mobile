@@ -80,4 +80,16 @@ export class SourcesService {
     const sourceName = await this.getLocalizedShortName(source, language)
     return `${sourceName} ${reference.slice(1).join('.')}`
   }
+
+  async getLocalizedReferences(
+    references: Reference[],
+    language: string,
+  ): Promise<string[]> {
+    if (!references) { return [] }
+    return Promise.all(
+      references.map(
+        async x => await this.getLocalizedReference(x, language)
+      )
+    )
+  }
 }
