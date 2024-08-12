@@ -6,7 +6,7 @@ export enum PlayingStatus {
   Loading,
   Playing,
   Paused,
-  Stoped,
+  Stopped,
   Played,
 }
 
@@ -26,6 +26,9 @@ export interface TrackViewModel {
   references: string[]
 
   /** Is track playing? */
-  playingStatus: PlayingStatus
+  playingStatus: PlayingStatus,
+
+  /** Date */
+  date: string
 }
 

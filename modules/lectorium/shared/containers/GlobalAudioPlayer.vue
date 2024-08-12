@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLibrary } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useUserData } from '@lectorium/playlist'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { AudioPlayer } from '@core/plugins'
@@ -16,15 +16,16 @@ const userData = useUserData()
 let currentTrackId = ""
 
 // ── Hooks ───────────────────────────────────────────────────────────
+onMounted(async () => {
+  await AudioPlayer.onProgressChanged((v) => {
+    audioPlayer.position.value = v.position
+    audioPlayer.duration.value = v.duration
+  })
+})
 watch(() => audioPlayer.playing.value, async (current) => await play(current))
 audioPlayer.bus.rewind.on(async ({ position }) => await rewind(position))
 audioPlayer.bus.open.on(async ({ trackId, position }) => await open(trackId, position))
 audioPlayer.bus.close.on(async () => await closeCurrentTrack())
-
-await AudioPlayer.onProgressChanged((v) => {
-  audioPlayer.position.value = v.position
-  audioPlayer.duration.value = v.duration
-})
 
 // ── Handlers ────────────────────────────────────────────────────────
 /**
@@ -46,7 +47,7 @@ async function open(
  * Close current track in the player.
  */
 async function closeCurrentTrack() {
-  await unloadTrack(currentTrackId)
+  await unloadTrack()
   currentTrackId = ""
 }
 
@@ -59,9 +60,9 @@ async function play(
 ) {
   if (!currentTrackId) { return }
   if (playing) {
-    await AudioPlayer.play({ audioId: currentTrackId })
+    await AudioPlayer.play()
   } else {
-    await AudioPlayer.pause({ audioId: currentTrackId })
+    await AudioPlayer.pause()
   }
 }
 
@@ -73,10 +74,7 @@ async function rewind(
   position: number
 ) {
   if (!currentTrackId) { return }
-  await AudioPlayer.seek({
-    audioId: currentTrackId,
-    position: position
-  })
+  await AudioPlayer.seek({ position: position })
 }
 
 /**
@@ -105,17 +103,13 @@ async function loadTrack(
 
   // Initialize track in the player.
   await AudioPlayer.create({
-    audioId: track.id,
     audioSource: audioSource,
   })
 
   // Play the track and seek to the position if needed.
-  await AudioPlayer.play({
-    audioId: track.id,
-  })
+  await AudioPlayer.play()
   if (position) {
     await AudioPlayer.seek({
-      audioId: track.id,
       position: position
     })
   }
@@ -125,11 +119,8 @@ async function loadTrack(
 
 /**
  * Unload track from the player.
- * @param trackId Track ID
  */
-async function unloadTrack(
-  trackId: string
-) {
-  await AudioPlayer.stop({ audioId: trackId })
+async function unloadTrack() {
+  await AudioPlayer.stop()
 }
 </script>
