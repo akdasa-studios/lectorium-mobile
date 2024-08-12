@@ -1,6 +1,6 @@
 <template>
   <p lang="ru"
-    v-for="(paragraph, idx) in paragraps"
+    v-for="(paragraph, idx) in paragraphs"
     :key="idx"
     class="Prompter"
     :class="{
@@ -49,18 +49,18 @@ const emit = defineEmits<{
 
 // ── State ───────────────────────────────────────────────────────────
 const { blocks } = toRefs(props)
-const paragraps = ref<Array<Block[]>>([])
+const paragraphs = ref<Array<Block[]>>([])
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watch(blocks, update, { immediate: true })
 
 // ── Helpers ─────────────────────────────────────────────────────────
 function update() {
-  paragraps.value = []
+  paragraphs.value = []
   let lastParagraph: Block[] = []
   for (var block of props.blocks) {
     if (block.type === 'paragraph') {
-      paragraps.value.push(lastParagraph)
+      paragraphs.value.push(lastParagraph)
       lastParagraph = []
     } else {
       lastParagraph.push(block)
