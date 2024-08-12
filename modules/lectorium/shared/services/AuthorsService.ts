@@ -1,6 +1,6 @@
 import { Author } from '@core/models'
 
-export class AuthorsRepository {
+export class AuthorsService {
   public async getAll(): Promise<Author[]> {
     return [
       { id: "123", name: "Шрила Прабхупада" },
