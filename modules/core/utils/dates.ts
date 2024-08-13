@@ -5,8 +5,11 @@ export function formatDate(input: string): string {
     const month = input.substring(4, 6);
     const day = input.substring(6, 8);
 
-    // Format the date as YYYY mm dd
-    return `${year} ${month} ${day}`;
+    // Format the date according to locale
+    return new Date(Number(year), Number(month), Number(day))
+      .toLocaleDateString('ru-RU', {
+        year: 'numeric', month: 'numeric', day: 'numeric'
+      });
   } else {
     return input
   }

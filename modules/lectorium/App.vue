@@ -12,11 +12,11 @@
 
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { IonApp, IonRouterOutlet, IonLoading } from '@ionic/vue'
 import { GlobalAudioPlayer } from '@lectorium/shared/containers'
 import { useConfig } from '@lectorium/shared/composables'
-import { useSync } from '@lectorium/shared'
+import { SyncProgress, useSync } from '@lectorium/shared'
 import { useUserData } from './playlist'
 
 // ── Dependencies ────────────────────────────────────────────────────
@@ -26,19 +26,21 @@ const data = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
 const documentsPendingToSync = ref(0);
-const syncMessage = computed(() => {
-  return  documentsPendingToSync.value > 0 ?
-    `${documentsPendingToSync.value} remains...` : "Loading data."
-})
+const syncMessage = ref('Syncing...')
 
 // ── Hooks ───────────────────────────────────────────────────────────
 onMounted(async () => {
+  // Start full sync
   await sync.execute({
-    trackIds: await data.playlistItems.service.getTrackIds()
+    dictionaryData: { enabled: true },
+    trackInfos: { enabled: true },
+    searchIndex: { enabled: true },
+    trackTranscripts: {
+      enabled: true,
+      trackIds: await data.playlistItems.service.getTrackIds()
+    }
+  }, (progress: SyncProgress) => {
+    syncMessage.value = progress.task + ' ' + progress.documentsPending
   })
-})
-
-watch(sync.documentsPendingToSync, async (value) => {
-  documentsPendingToSync.value = value
 })
 </script>

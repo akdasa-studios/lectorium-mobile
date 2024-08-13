@@ -1,14 +1,19 @@
-import { watch } from "vue"
 import { useUserData } from "@lectorium/playlist"
-import { useSync } from "@lectorium/shared"
+import { PlaylistChangedEvent, useSync } from "@lectorium/shared"
 
-export async function runSync() {
+export function runSync() {
   const data = useUserData()
   const sync = useSync()
 
-  watch(data.playlistItems.changedAt, async () => {
+  data.playlistItems.service.onChange(handlePlaylistChange)
+
+  async function handlePlaylistChange(event: PlaylistChangedEvent) {
+    // sync track transcripts when a new item is added to the playlist
     await sync.execute({
-      trackIds: await data.playlistItems.service.getTrackIds()
+      trackTranscripts: {
+        enabled: true,
+        trackIds: [ event.item.trackId ]
+      },
     })
-  })
+  }
 }

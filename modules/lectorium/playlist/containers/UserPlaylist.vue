@@ -12,7 +12,6 @@
 
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import { Track } from '@core/models'
 import { formatDate } from '@core/utils'
 import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksList, useUserData } from '@lectorium/playlist'
 import { useAudioPlayer } from '@lectorium/shared/composables'
@@ -57,33 +56,27 @@ function onTrackClicked(playlistItem: TrackViewModel) {
 }
 
 async function fetchData(): Promise<TrackViewModel[]> {
-  // Fetch playlist items
-  const playlistItems = await userData.playlistItems.service.getAll()
+  const result: TrackViewModel[] = []
+  const playlistItems = (
+    await userData.playlistItems.service.getAll()
+  ).sort((a, b) => a.order - b.order)
 
-  // Load all related tracks
-  const tracks =
-    (await Promise.all(
-      playlistItems
-        .map(i => i.trackId)
-        .map(i => library.tracks.get(i))
-      )).reduce((acc, track) => {
-        acc[track.id] = track
-        return acc
-      }, {} as Record<string, Track>)
+  for (const item of playlistItems) {
+    const track = await library.tracks.get(item.trackId)
+    const title = track.title // TODO: get localized title
+    const date = formatDate(track.date)
+    const location = await library.locations.getLocalizedName(track.location, 'ru')
+    const references = await library.sources.getLocalizedReferences(track.references, 'ru')
+    const playingStatus = audioPlayer.trackId.value === track.id
+          ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused
+          : PlayingStatus.None
 
-  // Map playlist items to view models
-  return await Promise.all(playlistItems
-    .sort((a, b) => a.order - b.order)
-    .map(async i => ({
-      order: i.order,
-      trackId: tracks[i.trackId].id,
-      location: await library.locations.getLocalizedName(tracks[i.trackId].location, 'ru'),
-      date: formatDate(tracks[i.trackId].date),
-      references: await library.sources.getLocalizedReferences(tracks[i.trackId].references, 'ru'),
-      title: tracks[i.trackId].title,
-      playingStatus: audioPlayer.trackId.value === i.trackId
-        ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused
-        : PlayingStatus.None,
-    })))
+    result.push({
+      trackId: item.trackId,
+      location, references, date, title, playingStatus
+    })
+  }
+
+  return result
 }
 </script>

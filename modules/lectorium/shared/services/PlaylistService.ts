@@ -4,7 +4,7 @@ import { Database } from '@core/persistence'
 /**
  * Represents the schema for a playlist item in the database.
  */
-type PlalistItemDBScema = {
+type PlaylistItemDBSchema = {
   _id: string
   trackId: string
   collectionId?: string
@@ -12,15 +12,20 @@ type PlalistItemDBScema = {
   played: number
 }
 
+export type PlaylistChangedEvent = {
+  item: PlaylistItem,
+  event: "added" | "removed"
+}
+
 /**
  * Service for managing playlist items.
  */
 export class PlaylistService {
-  private database = new Database({ name: 'data' })
-  private _onChangeHandlers: Array<() => void> = []
+  private _database = new Database({ name: 'data' })
+  private _onChangeHandlers: Array<(event: PlaylistChangedEvent) => void> = []
 
   // TODO: unsubscribe
-  public onChange(handler: () => void) {
+  public onChange(handler: (event: PlaylistChangedEvent) => void) {
     this._onChangeHandlers.push(handler)
   }
 
@@ -30,7 +35,7 @@ export class PlaylistService {
    * @returns A promise that resolves to the playlist item.
    */
   async get(id: string): Promise<PlaylistItem> {
-    const document = await this.database.db.get<PlalistItemDBScema>(`playlistItem::${id}`)
+    const document = await this._database.db.get<PlaylistItemDBSchema>(`playlistItem::${id}`)
     return {
       trackId: document.trackId,
       collectionId: document.collectionId,
@@ -44,7 +49,7 @@ export class PlaylistService {
    * @returns A promise that resolves to an array of playlist items.
    */
   async getAll(): Promise<PlaylistItem[]> {
-    return (await this.database.db.allDocs<PlalistItemDBScema>({
+    return (await this._database.db.allDocs<PlaylistItemDBSchema>({
       startkey: 'playlistItem::',
       endkey: 'playlistItem::\uffff',
       include_docs: true
@@ -77,14 +82,21 @@ export class PlaylistService {
     const existingTracksOrder = (await this.getAll()).map(item => item.order)
     const maxOrder = Math.max(...existingTracksOrder, 0)
 
-    await this.database.db.put<PlalistItemDBScema>({
+    await this._database.db.put<PlaylistItemDBSchema>({
       _id: `playlistItem::${trackId}`,
       trackId: trackId,
       order: maxOrder + 1,
       played: 0
     })
 
-    this._onChangeHandlers.forEach(x => x())
+    this._onChangeHandlers.forEach(x => x({
+      item: {
+        trackId: trackId,
+        order: maxOrder + 1,
+        played: 0,
+      },
+      event: "added"
+    }))
   }
 
   /**
@@ -98,10 +110,11 @@ export class PlaylistService {
     played: number
   ): Promise<void> {
     console.log('setPlayedTime', trackId, played)
-    const document = await this.database.db.get<PlalistItemDBScema>(`playlistItem::${trackId}`)
-    await this.database.db.put({
+    const document = await this._database.db.get<PlaylistItemDBSchema>(`playlistItem::${trackId}`)
+    await this._database.db.put({
       ...document,
       played: played
     })
   }
 }
+
