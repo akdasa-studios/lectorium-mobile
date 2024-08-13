@@ -27,7 +27,7 @@ import './theme.css'
 import { runConfigPersistence, runPlaylistPersistence } from '@lectorium/shared/tasks'
 import { register } from 'swiper/element/bundle'
 import { initStatusBar, initNavigationBar, runNavigationBarStyle, runStatusBarStyle } from './app'
-import { runDownloadMediaItems, runDownloadMedia } from './shared'
+import { runDownloader, runDownloadMedia } from './shared'
 
 async function createAndRunApp() {
   register()
@@ -42,7 +42,7 @@ async function createAndRunApp() {
   await runNavigationBarStyle()
 
   runDownloadMedia()
-  runDownloadMediaItems()
+  await runDownloader()
 
   const app = createApp(App)
     .use(IonicVue)

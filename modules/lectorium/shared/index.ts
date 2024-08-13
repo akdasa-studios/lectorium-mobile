@@ -1,4 +1,5 @@
 export * from './composables/useSync'
+export * from './composables/useLogger'
 
 // services:
 export * from './services/SourcesService'
@@ -12,5 +13,5 @@ export * from './services/CollectionsService'
 export * from './services/LibraryService'
 
 // tasks:
-export * from './tasks/runDownloadMedia'
-export * from './tasks/runDownloadMediaItems'
+export * from './tasks/runOffline'
+export * from './tasks/runDownloader'
