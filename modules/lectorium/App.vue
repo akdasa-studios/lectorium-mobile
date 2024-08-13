@@ -25,7 +25,6 @@ const config = useConfig()
 const data = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
-const documentsPendingToSync = ref(0);
 const syncMessage = ref('Syncing...')
 
 // ── Hooks ───────────────────────────────────────────────────────────

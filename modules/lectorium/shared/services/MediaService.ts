@@ -9,17 +9,23 @@ type MediaDBSchema = {
   localPath: string
   state: 'downloaded' | 'downloading' | 'pending' | 'failed'
   size?: number
+  meta?: any
+}
+
+export type MediaChangedEvent = {
+  item: MediaItem,
+  event: "added" | "removed" | "updated"
 }
 
 /**
  * Service for interacting with media items in the database.
  */
 export class MediaService {
-  private database = new Database({ name: 'data' })
-  private _onChangeHandlers: Array<() => void> = []
+  private _database = new Database({ name: 'data' })
+  private _onChangeHandlers: Array<(event: MediaChangedEvent) => void> = []
 
   // TODO: unsubscribe
-  public onChange(handler: () => void) {
+  public onChange(handler: (event: MediaChangedEvent) => void) {
     this._onChangeHandlers.push(handler)
   }
 
@@ -31,14 +37,15 @@ export class MediaService {
   async get(
     id: string
   ): Promise<MediaItem> {
-    const document = await this.database.db.get<MediaDBSchema>(id)
+    const document = await this._database.db.get<MediaDBSchema>(id)
     return {
       id: document._id,
       remoteUrl: document.remoteUrl,
       localUrl: document.localUrl,
       localPath: document.localPath,
       state: document.state,
-      size: document.size
+      size: document.size,
+      meta: document.meta,
     }
   }
 
@@ -54,7 +61,7 @@ export class MediaService {
    * @returns A promise that resolves to an array of MediaItem objects.
    */
   async getAll(): Promise<MediaItem[]> {
-    return (await this.database.db.allDocs<MediaDBSchema>({
+    return (await this._database.db.allDocs<MediaDBSchema>({
       startkey: 'media::',
       endkey: 'media::\uffff',
       include_docs: true
@@ -64,7 +71,8 @@ export class MediaService {
       localUrl: row.doc!.localUrl,
       localPath: row.doc!.localPath,
       state: row.doc!.state,
-      size: row.doc!.size
+      size: row.doc!.size,
+      meta: row.doc!.meta,
     }))
   }
 
@@ -77,16 +85,28 @@ export class MediaService {
   async queueDownload(
     remoteUrl: string,
     localPath: string,
+    meta?: any
   ): Promise<void> {
     const urlHash = cyrb53(remoteUrl)
-    await this.database.db.put({
+    await this._database.db.put({
       _id: `media::${urlHash}`,
       remoteUrl,
       localPath,
-      state: 'pending'
+      state: 'pending',
+      meta: meta,
     })
 
-    this._onChangeHandlers.forEach(x => x())
+    this._onChangeHandlers.forEach(x => x({
+      event: "added",
+      item: {
+        id: `${urlHash}`,
+        remoteUrl,
+        localUrl: '',
+        localPath,
+        state: 'pending',
+        meta: meta
+      }
+    }))
   }
 
   /**
@@ -98,9 +118,19 @@ export class MediaService {
     id: string,
     item: Partial<Omit<MediaItem, "id">>
   ): Promise<void> {
-    const document = await this.database.db.get<MediaDBSchema>(id)
-    await this.database.db.put({ ...document, ...item })
+    const document = await this._database.db.get<MediaDBSchema>(id)
+    await this._database.db.put({ ...document, ...item })
 
-    this._onChangeHandlers.forEach(x => x())
+    this._onChangeHandlers.forEach(x => x({
+      event: "updated",
+      item: {
+        id,
+        remoteUrl: item.remoteUrl || document.remoteUrl,
+        localUrl:  item.localUrl || document.localUrl,
+        localPath: item.localPath || document.localPath,
+        state:     item.state || document.state,
+        meta:      item.meta || document.meta,
+      }
+    }))
   }
 }

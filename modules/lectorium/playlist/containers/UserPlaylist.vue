@@ -17,6 +17,7 @@ import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksList, useUserData }
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useAsyncState } from '@vueuse/core'
 import { useLibrary } from '@lectorium/library'
+import { PlaylistChangedEvent } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -30,7 +31,7 @@ const emit = defineEmits<{
 
 // ── State ───────────────────────────────────────────────────────────
 const { state: items, isReady, execute: refresh } = useAsyncState<TrackViewModel[], [], false>(
-  async () => await fetchData(), [], { shallow: false })
+  async () => await fetchData(), [], { shallow: false, resetOnExecute: false })
 const playlistEmpty = computed(() => items.value.length === 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
@@ -46,7 +47,7 @@ watch(audioPlayer.playing, async (current) => {
   if (trackCurrent) { trackCurrent.playingStatus = current ? PlayingStatus.Playing : PlayingStatus.Paused }
 })
 
-watch(userData.playlistItems.changedAt, async () => {
+userData.playlistItems.service.onChange(async (event: PlaylistChangedEvent) => {
   await refresh()
 })
 
@@ -67,10 +68,12 @@ async function fetchData(): Promise<TrackViewModel[]> {
     const date = formatDate(track.date)
     const location = await library.locations.getLocalizedName(track.location, 'ru')
     const references = await library.sources.getLocalizedReferences(track.references, 'ru')
-    const playingStatus = audioPlayer.trackId.value === track.id
-          ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused
-          : PlayingStatus.None
-
+    const playingStatus =
+        (item.transcriptStatus === 'unknown' || item.mediaStatus !== 'downloaded')
+          ? PlayingStatus.Loading
+          : audioPlayer.trackId.value === track.id
+            ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused
+            : PlayingStatus.None
     result.push({
       trackId: item.trackId,
       location, references, date, title, playingStatus

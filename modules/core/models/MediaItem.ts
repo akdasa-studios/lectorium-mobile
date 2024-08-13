@@ -1,18 +1,21 @@
 export type MediaItem = {
-  id: string;
+  id: string
 
   // Remote url to download file
-  remoteUrl: string;
+  remoteUrl: string
 
   // Local url to access file
-  localUrl: string;
+  localUrl: string
 
   // Path to file on device
-  localPath: string;
+  localPath: string
 
   // Downloading state
-  state: 'downloaded' | 'downloading' | 'pending' | 'failed';
+  state: 'downloaded' | 'downloading' | 'pending' | 'failed'
 
   // Size in bytes
-  size?: number;
+  size?: number
+
+  // Any meta information
+  meta?: any
 }

@@ -1,6 +1,8 @@
 import { PlaylistItem } from '@core/models'
 import { Database } from '@core/persistence'
 
+type Aviability = "available" | "unavailable" | "downloaded" | "unknown"
+
 /**
  * Represents the schema for a playlist item in the database.
  */
@@ -10,11 +12,14 @@ type PlaylistItemDBSchema = {
   collectionId?: string
   order: number
   played: number
+
+  mediaStatus: Aviability
+  transcriptStatus: Aviability
 }
 
 export type PlaylistChangedEvent = {
   item: PlaylistItem,
-  event: "added" | "removed"
+  event: "added" | "removed" | "updated"
 }
 
 /**
@@ -40,7 +45,9 @@ export class PlaylistService {
       trackId: document.trackId,
       collectionId: document.collectionId,
       order: document.order,
-      played: document.played
+      played: document.played,
+      mediaStatus: document.mediaStatus,
+      transcriptStatus: document.transcriptStatus
     }
   }
 
@@ -57,7 +64,9 @@ export class PlaylistService {
       trackId: row.doc!.trackId,
       collectionId: row.doc!.collectionId,
       order: row.doc!.order,
-      played: row.doc!.played
+      played: row.doc!.played,
+      mediaStatus: row.doc!.mediaStatus,
+      transcriptStatus: row.doc!.transcriptStatus
     }))
   }
 
@@ -86,7 +95,9 @@ export class PlaylistService {
       _id: `playlistItem::${trackId}`,
       trackId: trackId,
       order: maxOrder + 1,
-      played: 0
+      played: 0,
+      mediaStatus: "available",
+      transcriptStatus: "unknown"
     })
 
     this._onChangeHandlers.forEach(x => x({
@@ -94,6 +105,8 @@ export class PlaylistService {
         trackId: trackId,
         order: maxOrder + 1,
         played: 0,
+        mediaStatus: "available",
+        transcriptStatus: "unknown"
       },
       event: "added"
     }))
@@ -116,5 +129,42 @@ export class PlaylistService {
       played: played
     })
   }
-}
 
+  public async setMediaStatus(
+    trackId: string,
+    aviability: Aviability
+  ): Promise<void> {
+    const document = await this._database.db.get<PlaylistItemDBSchema>(`playlistItem::${trackId}`)
+    await this._database.db.put({
+      ...document,
+      mediaStatus: aviability
+    })
+
+    this._onChangeHandlers.forEach(x => x({
+      event: "updated",
+      item: {
+        ...document,
+        mediaStatus: aviability
+      }
+    }))
+  }
+
+  public async setTranscriptStatus(
+    trackId: string,
+    aviability: Aviability
+  ): Promise<void> {
+    const document = await this._database.db.get<PlaylistItemDBSchema>(`playlistItem::${trackId}`)
+    await this._database.db.put({
+      ...document,
+      transcriptStatus: aviability
+    })
+
+    this._onChangeHandlers.forEach(x => x({
+      event: "updated",
+      item: {
+        ...document,
+        transcriptStatus: aviability
+      }
+    }))
+  }
+}

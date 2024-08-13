@@ -25,24 +25,13 @@ import { useLibrary } from '@lectorium/library'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
-const library = useLibrary()
 
 // ── State ───────────────────────────────────────────────────────────
 const searchQuery = ref('')
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onSearchResultItemClicked(trackId: string) {
-  const track = await library.tracks.get(trackId)
-  if (!track) return
-
-  function get_url_extension(url: string) {
-    // @ts-ignore
-    return url.split(/[#?]/)[0].split('.').pop().trim()
-  }
-
   await userData.playlistItems.service.addTrack(trackId)
-  await userData.media.service.queueDownload(
-    track.url, track.id +  "." + get_url_extension(track.url))
 }
 </script>
 

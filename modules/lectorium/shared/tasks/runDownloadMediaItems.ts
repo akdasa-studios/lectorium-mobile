@@ -3,12 +3,14 @@ import { useUserData } from "@lectorium/playlist"
 import { Directory, Filesystem } from "@capacitor/filesystem"
 import { Capacitor } from "@capacitor/core"
 
-export async function runDownloadMediaItems() {
+export function runDownloadMediaItems() {
   const data = useUserData()
 
   watch(data.media.changedAt, async () => {
     const mediaItems = await data.media.service.getAll()
     const fileToDownload = mediaItems.find(item => item.state === 'pending')
+
+    // TODO: download only one file at a time
     const downloadingFile = mediaItems.find(item => item.state === 'downloading')
 
     if (!fileToDownload || downloadingFile) { return }

@@ -12,5 +12,5 @@ export * from './services/CollectionsService'
 export * from './services/LibraryService'
 
 // tasks:
-export * from './tasks/runSync'
+export * from './tasks/runDownloadMedia'
 export * from './tasks/runDownloadMediaItems'
