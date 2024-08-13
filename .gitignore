@@ -1,4 +1,6 @@
 node_modules
 dist/
 .idea/
-_experiments/
+.DS_Store
+*.xcworkspacedata
+IDEWorkspaceChecks.plist
