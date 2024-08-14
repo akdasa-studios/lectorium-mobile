@@ -1,19 +1,19 @@
 <template>
   <div class="Container">
-  <div class="PlaylistEmpty">
-    <img
-      src="@lectorium/playlist/assets/empty.png"
-      class="image"
-      alt="Playlist is empty"
-    />
+    <div class="PlaylistEmpty">
+      <img
+        src="@lectorium/playlist/assets/empty.png"
+        class="image"
+        alt="Playlist is empty"
+      />
 
-    <div class="help">
-      {{ $t('playlist-empty') }}
+      <div class="help">
+        {{ $t('playlist-empty') }}
+      </div>
+      <span>
+        {{ $t('add-tracks-from-library') }}
+      </span>
     </div>
-    <span>
-      {{ $t('add-tracks-from-library') }}
-    </span>
-  </div>
   </div>
 </template>
 
@@ -34,7 +34,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  width: 75vw;
   text-align: center;
 }
 
