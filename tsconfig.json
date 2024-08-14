@@ -15,8 +15,14 @@
     "paths": {
       "@core/*": ["./modules/core/*"],
       "@lectorium/*": ["./modules/lectorium/*"],
+      "@i18n/*": ["./modules/i18n/*"],
     }
   },
-  "include": ["modules/lectorium/**/*.ts", "modules/lectorium/**/*.d.ts", "modules/lectorium/**/*.tsx", "modules/lectorium/**/*.vue"],
+  "include": [
+    "modules/lectorium/**/*.ts",
+    "modules/lectorium/**/*.d.ts",
+    "modules/lectorium/**/*.tsx",
+    "modules/lectorium/**/*.vue"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

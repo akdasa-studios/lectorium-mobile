@@ -2,17 +2,17 @@
   <IonTabBar>
     <IonTabButton tab="playlist" href="/app/playlist">
       <IonIcon aria-hidden="true" :icon="homeOutline" />
-      <IonLabel>Home</IonLabel>
+      <IonLabel>{{ $t('home') }}</IonLabel>
     </IonTabButton>
 
     <IonTabButton tab="library" href="/app/library">
       <IonIcon aria-hidden="true" :icon="libraryOutline" />
-      <IonLabel>Library</IonLabel>
+      <IonLabel>{{ $t('library') }}</IonLabel>
     </IonTabButton>
 
     <IonTabButton tab="settings" href="/app/settings">
       <IonIcon aria-hidden="true" :icon="settingsOutline" />
-      <IonLabel>Settings</IonLabel>
+      <IonLabel>{{ $t('settings') }}</IonLabel>
     </IonTabButton>
   </IonTabBar>
 </template>

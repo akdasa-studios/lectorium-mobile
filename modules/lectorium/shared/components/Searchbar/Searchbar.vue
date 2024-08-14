@@ -5,7 +5,7 @@
   >
     <IonInput
       fill="outline"
-      placeholder="Search"
+      :placeholder="$t('search')"
       :clear-input="true"
       v-model="searchQuery"
       @ion-focus="onFocus"
@@ -14,7 +14,7 @@
   </div>
   <IonSearchbar
     v-else
-    placeholder="Search"
+    :placeholder="$t('search')"
     @input="(e) => searchQuery = e.target.value"
     v-model="searchQuery"
   />

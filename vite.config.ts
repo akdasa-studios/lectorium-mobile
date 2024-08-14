@@ -12,6 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@core': path.resolve(__dirname, './modules/core/'),
+      '@i18n': path.resolve(__dirname, './modules/i18n/'),
       '@lectorium': path.resolve(__dirname, './modules/lectorium/'),
     },
   },

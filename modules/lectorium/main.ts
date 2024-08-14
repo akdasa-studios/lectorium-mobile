@@ -20,6 +20,9 @@ import '@ionic/vue/css/text-transformation.css'
 import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
 
+/* I18n */
+import { i18n } from './i18n'
+
 /* Theme variables */
 import './theme.css'
 
@@ -47,6 +50,7 @@ async function createAndRunApp() {
   const app = createApp(App)
     .use(IonicVue)
     .use(router)
+    .use(i18n)
 
   router.isReady().then(async () => {
     app.mount('#app')
