@@ -45,7 +45,13 @@ async function onPlaylistItemClicked(trackId: string) {
     audioPlayer.togglePause()
   } else {
     const status = await userData.playlistItems.service.get(trackId)
-    audioPlayer.play(trackId, status.played)
+    if (
+      status.mediaStatus === "downloaded" &&
+      (status.transcriptStatus === "downloaded" ||
+      status.transcriptStatus === "unavailable")
+    ) {
+      audioPlayer.play(trackId, status.played)
+    }
   }
 }
 
