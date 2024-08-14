@@ -1,12 +1,13 @@
 <template>
-  <div class="PlaylistEmpty">
-    <div class="help">
-      Nothing found
+  <div class="Container">
+    <div class="PlaylistEmpty">
+      <div class="help">
+        {{ $t('nothing-found') }}
+      </div>
+      <span>
+        {{ $t('change-query') }}
+      </span>
     </div>
-    <span>
-      In your library there are no tracks that satisfy your criteria.
-      Try to change the search query.
-    </span>
   </div>
 </template>
 
@@ -15,21 +16,23 @@
 
 
 <style scoped>
+.Container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .PlaylistEmpty {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
   text-align: center;
-  margin-top: 50%;
-  transform: translateY(+25%);
-  /* position: relative; */
-  /* top: 25%; */
+  width: 75vw;
 }
 
 .image {
-  width: 100%;
   max-width: 200px;
 }
 

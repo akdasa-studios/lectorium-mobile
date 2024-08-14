@@ -18,6 +18,7 @@ import { formatDate } from '@core/utils'
 import { useLibrary } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus, useUserData } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
+import { Track } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -62,8 +63,13 @@ async function fetchData(
   // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
   // https://github.com/akdasa-studios/lectorium-mobile/issues/32
   const playlistItems = (await userData.playlistItems.service.getAll()).map(x => x.trackId)
-  const foundTrackIds = await library.search.search(query, 'Russian');
-  const foundTracks = await library.tracks.getMany(foundTrackIds.ids)
+  let foundTracks: Track[] = []
+  if (query) {
+    const foundTrackIds = await library.search.search(query, 'Russian');
+    foundTracks = await library.tracks.getMany(foundTrackIds.ids)
+  } else {
+    foundTracks = await library.tracks.getAll()
+  }
 
   return await Promise.all(
     foundTracks.map(async i => ({
