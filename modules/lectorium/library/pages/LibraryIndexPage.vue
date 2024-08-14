@@ -21,7 +21,6 @@ import { ref } from 'vue'
 import { PageWithHeader } from '@lectorium/shared/components'
 import Searchbar from '@lectorium/shared/components/Searchbar/Searchbar.vue'
 import { TracksSearchResult, useUserData } from '@lectorium/playlist'
-import { useLibrary } from '@lectorium/library'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
