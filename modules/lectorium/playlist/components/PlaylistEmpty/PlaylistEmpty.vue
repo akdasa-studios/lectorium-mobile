@@ -1,4 +1,5 @@
 <template>
+  <div class="Container">
   <div class="PlaylistEmpty">
     <img
       src="@lectorium/playlist/assets/empty.png"
@@ -7,11 +8,12 @@
     />
 
     <div class="help">
-      Playlist is empty
+      {{ $t('playlist-empty') }}
     </div>
     <span>
-      Swipe down to add tracks to the playlist from the library.
+      {{ $t('add-tracks-from-library') }}
     </span>
+  </div>
   </div>
 </template>
 
@@ -20,6 +22,13 @@
 
 
 <style scoped>
+.Container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .PlaylistEmpty {
   display: flex;
   flex-direction: column;
@@ -27,13 +36,9 @@
   align-items: center;
   padding: 2rem;
   text-align: center;
-  margin-top: 50%;
-  /* position: relative; */
-  /* top: 25%; */
 }
 
 .image {
-  width: 100%;
   max-width: 200px;
 }
 
