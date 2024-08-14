@@ -15,7 +15,7 @@ export type SearchResult = {
 
 export class SearchService {
   // TODO: use database version based on config
-  private database = new Database({ name: 'library-v0001-index' })
+  private database = new Database({ name: 'library-index-v0001' })
 
   /**
    * Searches for Tracks with specified query

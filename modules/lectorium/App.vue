@@ -4,7 +4,7 @@
     <GlobalAudioPlayer />
 
     <IonLoading
-      :is-open="sync.inProgress.value && !config.lastSyncedAt.value"
+      :is-open="inProgress"
       :message="syncMessage"
     />
   </IonApp>
@@ -26,6 +26,7 @@ const data = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
 const syncMessage = ref('Syncing...')
+const inProgress = ref(false)
 
 // ── Hooks ───────────────────────────────────────────────────────────
 onMounted(async () => {
@@ -40,6 +41,7 @@ onMounted(async () => {
     }
   }, (progress: SyncProgress) => {
     syncMessage.value = progress.task + ' ' + progress.documentsPending
+    inProgress.value = progress.inProgress
   })
 })
 </script>

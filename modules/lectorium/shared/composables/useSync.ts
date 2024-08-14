@@ -19,22 +19,28 @@ interface SyncParams {
 export type SyncProgress = {
   task: string
   documentsPending: number
+  inProgress: boolean
 }
 
 export const useSync = createGlobalState(() => {
 
   // ── Dependencies ────────────────────────────────────────────────────
-  const config     = useConfig()
+  const config = useConfig()
 
   // ── State ───────────────────────────────────────────────────────────
-  const collectionName = 'library'
-  const inProgress = ref(false)
   const context = {
-    local:  new Database({ name: collectionName }),
-    remote: new Database({ name: config.serverBaseUrl.value + "/" + collectionName }),
-
-    localLibraryIndex:  new Database({ name: "library-v0001-index" }),
-    remoteLibraryIndex: new Database({ name: config.serverBaseUrl.value + "/library-v0001-index" }),
+    local: {
+      tracks:      new Database({ name: 'library-tracks-v0001' }),
+      transcripts: new Database({ name: 'library-transcripts-v0001' }),
+      dictionary:  new Database({ name: 'library-dictionary-v0001' }),
+      index:       new Database({ name: 'library-index-v0001' }),
+    },
+    remote: {
+      tracks:      new Database({ name: config.serverBaseUrl.value + '/library-tracks-v0001' }),
+      transcripts: new Database({ name: config.serverBaseUrl.value + '/library-transcripts-v0001' }),
+      dictionary:  new Database({ name: config.serverBaseUrl.value + '/library-dictionary-v0001' }),
+      index:       new Database({ name: config.serverBaseUrl.value + '/library-index-v0001' }),
+    }
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────
@@ -44,15 +50,15 @@ export const useSync = createGlobalState(() => {
   ) {
     console.log('Syncing data...', params)
     try {
-      inProgress.value = true
-
       // Replicate dictionary data
       if (params?.dictionaryData?.enabled) {
-        await context.local.replicateFrom(
-          context.remote, {
-            filter: 'library/dictionaryData',
+        await context.local.dictionary.replicateFrom(
+          context.remote.dictionary, {
+            filter: function(doc) {
+              return !doc._id.startsWith('_design/');
+            },
             onChange(v) {
-              progress && progress({ task: 'dictionary', documentsPending: v.documentsPending })
+              progress && progress({ task: 'dictionary', documentsPending: v.documentsPending, inProgress: true })
             }
           },
         )
@@ -60,11 +66,13 @@ export const useSync = createGlobalState(() => {
 
       // Replicate track infos data
       if (params?.trackInfos?.enabled) {
-        await context.local.replicateFrom(
-          context.remote, {
-            filter: 'library/trackInfos',
+        await context.local.tracks.replicateFrom(
+          context.remote.tracks, {
+            filter: function(doc) {
+              return !doc._id.startsWith('_design/');
+            },
             onChange(v) {
-              progress && progress({ task: 'tracks', documentsPending: v.documentsPending })
+              progress && progress({ task: 'tracks', documentsPending: v.documentsPending, inProgress: true })
             }
           },
         )
@@ -72,12 +80,12 @@ export const useSync = createGlobalState(() => {
 
       // Replicate track transcripts data
       if (params?.trackTranscripts?.enabled) {
-        await context.local.replicateFrom(
-          context.remote, {
-            filter: 'library/trackTranscripts',
-            query_params: { trackIds: params.trackTranscripts.trackIds },
+        await context.local.transcripts.replicateFrom(
+          context.remote.transcripts, {
+            filter: 'library/by_id',
+            query_params: { ids: params.trackTranscripts.trackIds },
             onChange(v) {
-              progress && progress({ task: 'transcripts', documentsPending: v.documentsPending })
+              progress && progress({ task: 'transcripts', documentsPending: v.documentsPending, inProgress: true })
             }
           },
         )
@@ -85,24 +93,28 @@ export const useSync = createGlobalState(() => {
 
       // Replicate Library Index database
       if (params?.searchIndex?.enabled) {
-        await context.localLibraryIndex.replicateFrom(
-          context.remoteLibraryIndex, {
+        await context.local.index.replicateFrom(
+          context.remote.index, {
+            filter: function(doc) {
+              return !doc._id.startsWith('_design/');
+            },
             onChange(v) {
-              progress && progress({ task: 'index', documentsPending: v.documentsPending })
+              progress && progress({ task: 'index', documentsPending: v.documentsPending, inProgress: true })
             }
           }
         )
       }
 
       config.lastSyncedAt.value = Date.now()
+      progress && progress({ task: '', documentsPending: 0, inProgress: false })
     } catch (error) {
       console.error("Unable to sync data", error)
     } finally {
       console.log("Sync complete...")
-      inProgress.value = false
+      progress && progress({ task: '', documentsPending: 0, inProgress: false })
     }
   }
 
   // ── Interface ─────────────────────────────────────────────────────────
-  return { execute, inProgress }
+  return { execute }
 })

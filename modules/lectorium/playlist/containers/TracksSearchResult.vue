@@ -58,6 +58,7 @@ function onTrackClicked(track: TrackViewModel) {
 async function fetchData(
   query: string
 ): Promise<TrackViewModel[]> {
+  // TODO: use languge of application. Note: user can search in any language.
   // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
   // https://github.com/akdasa-studios/lectorium-mobile/issues/32
   const playlistItems = (await userData.playlistItems.service.getAll()).map(x => x.trackId)

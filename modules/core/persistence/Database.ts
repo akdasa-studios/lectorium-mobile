@@ -10,7 +10,7 @@ export interface DatabaseReplicationChangeEvent {
 }
 
 export interface DatabaseReplicationOptions {
-  filter?: string,
+  filter?: string | ((doc: any, params: any) => any) | undefined;
   doc_ids?: string[],
   query_params?: Record<string, any>
   style?: string

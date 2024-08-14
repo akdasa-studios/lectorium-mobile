@@ -35,7 +35,7 @@ export function runDownloadMedia() {
     const { trackId } = event.item;
 
     if (event.event === "added") {
-      const track = await library.tracks.get(trackId)
+      const track = await library.tracks.getTrack(trackId)
       downloadTranscripts([trackId])
       downloadMediaFiles(trackId, track.url)
     }
@@ -62,17 +62,18 @@ export function runDownloadMedia() {
    * @param trackId Track Id
    */
   async function downloadTranscripts(
-    trackId: string[]
+    trackIds: string[]
   ) {
-    logger.info(`Downloading transcripts for track ${trackId}`)
+    logger.info(`Downloading transcripts for tracks ${trackIds}`)
 
     await sync.execute({
       trackTranscripts: {
         enabled: true,
-        trackIds: trackId
+        trackIds: trackIds
       },
     })
-    for (const id of trackId) {
+    for (const id of trackIds) {
+      // TODO: mark as unavailable if no transcripts found
       await updatePlaylistItemTranscriptStatus(id, "downloaded")
     }
   }

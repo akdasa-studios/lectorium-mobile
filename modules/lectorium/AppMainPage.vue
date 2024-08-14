@@ -50,7 +50,7 @@ const percentPlayed     = computed(() => audioPlayer.position.value / audioPlaye
 // ── State ───────────────────────────────────────────────────────────
 watch(audioPlayer.trackId, async (value) => {
   // TODO: https://github.com/akdasa-studios/lectorium-mobile/issues/31
-  currentTrack.value      = value ? await library.tracks.get(value) : currentTrack.value
+  currentTrack.value      = value ? await library.tracks.getTrack(value) : currentTrack.value
   currentTranscript.value = value ? await library.tracks.getTranscript(value, 'ru') : currentTranscript.value
 }, { immediate: true })
 

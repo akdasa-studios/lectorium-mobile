@@ -63,7 +63,7 @@ async function fetchData(): Promise<TrackViewModel[]> {
   ).sort((a, b) => a.order - b.order)
 
   for (const item of playlistItems) {
-    const track = await library.tracks.get(item.trackId)
+    const track = await library.tracks.getTrack(item.trackId)
     const title = track.title // TODO: get localized title
     const date = formatDate(track.date)
     const location = await library.locations.getLocalizedName(track.location, 'ru')

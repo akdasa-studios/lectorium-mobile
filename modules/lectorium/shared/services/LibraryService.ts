@@ -12,12 +12,21 @@ type TrackDBSchema = {
 }
 
 export class LibraryService {
-  private database: Database = new Database({ name: 'library'})
+  private _libraryTracks: Database = new Database({ name: 'library-tracks-v0001' })
+  private _libraryTranscripts: Database = new Database({ name: 'library-transcripts-v0001' })
+  // private _libraryDictionary: Database = new Database({ name: 'library-dictionary' })
 
-  async get(id: string): Promise<Track> {
-    const entity = await this.database.db.get<TrackDBSchema>(`track::${id}::info`)
+  /**
+   * Returns a track by its id.
+   * @param id Track Id
+   * @returns One track
+   */
+  async getTrack(
+    id: string
+  ): Promise<Track> {
+    const entity = await this._libraryTracks.db.get<TrackDBSchema>(id)
     return {
-      id: entity._id.replace('track::', '').replace('::info', ''),
+      id: id,
       title: entity.title,
       url: entity.url,
       location: entity.location,
@@ -27,23 +36,40 @@ export class LibraryService {
     }
   }
 
-  async getMany(ids: string[]): Promise<Track[]> {
-    type t = { a: string } & { b: string }
-    var z: t = { b: "123", a: "123" }
+  /**
+   * Returns all tracks.
+   * @returns Array of tracks
+   */
+  async getAll(): Promise<Track[]> {
+    return (await this._libraryTracks.db.allDocs<TrackDBSchema>({
+      include_docs: true,
+      limit: 25,
+      skip: 0,
+    })).rows.map((entity) => ({
+      id: entity.doc!._id,
+      title: entity.doc!.title,
+      url: entity.doc!.url,
+      location: entity.doc!.location,
+      date: entity.doc!.date,
+      references: entity.doc!.references,
+      languages: entity.doc!.languages
+    }))
+  }
 
-
-    const entities = await this.database.db.allDocs<TrackDBSchema>({
-      keys: ids.map(id => `track::${id}::info`),
+  async getMany(
+    ids: string[]
+  ): Promise<Track[]> {
+    const entities = await this._libraryTracks.db.allDocs<TrackDBSchema>({
+      keys: ids,
       include_docs: true,
       limit: 25,
       skip: 0,
     })
 
-    // TODO: collection with "track::" in title may cause some issues
     return entities.rows
       .filter(x => "id" in x)
       .map((entity) => ({
-        id: entity.doc!._id.replace('track::', '').replace('::info', ''),
+        id: entity.doc!._id,
         title: entity.doc!.title,
         url: entity.doc!.url,
         location: entity.doc!.location,
@@ -57,7 +83,7 @@ export class LibraryService {
     trackId: string,
     language: string
   ): Promise<TrackTranscript> {
-    const entity = await this.database.db.get(`track::${trackId}::transcript::${language}`)
+    const entity = await this._libraryTranscripts.db.get(`${trackId}::${language}`)
     return {
       // TODO
       //@ts-ignore
