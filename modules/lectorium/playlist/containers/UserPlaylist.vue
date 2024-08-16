@@ -6,6 +6,7 @@
     v-else
     :items="items"
     @click="onTrackClicked"
+    @remove="onTrackRemoved"
   />
 </template>
 
@@ -54,6 +55,11 @@ userData.playlistItems.service.onChange(async (event: PlaylistChangedEvent) => {
 // ── Handlers ────────────────────────────────────────────────────────
 function onTrackClicked(playlistItem: TrackViewModel) {
   emit('click', playlistItem.trackId)
+}
+
+async function onTrackRemoved(playlistItem: TrackViewModel) {
+  await userData.playlistItems.service.removeTrack(playlistItem.trackId)
+  await refresh()
 }
 
 async function fetchData(): Promise<TrackViewModel[]> {

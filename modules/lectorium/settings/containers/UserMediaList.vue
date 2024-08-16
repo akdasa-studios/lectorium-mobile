@@ -16,7 +16,7 @@ const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
 const { state: items, execute: refresh } = useAsyncState<MediaItemViewModel[]>(async () => {
-  const mediaItems = await userData.media.service.getAll()
+  const mediaItems = await userData.media.getAll()
   return mediaItems.map((item) => ({
     title: item.localPath,
     size: item.size?.toString() || "0",
@@ -25,7 +25,8 @@ const { state: items, execute: refresh } = useAsyncState<MediaItemViewModel[]>(a
 }, [], { resetOnExecute: false })
 
 // ── Handlers ────────────────────────────────────────────────────────
-watch(userData.media.changedAt, async () => {
-  await refresh()
-})
+// TODO: refresh view once media changed
+// watch(userData.media.changedAt, async () => {
+//   await refresh()
+// })
 </script>

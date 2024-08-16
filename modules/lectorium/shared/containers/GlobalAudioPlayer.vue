@@ -89,7 +89,7 @@ async function loadTrack(
   // Gets information about the track. Skip it if the track is not found
   // or not downloaded.
   const track = await library.tracks.getTrack(trackId)
-  const media = await userData.media.service.getByUrl(track.url)
+  const media = await userData.media.getByUrl(track.url)
   if (!media || media.state !== "downloaded") { return "" }
 
   // Get path to the media file according to the platform.

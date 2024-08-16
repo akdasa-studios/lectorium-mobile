@@ -6,7 +6,8 @@ export interface DatabaseConfig {
 }
 
 export interface DatabaseReplicationChangeEvent {
-  documentsPending: number
+  documentsPending: number,
+  docs: any[]
 }
 
 export interface DatabaseReplicationOptions {
@@ -44,7 +45,8 @@ export class Database {
     await this._db.replicate.from(source.db, options).on('change', info => {
       options?.onChange && options.onChange({
         // @ts-ignore
-        documentsPending: info.pending || 0
+        documentsPending: info.pending || 0,
+        docs: info.docs
       })
     })
   }

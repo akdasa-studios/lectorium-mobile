@@ -27,16 +27,30 @@ import { i18n } from './i18n'
 import './theme.css'
 
 /* */
-import { runConfigPersistence, runPlaylistPersistence } from '@lectorium/shared/tasks'
+import {
+  runCleanupFiles,
+  runConfigPersistence,
+  runDownloadMediaItems,
+  runSyncMediaItemsWithPlaylist,
+  runSyncTranscriptsWithPlaylist,
+  runPlaylistPersistence,
+  runRestoreFailedDownloads,
+  runSyncPlaylistStatus,
+} from '@lectorium/shared'
 import { register } from 'swiper/element/bundle'
 import { initStatusBar, initNavigationBar, runNavigationBarStyle, runStatusBarStyle } from './app'
-import { runDownloader, runDownloadMedia } from './shared'
 
 async function createAndRunApp() {
   register()
 
-  await runPlaylistPersistence()
+  await runCleanupFiles()
   await runConfigPersistence()
+  await runDownloadMediaItems()
+  await runSyncMediaItemsWithPlaylist()
+  await runSyncTranscriptsWithPlaylist()
+  await runPlaylistPersistence()
+  await runRestoreFailedDownloads()
+  await runSyncPlaylistStatus()
 
   await initStatusBar()
   await initNavigationBar()
@@ -44,8 +58,6 @@ async function createAndRunApp() {
   await runStatusBarStyle()
   await runNavigationBarStyle()
 
-  runDownloadMedia()
-  await runDownloader()
 
   const app = createApp(App)
     .use(IonicVue)

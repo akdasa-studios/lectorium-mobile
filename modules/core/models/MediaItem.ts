@@ -1,11 +1,11 @@
 export type MediaItem = {
-  id: string
+  _id: string
 
   // Remote url to download file
   remoteUrl: string
 
   // Local url to access file
-  localUrl: string
+  localUrl?: string
 
   // Path to file on device
   localPath: string

@@ -13,7 +13,7 @@ export const useUserData = createGlobalState(() => {
 
   PLAYLIST_ITEMS_REPOSITORY.onChange(() => { playlistItemsChangedAt.value = Date.now() })
   COLLECTIONS_REPOSITORY.onChange(() => { collectionsChangedAt.value = Date.now() })
-  MEDIA_SERVICE.onChange(() => { mediaItemsChangedAt.value = Date.now() })
+  MEDIA_SERVICE.subscribe(() => { mediaItemsChangedAt.value = Date.now() })
 
   return {
     playlistItems: {
@@ -24,9 +24,6 @@ export const useUserData = createGlobalState(() => {
       service: COLLECTIONS_REPOSITORY,
       changedAt: collectionsChangedAt,
     },
-    media: {
-      service: MEDIA_SERVICE,
-      changedAt: mediaItemsChangedAt,
-    }
+    media: MEDIA_SERVICE
   }
 })

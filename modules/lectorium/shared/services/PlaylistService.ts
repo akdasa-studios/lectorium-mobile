@@ -167,4 +167,17 @@ export class PlaylistService {
       }
     }))
   }
+
+  public async removeTrack(
+    trackId: string
+  ): Promise<void> {
+    // TODO: remove associated media and transcript
+    const document = await this._database.db.get<PlaylistItemDBSchema>(`playlistItem::${trackId}`)
+    await this._database.db.remove(document)
+
+    this._onChangeHandlers.forEach(x => x({
+      event: "removed",
+      item: document
+    }))
+  }
 }

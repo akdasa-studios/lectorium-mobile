@@ -4,7 +4,7 @@
     <GlobalAudioPlayer />
 
     <IonLoading
-      :is-open="inProgress"
+      :is-open="inProgress && !config.lastSyncedAt"
       :message="syncMessage"
     />
   </IonApp>
@@ -31,6 +31,7 @@ const inProgress = ref(false)
 // ── Hooks ───────────────────────────────────────────────────────────
 onMounted(async () => {
   // Start full sync
+  inProgress.value = true
   await sync.execute({
     dictionaryData: { enabled: true },
     trackInfos: { enabled: true },
@@ -39,9 +40,7 @@ onMounted(async () => {
       enabled: true,
       trackIds: await data.playlistItems.service.getTrackIds()
     }
-  }, (progress: SyncProgress) => {
-    syncMessage.value = progress.task + ' ' + progress.documentsPending
-    inProgress.value = progress.inProgress
   })
+  inProgress.value = false
 })
 </script>

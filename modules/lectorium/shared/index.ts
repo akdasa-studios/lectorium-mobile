@@ -1,5 +1,6 @@
 export * from './composables/useSync'
 export * from './composables/useLogger'
+export * from './composables/useFilesService'
 
 // services:
 export * from './services/SourcesService'
@@ -11,7 +12,15 @@ export * from './services/AuthorsService'
 export * from './services/LanguagesService'
 export * from './services/CollectionsService'
 export * from './services/LibraryService'
+export * from './services/FilesService'
+export * from './services/SyncService'
 
 // tasks:
-export * from './tasks/runOffline'
-export * from './tasks/runDownloader'
+export * from './tasks/runCleanupFiles'
+export * from './tasks/runConfigPersistence'
+export * from './tasks/runDownloadMediaItems'
+export * from './tasks/runSyncMediaItemsWithPlaylist'
+export * from './tasks/runSyncTranscriptsWithPlaylist'
+export * from './tasks/runPlaylistPersistence'
+export * from './tasks/runRestoreFailedDownloads'
+export * from './tasks/runSyncPlaylistStatus'
