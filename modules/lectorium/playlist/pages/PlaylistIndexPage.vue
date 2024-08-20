@@ -12,15 +12,16 @@
       />
     </template>
     -->
+    <IonContent>
+      <UserPlaylist
+        @click="onPlaylistItemClicked"
+      />
+    </IonContent>
 
-    <UserPlaylist
-      @click="onPlaylistItemClicked"
-    />
-
-    <CollectionsCreateDialog
+    <!-- <CollectionsCreateDialog
       v-model:isOpen="isCreateDialogOpen"
       @save="onCreateCollection"
-    />
+    /> -->
   </IonPage>
 </template>
 
@@ -28,7 +29,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserData } from '@lectorium/shared'
-import { IonPage } from '@ionic/vue'
+import { IonContent, IonPage } from '@ionic/vue'
 // import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { CollectionsCreateDialog, UserPlaylist, UserCollectionsList } from '@lectorium/playlist'
