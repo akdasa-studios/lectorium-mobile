@@ -1,15 +1,17 @@
 <template>
-  <PageWithDrawer
-    ref="page"
-    v-model:is-drawer-open="isDrawerOpen"
-    :can-open-drawer="true"
-  >
-
+  <IonPage>
+    <!--
+    <PageWithDrawer
+      ref="page"
+      v-model:is-drawer-open="isDrawerOpen"
+      :can-open-drawer="true"
+    >
     <template v-slot:drawer>
       <UserCollectionsList
         @add="isCreateDialogOpen = true"
       />
     </template>
+    -->
 
     <UserPlaylist
       @click="onPlaylistItemClicked"
@@ -19,14 +21,14 @@
       v-model:isOpen="isCreateDialogOpen"
       @save="onCreateCollection"
     />
-  </PageWithDrawer>
+  </IonPage>
 </template>
 
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserData } from '@lectorium/shared'
-import { PageWithDrawer } from '@lectorium/shared/components'
+// import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { CollectionsCreateDialog, UserPlaylist, UserCollectionsList } from '@lectorium/playlist'
 import { Collection } from '@core/models'
@@ -34,11 +36,11 @@ import { Collection } from '@core/models'
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
 const audioPlayer = useAudioPlayer()
-const page = ref<InstanceType<typeof PageWithDrawer>>()
+// const page = ref<InstanceType<typeof PageWithDrawer>>()
 
 // ── State ───────────────────────────────────────────────────────────
 const isCreateDialogOpen = ref(false)
-const isDrawerOpen = ref(false)
+// const isDrawerOpen = ref(false)
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onPlaylistItemClicked(trackId: string) {
