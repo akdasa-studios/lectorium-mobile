@@ -20,7 +20,8 @@
 import { ref } from 'vue'
 import { PageWithHeader } from '@lectorium/shared/components'
 import Searchbar from '@lectorium/shared/components/Searchbar/Searchbar.vue'
-import { TracksSearchResult, useUserData } from '@lectorium/playlist'
+import { TracksSearchResult } from '@lectorium/playlist'
+import { useUserData } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
@@ -33,4 +34,3 @@ async function onSearchResultItemClicked(trackId: string) {
   await userData.playlistItems.service.addTrack(trackId)
 }
 </script>
-

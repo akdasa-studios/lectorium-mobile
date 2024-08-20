@@ -1,6 +1,9 @@
+export * from './composables/useUserData'
 export * from './composables/useSync'
 export * from './composables/useLogger'
 export * from './composables/useFilesService'
+export * from './composables/useConfig'
+export * from './composables/useFullSync'
 
 // services:
 export * from './services/SourcesService'
@@ -13,7 +16,8 @@ export * from './services/LanguagesService'
 export * from './services/CollectionsService'
 export * from './services/LibraryService'
 export * from './services/FilesService'
-export * from './services/SyncService'
+export * from './services/Sync/SyncService'
+export * from './services/Sync/SyncStep'
 
 // tasks:
 export * from './tasks/runCleanupFiles'

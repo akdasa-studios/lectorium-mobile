@@ -1,6 +1,6 @@
 <template>
   <NothingFound
-    v-if="nothingFound"
+    v-if="nothingFound && isReady"
   />
   <TracksList
     v-else
@@ -16,9 +16,10 @@ import { useAsyncState } from '@vueuse/core'
 import { useSound } from '@vueuse/sound'
 import { formatDate } from '@core/utils'
 import { useLibrary } from '@lectorium/library'
-import { NothingFound, TracksList, TrackViewModel, PlayingStatus, useUserData } from '@lectorium/playlist'
+import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
 import { Track } from '@core/models'
+import { useUserData } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -37,7 +38,7 @@ const emit = defineEmits<{
 // ── State ───────────────────────────────────────────────────────────
 const { searchQuery } = toRefs(props)
 const nothingFound = computed(() => items.value.length === 0)
-const { state: items, execute } = useAsyncState<TrackViewModel[], [string], true>(
+const { state: items, execute, isReady } = useAsyncState<TrackViewModel[], [string], true>(
   async (p) => await fetchData(p),
   [], { resetOnExecute: false }
 )

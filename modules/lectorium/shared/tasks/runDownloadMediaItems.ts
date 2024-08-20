@@ -1,4 +1,4 @@
-import { useUserData } from "@lectorium/playlist"
+import { useUserData } from "@lectorium/shared"
 import { ItemChangedEvent, useFilesService, useLogger } from "@lectorium/shared"
 import { MediaItem } from "@core/models"
 

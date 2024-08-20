@@ -34,7 +34,7 @@ const styleBottomRadius = computed(() => shrinkSize.value > 0 ? "5px" : "0px")
 <style scoped>
 .MainSection {
   overflow: hidden;
-  transition: flex 0.5s;
+  transition: flex 0.1s;
   flex: 0 0 calc(50% - v-bind(styleShrinkSize));
 }
 

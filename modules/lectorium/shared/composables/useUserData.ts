@@ -2,11 +2,11 @@ import { CollectionsService, MediaService, PlaylistService } from '@lectorium/sh
 import { createGlobalState } from '@vueuse/core'
 import { ref } from 'vue'
 
-const PLAYLIST_ITEMS_REPOSITORY = new PlaylistService()
-const COLLECTIONS_REPOSITORY = new CollectionsService()
-const MEDIA_SERVICE = new MediaService()
-
 export const useUserData = createGlobalState(() => {
+  const PLAYLIST_ITEMS_REPOSITORY = new PlaylistService()
+  const COLLECTIONS_REPOSITORY = new CollectionsService()
+  const MEDIA_SERVICE = new MediaService()
+
   const playlistItemsChangedAt = ref<number>(0)
   const collectionsChangedAt = ref<number>(0)
   const mediaItemsChangedAt = ref<number>(0)

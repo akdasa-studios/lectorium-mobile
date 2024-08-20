@@ -4,6 +4,8 @@ import AppMainPage from './AppMainPage.vue'
 import { routes as LibraryRoutes } from './library/routes'
 import { routes as PlaylistRoutes } from './playlist/routes'
 import { routes as SettingsRoutes } from './settings/routes'
+import { routes as WelcomeRoutes } from './welcome/routes'
+import { useConfig } from '@lectorium/shared'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -20,13 +22,27 @@ const routes: Array<RouteRecordRaw> = [
       },
       ...LibraryRoutes,
       ...PlaylistRoutes,
-      ...SettingsRoutes
+      ...SettingsRoutes,
     ]
-  }
+  },
+  ...WelcomeRoutes,
 ]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from) => {
+  const config = useConfig()
+  const isSynced = config.lastSyncedAt.value > 0
+
+  if (!isSynced && to.name !== 'welcome') {
+    return { name: 'welcome' }
+  } else if (isSynced && to.name === 'welcome') {
+    return { name: 'playlist' }
+  }
+})
+
 
 export default router

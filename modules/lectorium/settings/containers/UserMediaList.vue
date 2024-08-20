@@ -6,10 +6,9 @@
 
 
 <script setup lang="ts">
-import { useUserData } from '@lectorium/playlist';
+import { useUserData } from '@lectorium/shared'
 import { MediaItemViewModel, MediaList } from '@lectorium/settings'
 import { useAsyncState } from '@vueuse/core'
-import { watch } from 'vue';
 
 // ── Interface ───────────────────────────────────────────────────────
 const userData = useUserData()

@@ -1,6 +1,6 @@
 import { watch } from "vue"
 import { useAudioPlayer } from "@lectorium/shared/composables"
-import { useUserData } from "@lectorium/playlist"
+import { useUserData } from "@lectorium/shared"
 
 /**
  * Saves the position when the track is changed or paused.

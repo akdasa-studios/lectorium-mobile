@@ -2,45 +2,21 @@
   <IonApp>
     <IonRouterOutlet />
     <GlobalAudioPlayer />
-
-    <IonLoading
-      :is-open="inProgress && !config.lastSyncedAt"
-      :message="syncMessage"
-    />
   </IonApp>
 </template>
 
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { IonApp, IonRouterOutlet, IonLoading } from '@ionic/vue'
+import { onMounted } from 'vue'
+import { IonApp, IonRouterOutlet } from '@ionic/vue'
 import { GlobalAudioPlayer } from '@lectorium/shared/containers'
-import { useConfig } from '@lectorium/shared/composables'
-import { SyncProgress, useSync } from '@lectorium/shared'
-import { useUserData } from './playlist'
+import { useFullSync } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const sync = useSync()
-const config = useConfig()
-const data = useUserData()
-
-// ── State ───────────────────────────────────────────────────────────
-const syncMessage = ref('Syncing...')
-const inProgress = ref(false)
+const sync = useFullSync()
 
 // ── Hooks ───────────────────────────────────────────────────────────
 onMounted(async () => {
-  // Start full sync
-  inProgress.value = true
-  await sync.execute({
-    dictionaryData: { enabled: true },
-    trackInfos: { enabled: true },
-    searchIndex: { enabled: true },
-    trackTranscripts: {
-      enabled: true,
-      trackIds: await data.playlistItems.service.getTrackIds()
-    }
-  })
-  inProgress.value = false
+  await sync.execute()
 })
 </script>

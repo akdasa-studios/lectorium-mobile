@@ -1,4 +1,4 @@
-import { useUserData } from "@lectorium/playlist"
+import { useUserData } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
 import { App } from "@capacitor/app"
 

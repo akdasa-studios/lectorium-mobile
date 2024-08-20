@@ -2,7 +2,7 @@
 import { useLibrary } from '@lectorium/library'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { onMounted, watch } from 'vue'
-import { useUserData } from '@lectorium/playlist'
+import { useUserData } from '@lectorium/shared'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { AudioPlayer } from '@core/plugins'
 import { Capacitor } from '@capacitor/core'

@@ -1,6 +1,6 @@
 import { MediaItem } from "@core/models"
-import { useUserData } from "@lectorium/playlist"
-import { ItemChangedEvent, SyncEvent, useSync } from "@lectorium/shared"
+import { useUserData } from "@lectorium/shared"
+import { ItemChangedEvent, SyncProgressEvent, useSync } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
 
 /**
@@ -10,13 +10,13 @@ import { useLogger } from "@lectorium/shared"
  */
 export function runSyncPlaylistStatus() {
   // ── Dependencies ────────────────────────────────────────────────────
+  const sync      = useSync()
   const logger    = useLogger({ name: "task::syncPlaylistStatus" })
   const { media, playlistItems } = useUserData()
-  const sync      = useSync()
 
   // ── Hooks ───────────────────────────────────────────────────────────
   media.subscribe(onMediaChange)
-  sync.subscribe(onSyncChange)
+  sync.progress.subscribe(onSyncChange)
 
   // ── Handlers ────────────────────────────────────────────────────────
   async function onMediaChange(
@@ -35,9 +35,9 @@ export function runSyncPlaylistStatus() {
   }
 
   async function onSyncChange(
-    event: SyncEvent
+    event: SyncProgressEvent
   ) {
-    if (event.database !== "transcripts") return
+    if (!event.to.db.name.startsWith("library-transcripts")) return
     const trackIds = event.ids.map(id => id.split("::")[0])
 
     for (const trackId of trackIds) {

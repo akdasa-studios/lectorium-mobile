@@ -1,5 +1,5 @@
 import { useLibrary } from "@lectorium/library"
-import { useUserData } from "@lectorium/playlist"
+import { useUserData } from "@lectorium/shared"
 import { PlaylistChangedEvent } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
 

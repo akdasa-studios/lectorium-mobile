@@ -1,4 +1,6 @@
+import { Event } from '@core/events'
 import { Database } from '@core/persistence'
+import { SyncProgressEvent, SyncStep } from './SyncStep'
 
 export type SyncTaskParams = {
   enabled: boolean
@@ -13,52 +15,10 @@ export interface SyncParams {
   searchIndex?: SyncTaskParams
 }
 
-export type SyncProgress = {
-  task: string
-  documentsPending: number
-  inProgress: boolean
-}
-
-
-
-class SyncStep {
-  private _from: Database
-  private _to: Database
-
-  constructor(from: Database, to: Database) {
-    this._from = from
-    this._to = to
-  }
-
-  async execute(
-    filter?: string,
-    params?: Record<string, any>
-  ): Promise<string[]> {
-    const result: string[] = []
-
-    await this._from.replicateFrom(this._to, {
-      filter: filter || function(doc) {
-        return !doc._id.startsWith('_design/');
-      },
-      query_params: params,
-      onChange(v) {
-        v.docs.forEach(doc => { result.push(doc._id) })
-      }
-    })
-
-    return result
-  }
-}
-export type SyncEvent = {
-  database: string
-  ids: string[]
-}
-
-export type SyncEventHandler = (event: SyncEvent) => void
 
 export class SyncService {
   private _context: Record<string, Database> = {}
-  private _syncEventHandlers: SyncEventHandler[] = []
+  private _progress: Event<SyncProgressEvent> = new Event()
 
   constructor(serverBaseUrl: string) {
     this._context["local.tracks"]       = new Database({ name: 'library-tracks-v0001' })
@@ -72,24 +32,7 @@ export class SyncService {
     this._context["remote.index"]       = new Database({ name: serverBaseUrl + '/library-index-v0001' })
   }
 
-  public subscribe(
-    handler: SyncEventHandler
-  ) {
-    // TODO: unsubscribe
-    this._syncEventHandlers.push(handler)
-  }
-
-  /**
-   * Notifies all subscribers of a change event.
-   * @param event The event to be broadcasted to all subscribers.
-   */
-  private notifyChange(
-    event: SyncEvent
-  ) {
-    for (const handler of this._syncEventHandlers) {
-      handler(event)
-    }
-  }
+  get progress() { return this._progress }
 
   async execute(
     params?: SyncParams,
@@ -97,41 +40,41 @@ export class SyncService {
     try {
       // Replicate dictionary data
       if (params?.dictionaryData?.enabled) {
-        const ids = await new SyncStep(
+        await new SyncStep(
+          this._context["remote.dictionary"],
           this._context["local.dictionary"],
-          this._context["remote.dictionary"]
+          (progress) => this.progress.notify(progress)
         ).execute()
-        this.notifyChange({ database: 'dictionary', ids })
       }
 
       // Replicate track infos data
       if (params?.trackInfos?.enabled) {
-        const ids = await new SyncStep(
+        await new SyncStep(
+          this._context["remote.tracks"],
           this._context["local.tracks"],
-          this._context["remote.tracks"]
+          (progress) => this.progress.notify(progress)
         ).execute()
-        this.notifyChange({ database: 'tracks', ids })
       }
 
       // Replicate track transcripts data
       if (params?.trackTranscripts?.enabled) {
-        const ids = await new SyncStep(
-          this._context["local.transcripts"],
+        await new SyncStep(
           this._context["remote.transcripts"],
+          this._context["local.transcripts"],
+          (progress) => this.progress.notify(progress)
         ).execute(
           'library/by_id',
           { ids: params.trackTranscripts.trackIds }
         )
-        this.notifyChange({ database: 'transcripts', ids })
       }
 
       // Replicate Library Index database
       if (params?.searchIndex?.enabled) {
-        const ids = await new SyncStep(
+        await new SyncStep(
+          this._context["remote.index"],
           this._context["local.index"],
-          this._context["remote.index"]
+          (progress) => this.progress.notify(progress)
         ).execute()
-        this.notifyChange({ database: 'index', ids })
       }
     } catch (error) {
       console.error("Unable to sync data", error)

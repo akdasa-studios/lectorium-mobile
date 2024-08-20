@@ -10,10 +10,10 @@
       <IonLabel>{{ $t('library') }}</IonLabel>
     </IonTabButton>
 
-    <IonTabButton tab="settings" href="/app/settings">
+    <!-- <IonTabButton tab="settings" href="/app/settings">
       <IonIcon aria-hidden="true" :icon="settingsOutline" />
       <IonLabel>{{ $t('settings') }}</IonLabel>
-    </IonTabButton>
+    </IonTabButton> -->
   </IonTabBar>
 </template>
 

@@ -25,9 +25,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useUserData } from '@lectorium/shared'
 import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
-import { CollectionsCreateDialog, UserPlaylist, UserCollectionsList, useUserData } from '@lectorium/playlist'
+import { CollectionsCreateDialog, UserPlaylist, UserCollectionsList } from '@lectorium/playlist'
 import { Collection } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────

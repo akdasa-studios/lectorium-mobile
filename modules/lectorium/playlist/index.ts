@@ -1,6 +1,3 @@
-// composables:
-export * from './composables/useUserData'
-
 // components:
 export { default as CollectionsCreateDialog } from './components/CollectionsCreateDialog/CollectionsCreateDialog.vue'
 export { default as CollectionsList } from './components/CollectionsList/CollectionsList.vue'
