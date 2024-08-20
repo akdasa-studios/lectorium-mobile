@@ -22,10 +22,10 @@ export async function runPlaylistPersistence() {
 
     if (isTrackChanged && prev.trackId) {
       // Track has changed. Save the position of the previous track.
-      await data.playlistItems.service.setPlayedTime(prev.trackId, prev.position)
+      await data.playlist.setPlayedTime(prev.trackId, prev.position)
     } else if (!isTrackChanged && isCurentTrackPaused) {
       // Track is paused. Save the position of the current track.
-      await data.playlistItems.service.setPlayedTime(cur.trackId!, cur.position)
+      await data.playlist.setPlayedTime(cur.trackId!, cur.position)
     }
   })
 }

@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserData } from '@lectorium/shared'
+import { IonPage } from '@ionic/vue'
 // import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { CollectionsCreateDialog, UserPlaylist, UserCollectionsList } from '@lectorium/playlist'
@@ -47,7 +48,7 @@ async function onPlaylistItemClicked(trackId: string) {
   if (audioPlayer.trackId.value === trackId) {
     audioPlayer.togglePause()
   } else {
-    const status = await userData.playlistItems.service.get(trackId)
+    const status = await userData.playlist.get(trackId)
     if (
       status.mediaStatus === "downloaded" &&
       (status.transcriptStatus === "downloaded" ||
@@ -60,7 +61,7 @@ async function onPlaylistItemClicked(trackId: string) {
 
 async function onCreateCollection(collection: Collection) {
   console.log('onCreateCollection', collection)
-  await userData.collections.service.add(collection)
+  await userData.collections.add(collection)
   isCreateDialogOpen.value = false
 }
 </script>

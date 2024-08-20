@@ -22,11 +22,11 @@ const userData = useUserData()
 
 // ── State ───────────────────────────────────────────────────────────
 const { state: collections, execute: refresh } = useAsyncState(
-  async () => await userData.collections.service.getAll(), [],
+  async () => await userData.collections.getAll(), [],
 )
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watch(userData.collections.changedAt, async () => {
-  await refresh()
-})
+// watch(userData.collections.changedAt, async () => {
+//   await refresh()
+// })
 </script>

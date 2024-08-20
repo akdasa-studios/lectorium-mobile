@@ -63,7 +63,7 @@ async function fetchData(
   // TODO: use languge of application. Note: user can search in any language.
   // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
   // https://github.com/akdasa-studios/lectorium-mobile/issues/32
-  const playlistItems = (await userData.playlistItems.service.getAll()).map(x => x.trackId)
+  const playlistItems = (await userData.playlist.getAll()).map(x => x.trackId)
   let foundTracks: Track[] = []
   if (query) {
     const foundTrackIds = await library.search.search(query, 'Russian');

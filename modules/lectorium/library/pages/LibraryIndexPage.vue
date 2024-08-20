@@ -31,6 +31,6 @@ const searchQuery = ref('')
 
 // ── Handlers ────────────────────────────────────────────────────────
 async function onSearchResultItemClicked(trackId: string) {
-  await userData.playlistItems.service.addTrack(trackId)
+  await userData.playlist.addTrack(trackId)
 }
 </script>

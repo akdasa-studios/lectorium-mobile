@@ -48,7 +48,7 @@ watch(audioPlayer.playing, async (current) => {
   if (trackCurrent) { trackCurrent.playingStatus = current ? PlayingStatus.Playing : PlayingStatus.Paused }
 })
 
-userData.playlistItems.service.onChange(async (event: PlaylistChangedEvent) => {
+userData.playlist.onChange(async (event: PlaylistChangedEvent) => {
   await refresh()
 })
 
@@ -58,14 +58,14 @@ function onTrackClicked(playlistItem: TrackViewModel) {
 }
 
 async function onTrackRemoved(playlistItem: TrackViewModel) {
-  await userData.playlistItems.service.removeTrack(playlistItem.trackId)
+  await userData.playlist.removeTrack(playlistItem.trackId)
   await refresh()
 }
 
 async function fetchData(): Promise<TrackViewModel[]> {
   const result: TrackViewModel[] = []
   const playlistItems = (
-    await userData.playlistItems.service.getAll()
+    await userData.playlist.getAll()
   ).sort((a, b) => a.order - b.order)
 
   for (const item of playlistItems) {

@@ -7,7 +7,7 @@ import { useUserData } from '@lectorium/shared'
 export const useFullSync = createGlobalState(() => {
   const config = useConfig()
   const sync = useSync()
-  const { playlistItems } = useUserData()
+  const { playlist } = useUserData()
 
   async function execute() {
     const options = {
@@ -16,7 +16,7 @@ export const useFullSync = createGlobalState(() => {
       searchIndex: { enabled: true },
       trackTranscripts: {
         enabled: true,
-        trackIds: await playlistItems.service.getTrackIds()
+        trackIds: await playlist.getTrackIds()
       },
     }
 

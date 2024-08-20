@@ -1,4 +1,5 @@
 import { MediaItem } from "@core/models"
+import { useLibrary } from "@lectorium/library"
 import { useUserData } from "@lectorium/shared"
 import { ItemChangedEvent, SyncProgressEvent, useSync } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
@@ -12,11 +13,12 @@ export function runSyncPlaylistStatus() {
   // ── Dependencies ────────────────────────────────────────────────────
   const sync      = useSync()
   const logger    = useLogger({ name: "task::syncPlaylistStatus" })
-  const { media, playlistItems } = useUserData()
+  const { media, playlist } = useUserData()
+  const { tracks } = useLibrary()
 
   // ── Hooks ───────────────────────────────────────────────────────────
   media.subscribe(onMediaChange)
-  sync.progress.subscribe(onSyncChange)
+  sync.progress.subscribe(onSyncTranscriptsComplete)
 
   // ── Handlers ────────────────────────────────────────────────────────
   async function onMediaChange(
@@ -30,19 +32,29 @@ export function runSyncPlaylistStatus() {
       event.item.state === "downloaded"
     ) {
       logger.info(`${trackId} -> media downloaded`)
-      await playlistItems.service.setMediaStatus(trackId, "downloaded")
+      await playlist.setMediaStatus(trackId, "downloaded")
     }
   }
 
-  async function onSyncChange(
+  async function onSyncTranscriptsComplete(
     event: SyncProgressEvent
   ) {
     if (!event.to.db.name.startsWith("library-transcripts")) return
-    const trackIds = event.ids.map(id => id.split("::")[0])
+    if (event.state !== "done") return
 
-    for (const trackId of trackIds) {
-      logger.info(`${trackId} -> transcript downloaded`)
-      await playlistItems.service.setTranscriptStatus(trackId, "downloaded")
+    // Get all playlist items that don't have the transcript downloaded
+    const playlistItems = await playlist.getAll()
+    const withoutTranscript = playlistItems.filter(x => x.transcriptStatus !== "downloaded")
+
+    // Check if the transcript is available for each track
+    for (const playlistItem of withoutTranscript) {
+      const transcript = await tracks.getTranscripts(playlistItem.trackId)
+      if (transcript) { // Transcript found, update the status
+        logger.info(`${playlistItem.trackId} -> transcript downloaded`)
+        await playlist.setTranscriptStatus(playlistItem.trackId, "downloaded")
+      } else { // Transcript not found
+        logger.error(`${playlistItem.trackId} -> transcript not found`)
+      }
     }
   }
 }

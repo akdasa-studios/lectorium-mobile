@@ -9,11 +9,11 @@ import { useLogger } from "@lectorium/shared"
 export function runSyncMediaItemsWithPlaylist() {
   // ── Dependencies ────────────────────────────────────────────────────
   const logger  = useLogger({ name: "task::syncMediaItemsWithPlaylist" })
-  const { media, playlistItems } = useUserData()
-  const { tracks }               = useLibrary()
+  const { media, playlist } = useUserData()
+  const { tracks }          = useLibrary()
 
   // ── Hooks ───────────────────────────────────────────────────────────
-  playlistItems.service.onChange(onPlaylistChange)
+  playlist.onChange(onPlaylistChange)
 
   // ── Handlers ────────────────────────────────────────────────────────
   async function onPlaylistChange(

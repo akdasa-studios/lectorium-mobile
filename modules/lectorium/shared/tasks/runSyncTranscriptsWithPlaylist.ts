@@ -11,19 +11,17 @@ export function runSyncTranscriptsWithPlaylist() {
   // ── Dependencies ────────────────────────────────────────────────────
   const logger  = useLogger({ name: "task::syncTranscriptsWithPlaylist" })
   const data    = useUserData()
-  const library = useLibrary()
   const sync    = useSync()
   let runSyncTimeout: NodeJS.Timeout | undefined = undefined
 
   // ── Hooks ───────────────────────────────────────────────────────────
-  data.playlistItems.service.onChange(onPlaylistChange)
+  data.playlist.onChange(onPlaylistChange)
 
   // ── Handlers ────────────────────────────────────────────────────────
   async function onPlaylistChange(
     event: PlaylistChangedEvent
   ) {
     const { trackId } = event.item;
-    const track = await library.tracks.getTrack(trackId)
 
     if (event.event === "added") {
       logger.info(`${trackId} -> added to playlist`)
@@ -38,7 +36,7 @@ export function runSyncTranscriptsWithPlaylist() {
         await sync.execute({
           trackTranscripts: {
             enabled: true,
-            trackIds: await data.playlistItems.service.getTrackIds(),
+            trackIds: await data.playlist.getTrackIds(),
           },
         })
       }, 5000)
