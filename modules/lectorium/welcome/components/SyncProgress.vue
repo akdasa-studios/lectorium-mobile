@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="header">
+      {{ $t('loading-data') }}
+    </div>
+
     <div v-for="step in steps" :key="step.name">
       <div class="row">
         <RadialProgress
@@ -36,6 +40,12 @@ defineProps<{
 
 
 <style scoped>
+.header {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 1rem;
+}
+
 .row {
   display: flex;
   align-items: center;
