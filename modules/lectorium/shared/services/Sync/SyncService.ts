@@ -37,45 +37,49 @@ export class SyncService {
   async execute(
     params?: SyncParams,
   ) {
+    const steps: Promise<void>[] = []
+
     try {
       // Replicate dictionary data
       if (params?.dictionaryData?.enabled) {
-        await new SyncStep(
+        steps.push(new SyncStep(
           this._context["remote.dictionary"],
           this._context["local.dictionary"],
           (progress) => this.progress.notify(progress)
-        ).execute()
+        ).execute())
       }
 
       // Replicate track infos data
       if (params?.trackInfos?.enabled) {
-        await new SyncStep(
+        steps.push(new SyncStep(
           this._context["remote.tracks"],
           this._context["local.tracks"],
           (progress) => this.progress.notify(progress)
-        ).execute()
+        ).execute())
       }
 
       // Replicate track transcripts data
       if (params?.trackTranscripts?.enabled) {
-        await new SyncStep(
+        steps.push(new SyncStep(
           this._context["remote.transcripts"],
           this._context["local.transcripts"],
           (progress) => this.progress.notify(progress)
         ).execute(
           'library/by_id',
           { ids: params.trackTranscripts.trackIds }
-        )
+        ))
       }
 
       // Replicate Library Index database
       if (params?.searchIndex?.enabled) {
-        await new SyncStep(
+        steps.push(new SyncStep(
           this._context["remote.index"],
           this._context["local.index"],
           (progress) => this.progress.notify(progress)
-        ).execute()
+        ).execute())
       }
+
+      await Promise.all(steps)
     } catch (error) {
       console.error("Unable to sync data", error)
     } finally {
