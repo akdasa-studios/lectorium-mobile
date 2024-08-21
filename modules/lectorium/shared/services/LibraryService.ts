@@ -40,11 +40,13 @@ export class LibraryService {
    * Returns all tracks.
    * @returns Array of tracks
    */
-  async getAll(): Promise<Track[]> {
+  async getAll(
+    offset: number = 0,
+  ): Promise<Track[]> {
     return (await this._libraryTracks.db.allDocs<TrackDBSchema>({
       include_docs: true,
       limit: 25,
-      skip: 0,
+      skip: offset,
     })).rows.map((entity) => ({
       id: entity.doc!._id,
       title: entity.doc!.title,
@@ -57,7 +59,7 @@ export class LibraryService {
   }
 
   async getMany(
-    ids: string[]
+    ids: string[],
   ): Promise<Track[]> {
     const entities = await this._libraryTracks.db.allDocs<TrackDBSchema>({
       keys: ids,

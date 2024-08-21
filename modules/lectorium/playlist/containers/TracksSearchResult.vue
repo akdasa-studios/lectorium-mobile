@@ -7,19 +7,26 @@
     :items="items"
     @click="onTrackClicked"
   />
+  <IonInfiniteScroll
+    @ionInfinite="onInfiniteSctoll"
+    :disabled="!infiniteScrollEnabled"
+  >
+    <IonInfiniteScrollContent></IonInfiniteScrollContent>
+  </IonInfiniteScroll>
 </template>
 
 
 <script setup lang="ts">
-import { computed, toRefs, watch } from 'vue'
-import { useAsyncState } from '@vueuse/core'
+import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue'
+import { computed, ref, toRefs } from 'vue'
 import { useSound } from '@vueuse/sound'
 import { formatDate } from '@core/utils'
 import { useLibrary } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
 import { Track } from '@core/models'
-import { useUserData } from '@lectorium/shared'
+import { PlaylistChangedEvent, useUserData } from '@lectorium/shared'
+import { watchDebounced } from '@vueuse/core'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -38,14 +45,26 @@ const emit = defineEmits<{
 // ── State ───────────────────────────────────────────────────────────
 const { searchQuery } = toRefs(props)
 const nothingFound = computed(() => items.value.length === 0)
-const { state: items, execute, isReady } = useAsyncState<TrackViewModel[], [string], true>(
-  async (p) => await fetchData(p),
-  [], { resetOnExecute: false }
-)
+const items = ref<TrackViewModel[]>([])
+const infiniteScrollEnabled = ref(true)
+const isReady = ref(false)
+
+fetchData(searchQuery.value, 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watch(searchQuery, async (value) => {
-  await execute(0, value)
+watchDebounced(searchQuery, async (value) => {
+  infiniteScrollEnabled.value = await fetchData(value, 0)
+}, { debounce: 250, maxWait: 1000 })
+
+userData.playlist.onChange(async (e: PlaylistChangedEvent) => {
+  if (e.event !== 'added') { return }
+
+  items.value = items.value.map(i => {
+    if (i.trackId === e.item.trackId) {
+      return { ...i, playingStatus: PlayingStatus.InQueue }
+    }
+    return i
+  })
 })
 
 // ── Handlers ────────────────────────────────────────────────────────
@@ -53,13 +72,18 @@ function onTrackClicked(track: TrackViewModel) {
   if (track.playingStatus == PlayingStatus.InQueue) { return }
   emit('click', track.trackId)
   playItemAdded()
-  execute(150, searchQuery.value)
+}
+
+async function onInfiniteSctoll(e: InfiniteScrollCustomEvent) {
+  infiniteScrollEnabled.value = await fetchData(searchQuery.value, items.value.length)
+  e.target.complete()
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
 async function fetchData(
-  query: string
-): Promise<TrackViewModel[]> {
+  query: string,
+  offset: number = 0
+): Promise<boolean> {
   // TODO: use languge of application. Note: user can search in any language.
   // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
   // https://github.com/akdasa-studios/lectorium-mobile/issues/32
@@ -67,12 +91,13 @@ async function fetchData(
   let foundTracks: Track[] = []
   if (query) {
     const foundTrackIds = await library.search.search(query, 'Russian');
-    foundTracks = await library.tracks.getMany(foundTrackIds.ids)
+    const tracksToLoad = foundTrackIds.ids.slice(offset, offset + 25)
+    foundTracks = await library.tracks.getMany(tracksToLoad)
   } else {
-    foundTracks = await library.tracks.getAll()
+    foundTracks = await library.tracks.getAll(offset)
   }
 
-  return await Promise.all(
+  const loadedItems = await Promise.all(
     foundTracks.map(async i => ({
       trackId: i.id,
       title: i.title,
@@ -84,5 +109,14 @@ async function fetchData(
           : PlayingStatus.None,
     }))
   )
+
+  if (offset === 0) {
+    items.value = loadedItems
+  } else {
+    items.value = [...items.value, ...loadedItems]
+  }
+
+  isReady.value = true
+  return foundTracks.length > 0
 }
 </script>
