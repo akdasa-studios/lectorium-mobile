@@ -13,6 +13,11 @@ export type SearchResult = {
   ids: Array<string>
 }
 
+const localizedSources: Record<string, string> = {
+  "шб": "sb",
+  "бг": "bg",
+}
+
 export class SearchService {
   // TODO: use database version based on config
   private database = new Database({ name: 'library-index-v0001' })
@@ -37,7 +42,12 @@ export class SearchService {
       .map(x => {
         stemmer.setCurrent(x)
         stemmer.stem()
-        return stemmer.getCurrent()
+        const value: string = stemmer.getCurrent()
+        if (value in localizedSources) {
+          return localizedSources[value] || value
+        }
+
+        return value
       })
 
     // Retrieve all documents containing the specified term.
