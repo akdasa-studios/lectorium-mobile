@@ -2,16 +2,22 @@ import fs from 'fs'
 
 // Step 1: Read the environment variable
 const serverBaseUrl = process.env.SERVER_BASE_URL;
+const sentryDsn = process.env.SENTRY_DSN;
 
 if (!serverBaseUrl) {
-  console.info('Config: SERVER_BASE_URL environment variable is missing. Using default value.');
+  console.error('Config: SERVER_BASE_URL environment variable is missing. Using default value.');
   process.exit(0);
+}
+
+if (!sentryDsn) {
+  console.warn('Config: SENTRY_DSN environment variable is missing.');
 }
 
 // Step 2: Define the content template
 const contentTemplate = `
 export const ENVIRONMENT = {
   databaseUrl: "{{SERVER_BASE_URL}}/database",
+  sentryDsn: "${sentryDsn}",
 }
 `;
 

@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import legacy from '@vitejs/plugin-legacy'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
@@ -7,7 +8,11 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [
     vue(),
-    legacy()
+    legacy(),
+    sentryVitePlugin({
+      org: "akdasa-studios",
+      project: "lectorium"
+    })
   ],
   resolve: {
     alias: {
@@ -19,5 +24,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom'
+  },
+  build: {
+    sourcemap: true
   }
 })

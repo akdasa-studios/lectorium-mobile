@@ -1,8 +1,13 @@
+import { ENVIRONMENT } from '@core/env'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
 import { IonicVue } from '@ionic/vue'
+
+/* Sentry */
+import * as Sentry from '@sentry/capacitor'
+import * as SentryVue from '@sentry/vue'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -43,28 +48,62 @@ import { initStatusBar, initNavigationBar, runNavigationBarStyle, runStatusBarSt
 async function createAndRunApp() {
   register()
 
-  await runCleanupFiles()
   await runConfigPersistence()
-  await runDownloadMediaItems()
-  await runSyncMediaItemsWithPlaylist()
-  await runSyncTranscriptsWithPlaylist()
-  await runPlaylistPersistence()
-  await runRestoreFailedDownloads()
-  await runSyncPlaylistStatus()
-
-  await initStatusBar()
-  await initNavigationBar()
-
-  await runStatusBarStyle()
-  await runNavigationBarStyle()
-
 
   const app = createApp(App)
     .use(IonicVue)
     .use(router)
     .use(i18n)
 
+
+  // Init sentry
+  if (ENVIRONMENT.sentryDsn) {
+    Sentry.init({
+      app,
+      dsn: ENVIRONMENT.sentryDsn,
+      integrations: [
+        SentryVue.browserTracingIntegration({
+          router: router,
+          routeLabel: 'name',
+        }),
+        SentryVue.replayIntegration({
+          maskAllText: false,
+          maskAllInputs: false,
+          sessionSampleRate: 1.0,
+          errorSampleRate: 1.0,
+        }),
+        new SentryVue.BrowserTracing({
+          // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+          tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+          routingInstrumentation: SentryVue.vueRouterInstrumentation(router),
+        }),
+      ],
+
+      // Tracing
+      tracesSampleRate: 1.0, //  Capture 100% of the transactions
+
+      // Session Replay
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+    }, SentryVue.init);
+  }
+
+
   router.isReady().then(async () => {
+    await runCleanupFiles()
+    await runDownloadMediaItems()
+    await runSyncMediaItemsWithPlaylist()
+    await runSyncTranscriptsWithPlaylist()
+    await runPlaylistPersistence()
+    await runRestoreFailedDownloads()
+    await runSyncPlaylistStatus()
+
+    await initStatusBar()
+    await initNavigationBar()
+
+    await runStatusBarStyle()
+    await runNavigationBarStyle()
+
     app.mount('#app')
   })
 }
