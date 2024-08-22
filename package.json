@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "appflow:build": "node ./modules/tools/updateEnvConfig.js && if [ \"$CI_PLATFORM\" != \"web\" ]; then npx trapeze run appflow.yml -y --$CI_PLATFORM; fi",
+    "appflow:build": "node ./modules/tools/updateEnvConfig.js && if [ \"$CI_PLATFORM\" != \"web\" ]; then npx trapeze run appflow.yml -y --$CI_PLATFORM; fi && vue-tsc && vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
     "lint": "eslint ."
