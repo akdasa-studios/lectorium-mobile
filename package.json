@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "appflow:build": "node ./modules/tools/updateEnvConfig.js && vue-tsc && vite build",
+    "appflow:build": "node ./modules/tools/updateEnvConfig.js && if [ \"$CI_PLATFORM\" != \"web\" ]; then npx trapeze run appflow.yml -y --$CI_PLATFORM; fi",
     "preview": "vite preview",
     "test:unit": "vitest",
     "lint": "eslint ."
@@ -43,6 +43,7 @@
     "vue3-radial-progress": "^1.1.1"
   },
   "devDependencies": {
+    "@trapezedev/configure": "^7.0.10",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "6.1.0",
     "@types/pouchdb": "^6.4.2",
