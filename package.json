@@ -32,7 +32,6 @@
     "@vue/typescript-plugin": "^2.0.26",
     "@vueuse/core": "^10.9.0",
     "@vueuse/sound": "^2.0.1",
-    "capacitor-plugin-safe-area": "^3.0.1",
     "events": "^3.3.0",
     "fluent-vue": "^3.6.0",
     "ionicons": "^7.4.0",
@@ -44,6 +43,7 @@
     "vue3-radial-progress": "^1.1.1"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "6.1.0",
     "@types/pouchdb": "^6.4.2",
     "@vitejs/plugin-legacy": "^5.0.0",

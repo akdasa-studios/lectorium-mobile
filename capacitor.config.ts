@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'studio.akdasa.lectorium',
-  appName: 'lectorium',
+  appName: 'Listen to Sadhu',
   webDir: 'dist',
   server: {
     androidScheme: 'https'

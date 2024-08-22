@@ -55,7 +55,6 @@ async function createAndRunApp() {
     .use(router)
     .use(i18n)
 
-
   // Init sentry
   if (ENVIRONMENT.sentryDsn) {
     Sentry.init({
