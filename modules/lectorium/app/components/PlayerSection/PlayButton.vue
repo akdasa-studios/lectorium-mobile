@@ -23,8 +23,8 @@ const icon = computed(() => playing.value ? pauseCircle : playCircle)
 .PlayButton {
   /* width: 100%; */
   /* height: 100%; */
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 58px;
+  min-height: 58px;
 }
 </style>
 
