@@ -6,6 +6,7 @@ export * from './composables/useConfig'
 export * from './composables/useFullSync'
 
 // services:
+export * from './services/DatabaseService'
 export * from './services/SourcesService'
 export * from './services/LocationsService'
 export * from './services/PlaylistService'

@@ -36,8 +36,10 @@ function onSelect(ids: string[]) {
 // ── Helpers ─────────────────────────────────────────────────────────
 function map2(authors: Author[]) {
   return authors.map((author) => ({
-    id: author.id,
-    title: author.name,
+    id: author._id,
+    // TODO: Get author name using app language
+    //       https://github.com/akdasa-studios/lectorium-mobile/issues/35
+    title: author.name["ru"],
     checked: false,
   }))
 }

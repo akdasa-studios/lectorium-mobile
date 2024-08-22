@@ -9,6 +9,7 @@ type TrackDBSchema = {
   date: string,
   references: any,
   languages: any,
+  author: string,
 }
 
 export class LibraryService {
@@ -32,7 +33,8 @@ export class LibraryService {
       location: entity.location,
       date: entity.date,
       references: entity.references,
-      languages: entity.languages
+      languages: entity.languages,
+      author: entity.author
     }
   }
 
@@ -54,7 +56,8 @@ export class LibraryService {
       location: entity.doc!.location,
       date: entity.doc!.date,
       references: entity.doc!.references,
-      languages: entity.doc!.languages
+      languages: entity.doc!.languages,
+      author: entity.doc!.author
     }))
   }
 
@@ -77,7 +80,8 @@ export class LibraryService {
         location: entity.doc!.location,
         date: entity.doc!.date,
         references: entity.doc!.references,
-        languages: entity.doc!.languages
+        languages: entity.doc!.languages,
+        author: entity.doc!.author,
       }))
   }
 

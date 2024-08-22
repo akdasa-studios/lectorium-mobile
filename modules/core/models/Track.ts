@@ -6,6 +6,7 @@ export type Track = {
   date: string
   references: Array<string[]>
   languages: TrackLanguage[]
+  author: string
 }
 
 export type TrackLanguage = {

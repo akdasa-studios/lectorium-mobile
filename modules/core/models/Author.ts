@@ -1,4 +1,4 @@
 export type Author = {
-  id: string
-  name: string
+  _id: string
+  name: Record<string, string>
 }

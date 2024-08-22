@@ -2,7 +2,7 @@
   <PlaylistEmpty
     v-if="playlistEmpty && isReady"
   />
-  <TracksList
+  <TracksListSwipable
     v-else
     :items="items"
     @click="onTrackClicked"
@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { formatDate } from '@core/utils'
-import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksList } from '@lectorium/playlist'
+import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksListSwipable } from '@lectorium/playlist'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useAsyncState } from '@vueuse/core'
 import { useLibrary } from '@lectorium/library'

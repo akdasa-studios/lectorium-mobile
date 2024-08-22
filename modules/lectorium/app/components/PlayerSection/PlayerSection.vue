@@ -2,8 +2,8 @@
   <div class="PlayerSection">
     <AudioControlsCompact
       ref="audioControlsCompactRef"
-      :title="track?.title || ''"
-      :author="'Author'"
+      :title="title || ''"
+      :author="author || ''"
       :playing="playing"
       :loading="false"
       @playClicked="emit('playClicked')"
@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue'
 import { IonContent } from '@ionic/vue'
-import { Track, TrackTranscript } from '@core/models'
+import { TrackTranscript } from '@core/models'
 import AudioControlsCompact from './AudioControlsCompact.vue'
 import Prompter from './Prompter.vue'
 import CloseHandle from './CloseHandle.vue'
@@ -47,7 +47,8 @@ const props = defineProps<{
   loading: boolean
   percentPlayed: number
   position: number
-  track: Track | undefined
+  author: string
+  title: string
   transcript: TrackTranscript | undefined
 }>()
 

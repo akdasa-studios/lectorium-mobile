@@ -7,17 +7,18 @@
     <template #main="props">
       <MainSection
         :shrink-size="props.shrink"
-    />
+      />
     </template>
 
     <template #player>
       <PlayerSection
         ref="refPlayerSection"
+        :author="currentAuthorName"
+        :title="currentTrackTitle"
         :playing="audioPlayer.playing.value"
         :loading="false"
         :position="audioPlayer.position.value"
         :percentPlayed="percentPlayed"
-        :track="currentTrack"
         :transcript="currentTranscript"
         @play-clicked="audioPlayer.togglePause()"
         @rewind="(to) => audioPlayer.rewindTo(to)"
@@ -30,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Track, TrackTranscript } from '@core/models'
+import { TrackTranscript } from '@core/models'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library'
 import { MainSection, PlayerSection, useAppLayout } from '@lectorium/app'
@@ -43,15 +44,30 @@ const library     = useLibrary()
 
 // ── State ───────────────────────────────────────────────────────────
 const refPlayerSection  = ref<InstanceType<typeof PlayerSection>>()
-const currentTrack      = ref<Track|undefined>()
+const currentTrackTitle = ref<string>("")
+const currentAuthorName = ref<string>("")
 const currentTranscript = ref<TrackTranscript|undefined>()
 const percentPlayed     = computed(() => audioPlayer.position.value / audioPlayer.duration.value * 100)
 
 // ── State ───────────────────────────────────────────────────────────
 watch(audioPlayer.trackId, async (value) => {
-  // TODO: https://github.com/akdasa-studios/lectorium-mobile/issues/31
-  currentTrack.value      = value ? await library.tracks.getTrack(value) : currentTrack.value
-  currentTranscript.value = value ? await library.tracks.getTranscript(value, 'ru') : currentTranscript.value
+  if (!value) {
+    currentTranscript.value = undefined
+    return
+  }
+
+  const currentTrack = await library.tracks.getTrack(value)
+  if (!currentTrack) { return }
+
+  // TODO: Get author name using app language from config
+  //       https://github.com/akdasa-studios/lectorium-mobile/issues/35
+  currentAuthorName.value = (await library.authors.getOne(currentTrack.author)).name['ru']
+  currentTrackTitle.value = currentTrack.title
+
+  // TODO: Get transcrupt using app language from config
+  //       https://github.com/akdasa-studios/lectorium-mobile/issues/31
+  currentTranscript.value = await library.tracks.getTranscript(value, 'ru')
+
 }, { immediate: true })
 
 watch(appLayout.layoutState, (value) => {
