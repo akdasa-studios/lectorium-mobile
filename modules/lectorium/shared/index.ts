@@ -4,6 +4,7 @@ export * from './composables/useLogger'
 export * from './composables/useFilesService'
 export * from './composables/useConfig'
 export * from './composables/useFullSync'
+export * from './composables/useMetrics'
 
 // services:
 export * from './services/DatabaseService'

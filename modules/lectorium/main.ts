@@ -71,6 +71,7 @@ async function createAndRunApp() {
           sessionSampleRate: 1.0,
           errorSampleRate: 1.0,
         }),
+        SentryVue.metrics.metricsAggregatorIntegration(),
         new SentryVue.BrowserTracing({
           // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
           tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
