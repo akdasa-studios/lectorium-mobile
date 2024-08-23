@@ -137,44 +137,12 @@ public class AudioPlayerPlugin extends Plugin {
     private void runInMainThread(Runnable r) {
         new Handler(Looper.getMainLooper()).post(r);
     }
-//    @PluginMethod
-//    public void destroy(PluginCall call) {
-//        try {
-//            String audioId = audioId(call);
-//
-//            if (!audioSourceExists("destroy", call)) {
-//                return;
-//            }
-//
-//            new Handler(Looper.getMainLooper()).post(
-//                    () -> {
-//                        try {
-//                            audioPlayerService.destroyAudioSource(audioId);
-//                            call.resolve();
-//                        } catch (Exception ex) {
-//                            call.reject("There was an issue cleaning up the audio player (1).", ex);
-//                        }
-//                    }
-//            );
-//        } catch (Exception ex) {
-//            call.reject("There was an issue cleaning up the audio player (2).", ex);
-//        }
-//    }
-//
-//    @Override
-//    protected void handleOnDestroy() {
-//        getContextForAudioService().stopService(AudioPlayerService.newIntent(getContextForAudioService()));
-//        unbindAudioService();
-//
-//        super.handleOnDestroy();
-//    }
-//
-//    private void unbindAudioService() {
-//        if (audioPlayerService == null) {
-//            return;
-//        }
-//
-//        getContextForAudioService().unbindService(connection);
-//        audioPlayerService = null;
-//    }
+
+    @Override
+    protected void handleOnDestroy() {
+        Context context = this.getActivity();
+        // context.unbindService(connection);
+        context.stopService(AudioPlayerService.newIntent(context));
+        super.handleOnDestroy();
+    }
 }
