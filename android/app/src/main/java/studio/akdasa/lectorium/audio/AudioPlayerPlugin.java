@@ -63,10 +63,6 @@ public class AudioPlayerPlugin extends Plugin {
     }
 
     private void bindAudioService() {
-        if (audioPlayerService != null) {
-            return;
-        }
-
         Context appContext = getBridge().getActivity().getApplicationContext();
         Intent intent = AudioPlayerService.newIntent(appContext);
         appContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -140,9 +136,9 @@ public class AudioPlayerPlugin extends Plugin {
 
     @Override
     protected void handleOnDestroy() {
-        Context context = this.getActivity();
-        // context.unbindService(connection);
-        context.stopService(AudioPlayerService.newIntent(context));
+        Context appContext = getBridge().getActivity().getApplicationContext();
+        appContext.stopService(AudioPlayerService.newIntent(appContext));
+        appContext.unbindService(connection);
         super.handleOnDestroy();
     }
 }
