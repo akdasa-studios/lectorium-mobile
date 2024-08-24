@@ -35,6 +35,8 @@
         <service
             android:name=".audio.AudioPlayerService"
             android:description="@string/audio_player_service_description"
+            android:enabled="true"
+            android:exported="false"
         />
     </application>
 </manifest>

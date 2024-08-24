@@ -16,16 +16,19 @@ const userData = useUserData()
 let currentTrackId = ""
 
 // ── Hooks ───────────────────────────────────────────────────────────
-onMounted(async () => {
-  await AudioPlayer.onProgressChanged((v) => {
-    audioPlayer.position.value = v.position
-    audioPlayer.duration.value = v.duration
-  })
-})
-watch(() => audioPlayer.playing.value, async (current) => await play(current))
-audioPlayer.bus.rewind.on(async ({ position }) => await rewind(position))
-audioPlayer.bus.open.on(async ({ trackId, position }) => await open(trackId, position))
-audioPlayer.bus.close.on(async () => await closeCurrentTrack())
+// onMounted(async () => {
+//   await AudioPlayer.onProgressChanged((v) => {
+//     console.log(JSON.stringify(v))
+//     audioPlayer.trackId.value  = v.trackId
+//     audioPlayer.position.value = v.position
+//     audioPlayer.duration.value = v.duration
+//     audioPlayer.playing.value  = v.playing
+//   })
+// })
+// watch(() => audioPlayer.playing.value, async (current) => await play(current))
+// audioPlayer.bus.rewind.on(async ({ position }) => await rewind(position))
+// audioPlayer.bus.open.on(async ({ trackId, position }) => await open(trackId, position))
+// audioPlayer.bus.close.on(async () => await closeCurrentTrack())
 
 // ── Handlers ────────────────────────────────────────────────────────
 /**
@@ -33,15 +36,15 @@ audioPlayer.bus.close.on(async () => await closeCurrentTrack())
  * @param trackId Track ID to open.
  * @param position Position to seek in seconds.
  */
-async function open(
-  trackId: string,
-  position?: number
-) {
-  if (currentTrackId && trackId !== currentTrackId) {
-    await closeCurrentTrack()
-  }
-  currentTrackId = await loadTrack(trackId, position)
-}
+// async function open(
+//   trackId: string,
+//   position?: number
+// ) {
+//   if (currentTrackId && trackId !== currentTrackId) {
+//     await closeCurrentTrack()
+//   }
+//   currentTrackId = await loadTrack(trackId, position)
+// }
 
 /**
  * Close current track in the player.
@@ -62,7 +65,7 @@ async function play(
   if (playing) {
     await AudioPlayer.play()
   } else {
-    await AudioPlayer.pause()
+    // await AudioPlayer.pause()
   }
 }
 
@@ -101,13 +104,13 @@ async function loadTrack(
         path: media.localPath
       })).uri
 
-  // Initialize track in the player.
-  await AudioPlayer.create({
-    audioSource: audioSource,
-  })
-
   // Play the track and seek to the position if needed.
-  await AudioPlayer.play()
+  await AudioPlayer.open({
+    trackId: track.id,
+    url: audioSource,
+    title: track.title,
+    author: await library.authors.getLocalizedName(track.author, "ru"),
+  })
   if (position) {
     await AudioPlayer.seek({
       position: position

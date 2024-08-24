@@ -1,37 +1,47 @@
-package studio.akdasa.lectorium.audio;
-
-import android.os.Handler;
-
-import com.getcapacitor.JSObject;
-import com.getcapacitor.PluginCall;
-import com.google.android.exoplayer2.ExoPlayer;
-
-public class AudioPlayerProgressTracker implements Runnable {
-    private ExoPlayer player;
-    private PluginCall call;
-    private final Handler handler = new Handler();
-
-    public AudioPlayerProgressTracker() {
-        handler.post(this);
-    }
-
-    public void run() {
-        if (this.call != null && this.player != null) {
-            JSObject callPayload = new JSObject();
-            callPayload.put("position", this.player.getCurrentPosition() / 1000);
-            callPayload.put("playing", this.player.isPlaying());
-            callPayload.put("duration", this.player.getDuration() / 1000);
-            this.call.resolve(callPayload);
-        }
-
-        handler.postDelayed(this, 1000);
-    }
-
-    public void setCall(PluginCall call) {
-        this.call = call;
-    }
-
-    public void setPlayer(ExoPlayer player) {
-        this.player = player;
-    }
-}
+//package studio.akdasa.lectorium.audio;
+//
+//import android.media.MediaPlayer;
+//import android.os.Handler;
+//
+//import com.getcapacitor.JSObject;
+//import com.getcapacitor.PluginCall;
+//
+//public class AudioPlayerProgressTracker implements Runnable {
+////    private MediaPlayer player;
+//    private PluginCall call;
+//    private AudioPlayerService service;
+//    private final Handler handler = new Handler();
+//
+//    public AudioPlayerProgressTracker() {
+//        handler.post(this);
+//    }
+//
+//    public void run() {
+//        MediaPlayer player = this.service.getMediaPlayer();
+//
+//        if (player == null) { return; }
+//        if (call == null) { return; }
+//
+//        JSObject callPayload = new JSObject();
+//        callPayload.put("position", player.getCurrentPosition() / 1000);
+//        callPayload.put("playing", player.isPlaying());
+//        callPayload.put("duration", player.getDuration() / 1000);
+//        this.call.resolve(callPayload);
+//
+//        handler.postDelayed(this, 1000);
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        })
+//    }
+//
+//    public void setCall(PluginCall call) {
+//        this.call = call;
+//    }
+//
+//    public void setService(AudioPlayerService service) {
+//        this.service = service;
+//    }
+//}

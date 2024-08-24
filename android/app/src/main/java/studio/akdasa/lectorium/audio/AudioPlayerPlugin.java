@@ -1,42 +1,30 @@
 package studio.akdasa.lectorium.audio;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-import studio.akdasa.lectorium.audio.AudioPlayerService.AudioPlayerServiceBinder;
-
-@CapacitorPlugin(name = "AudioPlayer")
+@CapacitorPlugin(name="AudioPlayer")
 public class AudioPlayerPlugin extends Plugin {
-    private static final String TAG = "AudioPlayerPlugin";
     private AudioPlayerService audioPlayerService;
 
-    private final ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.i(TAG, "Service connected");
-            AudioPlayerServiceBinder binder = (AudioPlayerServiceBinder) service;
+            AudioPlayerService.LocalBinder binder = (AudioPlayerService.LocalBinder) service;
             audioPlayerService = binder.getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.i(TAG, "Service disconnected");
             audioPlayerService = null;
         }
     };
@@ -44,101 +32,92 @@ public class AudioPlayerPlugin extends Plugin {
     @Override
     public void load() {
         super.load();
-        createNotificationChannel();
-        bindAudioService();
-        startAudioService();
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel playbackChannel = new NotificationChannel(
-                    AudioPlayerService.PLAYBACK_CHANNEL_ID,
-                    "Audio playback",
-                    NotificationManager.IMPORTANCE_LOW
-            );
-
-            NotificationManager manager = getContext().getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(playbackChannel);
-        }
-    }
-
-    private void bindAudioService() {
-        Context appContext = getBridge().getActivity().getApplicationContext();
-        Intent intent = AudioPlayerService.newIntent(appContext);
-        appContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-    }
-
-    private void startAudioService() {
-        Context appContext = getBridge().getActivity().getApplicationContext();
-        appContext.startService(AudioPlayerService.newIntent(appContext));
+        Intent intent = new Intent(getContext(), AudioPlayerService.class);
+        ContextCompat.startForegroundService(getContext(), intent);
+        getContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @PluginMethod
-    public void create(@NonNull PluginCall call) {
-        String audioSource = call.getString("audioSource");
+    public void open(PluginCall call) {
+        String trackId = call.getString("trackId");
+        String url = call.getString("url");
+        String title = call.getString("title");
+        String author = call.getString("author");
 
-        if (audioPlayerService == null) {
-            call.reject("Audio service is not initialized.");
+        if (url == null || url.isEmpty()) {
+            call.reject("URL is required");
             return;
         }
 
-        runInMainThread(() -> {
-            audioPlayerService.createAudioSource(audioSource);
-            call.resolve();
-        });
+        Intent serviceIntent = new Intent(getContext(), AudioPlayerService.class);
+        serviceIntent.setAction(AudioPlayerService.ACTION_OPEN);
+        serviceIntent.putExtra("url", url);
+        serviceIntent.putExtra("title", title);
+        serviceIntent.putExtra("author", author);
+        serviceIntent.putExtra("trackId", trackId);
+
+        getContext().startForegroundService(serviceIntent);
+        call.resolve();
+
+        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //     getContext().startForegroundService(serviceIntent);
+        // } else {
+        //     getContext().startService(serviceIntent);
+        // }
     }
 
     @PluginMethod
     public void play(PluginCall call) {
-        runInMainThread(() -> {
-            audioPlayerService.play();
-            call.resolve();
-        });
+        Intent serviceIntent = new Intent(getContext(), AudioPlayerService.class);
+        serviceIntent.setAction(AudioPlayerService.ACTION_PLAY);
+        getContext().startService(serviceIntent);
+        call.resolve();
     }
 
     @PluginMethod
-    public void pause(PluginCall call) {
-        runInMainThread(() -> {
-            audioPlayerService.pause();
-            call.resolve();
-        });
-    }
-
-    @PluginMethod
-    public void seek(@NonNull PluginCall call) {
-        Float position = call.getFloat("position", 0.0f);
-        if (position == null) { return; }
-
-        runInMainThread(() -> {
-            audioPlayerService.seek(position.longValue() * 1000);
-            call.resolve();
-        });
+    public void togglePause(PluginCall call) {
+        Intent serviceIntent = new Intent(getContext(), AudioPlayerService.class);
+        serviceIntent.setAction(AudioPlayerService.ACTION_TOGGLE_PAUSE);
+        getContext().startService(serviceIntent);
+        call.resolve();
     }
 
     @PluginMethod
     public void stop(PluginCall call) {
-        runInMainThread(() -> {
-            audioPlayerService.stop();
-            call.resolve();
-        });
+        Intent serviceIntent = new Intent(getContext(), AudioPlayerService.class);
+        serviceIntent.setAction(AudioPlayerService.ACTION_STOP);
+        getContext().startService(serviceIntent);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void seek(PluginCall call) {
+        Float position = call.getFloat("position", 0.0f);
+        if (position == null) { return; }
+
+        Intent serviceIntent = new Intent(getContext(), AudioPlayerService.class);
+        serviceIntent.setAction(AudioPlayerService.ACTION_SEEK);
+        serviceIntent.putExtra("position", position.longValue() * 1000);
+        getContext().startService(serviceIntent);
+        call.resolve();
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onProgressChanged(@NonNull PluginCall call) {
+    public void onProgressChanged(PluginCall call) {
         call.setKeepAlive(true);
         getBridge().saveCall(call);
-        audioPlayerService.addOnStatusChangeListener(call);
-    }
-
-    private void runInMainThread(Runnable r) {
-        new Handler(Looper.getMainLooper()).post(r);
+        audioPlayerService.setCall(call);
+//        progressTracker = new AudioPlayerProgressTracker();
+//        progressTracker.setPlayer(audioPlayerService.getMediaPlayer());
+//        progressTracker.setCall(call);
     }
 
     @Override
     protected void handleOnDestroy() {
-        Context appContext = getBridge().getActivity().getApplicationContext();
-        appContext.stopService(AudioPlayerService.newIntent(appContext));
-        appContext.unbindService(connection);
+        if (audioPlayerService != null) {
+            getContext().unbindService(serviceConnection);
+            audioPlayerService = null;
+        }
         super.handleOnDestroy();
     }
 }
