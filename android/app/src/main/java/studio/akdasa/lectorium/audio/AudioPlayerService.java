@@ -3,6 +3,8 @@ package studio.akdasa.lectorium.audio;
 import static android.media.MediaPlayer.SEEK_PREVIOUS_SYNC;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -84,6 +87,15 @@ public class AudioPlayerService extends Service implements MediaPlayer.OnPrepare
         mediaSession = new MediaSessionCompat(this, "AudioPlayerService");
         mediaSession.setCallback(new MediaSessionCallback());
         mediaSession.setActive(true);
+
+        NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID,
+                "Background Audio Channel",
+                NotificationManager.IMPORTANCE_LOW
+        );
+        channel.setDescription("Channel for background audio playback");
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
     }
 
     @Override
