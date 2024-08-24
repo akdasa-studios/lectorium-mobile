@@ -17,8 +17,6 @@ export interface AudioPlayerPlugin extends Plugin {
   togglePause(): Promise<void>
   seek(options: { position: number }): Promise<void>
   stop(): Promise<void>
-
-  // destroy(params: AudioPlayerDefaultParams): Promise<void>
   onProgressChanged(
     callback: (result: { position: number, playing: boolean, duration: number, trackId: string }) => void
   ): Promise<AudioPlayerListenerResult>

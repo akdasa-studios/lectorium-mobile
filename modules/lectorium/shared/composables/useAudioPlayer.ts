@@ -1,19 +1,10 @@
 import { ref } from 'vue'
-import { createGlobalState, useEventBus } from '@vueuse/core'
+import { createGlobalState } from '@vueuse/core'
 import { useLibrary } from '@lectorium/library'
 import { useUserData } from './useUserData'
 import { Capacitor } from '@capacitor/core'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { AudioPlayer } from '@core/plugins'
-
-// export const Rewind: EventBusKey<{ position: number }> = Symbol('rewind')
-// export const Playing: EventBusKey<{ trackId: string, position?: number }> = Symbol('playing')
-// export const Close: EventBusKey<{ trackId: string }> = Symbol('close')
-// export const AudioPlayerEventBus = {
-//   rewind: useEventBus(Rewind),
-//   // open: useEventBus(Playing),
-//   close: useEventBus(Close)
-// }
 
 export const useAudioPlayer = createGlobalState(() => {
   const library = useLibrary()
@@ -60,23 +51,14 @@ export const useAudioPlayer = createGlobalState(() => {
 
   async function togglePause() {
     await AudioPlayer.togglePause()
-
-    // _playing.value = !_playing.value
   }
 
   async function stop() {
     await AudioPlayer.stop()
-    // console.log('stop')
-
-    // if (!_trackId.value) return
-    // AudioPlayerEventBus.close.emit({ trackId: _trackId.value })
-    // _playing.value = false
-    // _trackId.value = undefined
   }
 
   async function seek(position: number) {
     await AudioPlayer.seek({ position })
-    // AudioPlayerEventBus.rewind.emit({ position })
   }
 
   const _trackId = ref<string|undefined>(undefined)
