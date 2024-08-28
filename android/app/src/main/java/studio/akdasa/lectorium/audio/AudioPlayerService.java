@@ -33,6 +33,7 @@ public class AudioPlayerService extends Service {
     public void onCreate() {
         super.onCreate();
         mediaPlayer = new MediaPlayer();
+        mediaStateChangeNotifier = new MediaStateChangeNotifier(mediaPlayer);
         createNotificationChannel();
     }
 
@@ -88,15 +89,13 @@ public class AudioPlayerService extends Service {
     }
 
     public void stop() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            mediaStateChangeNotifier.setCurrentTrackId(null);
-        }
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        mediaStateChangeNotifier.setCurrentTrackId(null);
     }
 
     public void setOnProgressChangeCall(PluginCall call) {
-        this.mediaStateChangeNotifier = new MediaStateChangeNotifier(mediaPlayer, call);
+        this.mediaStateChangeNotifier.setCallback(call);
         this.mediaStateChangeNotifier.run();
     }
 

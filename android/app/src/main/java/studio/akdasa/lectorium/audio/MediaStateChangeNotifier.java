@@ -7,10 +7,10 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 
 public class MediaStateChangeNotifier {
+    private PluginCall callback;
     private String currentTrackId;
 
     private final MediaPlayer player;
-    private final PluginCall callback;
     private final Handler handler = new Handler();
     private final Runnable runnable = new Runnable() {
         @Override
@@ -21,11 +21,9 @@ public class MediaStateChangeNotifier {
     };
 
     public MediaStateChangeNotifier(
-            MediaPlayer player,
-            PluginCall callback
+            MediaPlayer player
     ) {
         this.player = player;
-        this.callback = callback;
     }
 
     public void run() {
@@ -33,9 +31,7 @@ public class MediaStateChangeNotifier {
     }
 
     private void update() {
-        if (player == null || callback  == null) {
-            return;
-        }
+        if (player == null || callback  == null) { return; }
 
         JSObject callPayload = new JSObject();
         if (currentTrackId != null) {
@@ -54,5 +50,9 @@ public class MediaStateChangeNotifier {
 
     public void setCurrentTrackId(String value) {
         currentTrackId = value;
+    }
+
+    public void setCallback(PluginCall value) {
+        callback = value;
     }
 }
