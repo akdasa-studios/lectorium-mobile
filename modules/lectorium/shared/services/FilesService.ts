@@ -55,7 +55,7 @@ export class FilesService {
   /**
    * Deletes a file from the specified directory.
    *
-   * @param path - The path of the file to be deleted.
+   * @param path The path of the file to be deleted.
    * @returns A promise that resolves when the file is
    *          successfully deleted.
    */
