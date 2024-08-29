@@ -5,7 +5,7 @@
   >
     <IonInput
       fill="outline"
-      :placeholder="$t('search')"
+      :placeholder="placeholder"
       :clear-input="true"
       v-model="searchQuery"
       @ion-focus="onFocus"
@@ -26,6 +26,10 @@ import { IonInput, IonSearchbar, isPlatform } from '@ionic/vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 const searchQuery = defineModel<string>({ type: String, default: '' })
+
+defineProps<{
+  placeholder?: string
+}>()
 
 const emit = defineEmits<{
   focus: [value: boolean]

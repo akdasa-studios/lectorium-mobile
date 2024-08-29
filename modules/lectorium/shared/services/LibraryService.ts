@@ -62,6 +62,10 @@ export class LibraryService {
     }))
   }
 
+  async getCount(): Promise<number> {
+    return (await this._libraryTracks.db.allDocs()).total_rows
+  }
+
   async getMany(
     ids: string[],
   ): Promise<Track[]> {
