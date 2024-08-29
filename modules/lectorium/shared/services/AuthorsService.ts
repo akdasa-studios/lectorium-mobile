@@ -1,4 +1,5 @@
 import { Author } from '@core/models'
+import { Database } from '@core/persistence'
 import { DatabaseService, Identifiable, ItemChangedEventHandler } from '@lectorium/shared'
 
 export type AuthorDbScheme = {
@@ -16,8 +17,12 @@ const authorDeserializer = (document: AuthorDbScheme): Author => ({
 })
 
 export class AuthorsService {
-  private _databaseService = new DatabaseService<Author, AuthorDbScheme>
-    ('library-dictionary-v0001', authorSerializer, authorDeserializer)
+  private _databaseService: DatabaseService<Author, AuthorDbScheme>
+
+  constructor(database: Database) {
+    this._databaseService = new DatabaseService(
+      database, authorSerializer, authorDeserializer)
+  }
 
   /**
    * Retrieves an author by its id.

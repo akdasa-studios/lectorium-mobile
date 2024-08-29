@@ -1,4 +1,5 @@
 import { MediaItem } from '@core/models'
+import { Database } from '@core/persistence'
 import { cyrb53 } from '@core/utils'
 import { DatabaseService, Identifiable, ItemChangedEventHandler } from '@lectorium/shared'
 
@@ -36,7 +37,12 @@ const mediaItemDeserializer = (document: MediaDbScheme): MediaItem => ({
  * Service for interacting with media items in the database.
  */
 export class MediaService {
-  private _databaseService = new DatabaseService<MediaItem, MediaDbScheme>('data', mediaItemSerializer, mediaItemDeserializer)
+  private _databaseService: DatabaseService<MediaItem, MediaDbScheme>
+
+  constructor(database: Database) {
+    this._databaseService = new DatabaseService(
+      database, mediaItemSerializer, mediaItemDeserializer)
+  }
 
   public subscribe(
     handler: ItemChangedEventHandler<MediaItem>

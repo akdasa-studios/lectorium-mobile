@@ -44,7 +44,7 @@ sync.progress.subscribe((event: SyncProgressEvent) => {
     syncSteps[3].progress = event.percent
   }
 
-  console.log('Sync progress:', event)
+  console.log(`Sync progress: ${event.to.db.name} ${event.percent}%`)
 })
 
 // ── Hooks ───────────────────────────────────────────────────────────

@@ -44,7 +44,7 @@ export class SyncStep {
   async execute(
     filter?: string,
     params?: Record<string, any>,
-  ) {
+  ): Promise<void> {
     let documentsCount = 0
     let documentsProcessed = 0
 

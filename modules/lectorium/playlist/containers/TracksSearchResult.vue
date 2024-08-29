@@ -84,39 +84,45 @@ async function fetchData(
   query: string,
   offset: number = 0
 ): Promise<boolean> {
-  // TODO: use languge of application. Note: user can search in any language.
-  // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
-  // https://github.com/akdasa-studios/lectorium-mobile/issues/32
-  const playlistItems = (await userData.playlist.getAll()).map(x => x.trackId)
-  let foundTracks: Track[] = []
-  if (query) {
-    const foundTrackIds = await library.search.search(query, 'Russian');
-    const tracksToLoad = foundTrackIds.ids.slice(offset, offset + 25)
-    foundTracks = await library.tracks.getMany(tracksToLoad)
-  } else {
-    foundTracks = await library.tracks.getAll(offset)
+  try {
+    // TODO: use languge of application. Note: user can search in any language.
+    // TODO: optimization: there is no reason to fetch all playlist items again and again, we can cache it
+    // https://github.com/akdasa-studios/lectorium-mobile/issues/32
+    const playlistItems = (await userData.playlist.getAll()).map(x => x.trackId)
+    let foundTracks: Track[] = []
+    if (query) {
+      const foundTrackIds = await library.search.search(query, 'Russian');
+      const tracksToLoad = foundTrackIds.ids.slice(offset, offset + 25)
+      foundTracks = await library.tracks.getMany(tracksToLoad)
+    } else {
+      foundTracks = await library.tracks.getAll(offset)
+    }
+
+    const loadedItems = await Promise.all(
+      foundTracks.map(async i => ({
+        trackId: i.id,
+        title: i.title,
+        date: formatDate(i.date),
+        location: await library.locations.getLocalizedName(i.location, 'ru'),
+        references: await library.sources.getLocalizedReferences(i.references, 'ru'),
+        playingStatus: playlistItems.includes(i.id)
+            ? PlayingStatus.InQueue
+            : PlayingStatus.None,
+      }))
+    )
+
+    if (offset === 0) {
+      items.value = loadedItems
+    } else {
+      items.value = [...items.value, ...loadedItems]
+    }
+
+    return foundTracks.length > 0
+  } catch (e) {
+    console.error("Error", e,  JSON.stringify(e))
+    return false
+  } finally {
+    isReady.value = true
   }
-
-  const loadedItems = await Promise.all(
-    foundTracks.map(async i => ({
-      trackId: i.id,
-      title: i.title,
-      date: formatDate(i.date),
-      location: await library.locations.getLocalizedName(i.location, 'ru'),
-      references: await library.sources.getLocalizedReferences(i.references, 'ru'),
-      playingStatus: playlistItems.includes(i.id)
-          ? PlayingStatus.InQueue
-          : PlayingStatus.None,
-    }))
-  )
-
-  if (offset === 0) {
-    items.value = loadedItems
-  } else {
-    items.value = [...items.value, ...loadedItems]
-  }
-
-  isReady.value = true
-  return foundTracks.length > 0
 }
 </script>

@@ -1,0 +1,1 @@
+node ./modules/tools/updateEnvConfig.js && if [ \"$CI_PLATFORM\" != \"web\" ]; then npx trapeze run appflow.yml -y --$CI_PLATFORM; sh ./utils/download-artifacts.sh; fi && vue-tsc && vite build

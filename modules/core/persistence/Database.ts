@@ -1,4 +1,7 @@
 import PouchDB from 'pouchdb'
+import PouchDBAdapterSqlLite from 'pouchdb-adapter-cordova-sqlite'
+
+PouchDB.plugin(PouchDBAdapterSqlLite)
 
 export interface DatabaseConfig {
   name: string,
@@ -31,7 +34,9 @@ export class Database {
   ) {
     this._config = config
     this._db = new PouchDB(this._config.name, {
-      adapter: this._config.adapter
+      adapter: this._config.adapter,
+      // @ts-ignore
+      location: 'default',
     })
   }
 
@@ -42,13 +47,15 @@ export class Database {
     source: Database,
     options?: DatabaseReplicationOptions,
   ) {
-    await this._db.replicate.from(source.db, options).on('change', info => {
-      options?.onChange && options.onChange({
-        // @ts-ignore
-        documentsPending: info.pending || 0,
-        docs: info.docs
+    await this._db.replicate
+      .from(source.db, options)
+      .on('change', info => {
+        options?.onChange && options.onChange({
+          // @ts-ignore
+          documentsPending: info.pending || 0,
+          docs: info.docs
+        })
       })
-    })
   }
 
   /**

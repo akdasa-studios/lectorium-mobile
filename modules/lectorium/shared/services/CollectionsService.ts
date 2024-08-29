@@ -11,7 +11,7 @@ type CollectionsDBSchema = {
 }
 
 export class CollectionsService {
-  private database = new Database({ name: 'data' })
+  constructor(private database: Database) {}
   private _onChangeHandlers: Array<() => void> = []
 
   public onChange(handler: () => void) {

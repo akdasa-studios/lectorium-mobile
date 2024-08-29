@@ -19,8 +19,7 @@ const localizedSources: Record<string, string> = {
 }
 
 export class SearchService {
-  // TODO: use database version based on config
-  private database = new Database({ name: 'library-index-v0001' })
+  constructor(private database: Database) {}
 
   /**
    * Searches for Tracks with specified query
