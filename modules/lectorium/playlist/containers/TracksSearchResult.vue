@@ -123,7 +123,6 @@ async function fetchData(
     return false
   } finally {
     isReady.value = true
-    return false
   }
 }
 </script>
