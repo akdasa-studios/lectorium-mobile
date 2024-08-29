@@ -47,6 +47,7 @@ export const useAudioPlayer = createGlobalState(() => {
         position: position
       })
     }
+    await AudioPlayer.play()
   }
 
   async function togglePause() {
