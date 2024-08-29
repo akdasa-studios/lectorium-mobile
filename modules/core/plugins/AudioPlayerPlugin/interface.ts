@@ -7,6 +7,13 @@ export type OpenParams = {
   trackId: string,
 }
 
+export type Status = {
+  position: number,
+  playing: boolean,
+  duration: number,
+  trackId: string,
+}
+
 export interface AudioPlayerListenerResult {
   callbackId: string
 }
@@ -18,6 +25,6 @@ export interface AudioPlayerPlugin extends Plugin {
   seek(options: { position: number }): Promise<void>
   stop(): Promise<void>
   onProgressChanged(
-    callback: (result: { position: number, playing: boolean, duration: number, trackId: string }) => void
+    callback: (status: Status) => void
   ): Promise<AudioPlayerListenerResult>
 }

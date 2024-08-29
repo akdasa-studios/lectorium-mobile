@@ -11,7 +11,6 @@ export const useAudioPlayer = createGlobalState(() => {
   const userData = useUserData()
 
   AudioPlayer.onProgressChanged((v) => {
-    console.log(JSON.stringify(v))
     _trackId.value  = v.trackId
     _position.value = v.position
     _duration.value = v.duration

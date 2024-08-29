@@ -3,5 +3,5 @@ import { AudioPlayerPlugin } from './interface'
 
 
 export const AudioPlayer = registerPlugin<AudioPlayerPlugin>('AudioPlayer', {
-  // web: () => import('./web').then(m => new m.WebAudioPlayerPlugin()),
+  web: () => import('./web').then(m => new m.WebAudioPlayerPlugin()),
 })

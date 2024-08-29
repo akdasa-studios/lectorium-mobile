@@ -1,55 +1,79 @@
-// import { PluginListenerHandle } from "@capacitor/core";
-// import { AudioPlayerPlugin, AudioPlayerPrepareParams, AudioPlayerListenerResult } from "./interface";
+import { PluginListenerHandle } from "@capacitor/core"
+import { AudioPlayerPlugin, OpenParams, AudioPlayerListenerResult, Status } from "./interface"
 
 
-// export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
-//   onProgressChanged(
-//       callback: (result: { position: number; playing: boolean; duration: number; }) => void
-//   ): Promise<AudioPlayerListenerResult> {
-//     return new Promise((resolve, reject) => {
-//       resolve({ callbackId: "123" });
-//     });
-//     // throw new Error("Method not implemented.");
-//   }
-//   private audio: HTMLAudioElement | null = null;
+export class WebAudioPlayerPlugin implements AudioPlayerPlugin {
+  private audio: HTMLAudioElement | null = null;
+  private callback: ((status: Status) => void) | null = null;
+  private currentTrackId: string | null = null;
 
 
-//   async create(params: AudioPlayerPrepareParams): Promise<{ success: boolean }> {
-//     this.audio = new Audio(params.audioSource);
-//     return { success: true };
-//   }
+  constructor () {
+    setInterval(() => {
+      if (!this.audio || !this.callback) { return }
 
-//   async play(): Promise<void> {
-//     if (this.audio) {
-//       await this.audio.play();
-//     }
-//   }
+      this.callback({
+        position: this.audio.currentTime,
+        playing: !this.audio.paused,
+        duration: this.audio.duration,
+        trackId: this.currentTrackId || "",
+      });
+    }, 1000);
+  }
 
-//   async pause(): Promise<void> {
-//     if (this.audio) {
-//       this.audio.pause();
-//     }
-//   }
 
-//   async seek(options: { position: number }): Promise<void> {
-//     if (this.audio) {
-//       this.audio.currentTime = options.position;
-//     }
-//   }
+  async open(
+    params: OpenParams
+  ): Promise<void> {
+    this.audio = new Audio(params.url);
+    this.currentTrackId = params.trackId;
+  }
 
-//   async stop(): Promise<void> {
-//     if (this.audio) {
-//       this.audio.pause();
-//       this.audio.remove();
+  async play(): Promise<void> {
+    if (this.audio) {
+      await this.audio.play();
+    }
+  }
 
-//       // this.audio.currentTime = 0;
-//     }
-//   }
+  async togglePause(): Promise<void> {
+    if (!this.audio) { return; }
+    if (this.audio.paused) {
+      this.audio.play();
+    } else {
+      this.audio.pause();
+    }
+  }
 
-//   addListener(eventName: string, listenerFunc: (...args: any[]) => any): Promise<PluginListenerHandle> {
-//     throw new Error("Method not implemented.");
-//   }
-//   removeAllListeners(): Promise<void> {
-//     throw new Error("Method not implemented.");
-//   }
-// }
+  async seek(
+    options: { position: number }
+  ): Promise<void> {
+    if (this.audio) {
+      this.audio.currentTime = options.position;
+    }
+  }
+
+  async stop(): Promise<void> {
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.remove();
+      this.currentTrackId = null;
+    }
+  }
+
+  onProgressChanged(
+    callback: (status: Status) => void
+  ): Promise<AudioPlayerListenerResult> {
+    this.callback = callback;
+    return new Promise((resolve, reject) => {
+      resolve({ callbackId: "123" });
+    });
+  }
+
+  addListener(eventName: string, listenerFunc: (...args: any[]) => any): Promise<PluginListenerHandle> {
+    throw new Error("Method not implemented.");
+  }
+
+  removeAllListeners(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+}
