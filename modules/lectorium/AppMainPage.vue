@@ -21,7 +21,7 @@
         :percentPlayed="percentPlayed"
         :transcript="currentTranscript"
         @play-clicked="audioPlayer.togglePause()"
-        @rewind="(to) => audioPlayer.rewindTo(to)"
+        @rewind="(to) => audioPlayer.seek(to)"
         @click="onPlayerClicked"
       />
     </template>

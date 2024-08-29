@@ -35,6 +35,15 @@ export class AuthorsService {
     return this._databaseService.getOne(`author::${id}`)
   }
 
+  public async getLocalizedName(
+    id: string,
+    language: string,
+  ): Promise<string> {
+    const author = await this.getOne(id)
+    return author.name[language] || author.name['en']
+  }
+
+
   /**
    * Retrieves all authors.
    * @returns Array of authors

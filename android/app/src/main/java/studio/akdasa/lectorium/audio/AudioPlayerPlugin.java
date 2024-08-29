@@ -1,144 +1,100 @@
 package studio.akdasa.lectorium.audio;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-import studio.akdasa.lectorium.audio.AudioPlayerService.AudioPlayerServiceBinder;
 
-@CapacitorPlugin(name = "AudioPlayer")
-public class AudioPlayerPlugin extends Plugin {
-    private static final String TAG = "AudioPlayerPlugin";
-    private AudioPlayerService audioPlayerService;
+@CapacitorPlugin(name="AudioPlayer")
+public class  AudioPlayerPlugin extends Plugin {
 
+    private AudioPlayerService mediaPlaybackService;
+    private boolean isBound = false;
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.i(TAG, "Service connected");
-            AudioPlayerServiceBinder binder = (AudioPlayerServiceBinder) service;
-            audioPlayerService = binder.getService();
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            AudioPlayerService.LocalBinder binder = (AudioPlayerService.LocalBinder) service;
+            mediaPlaybackService = binder.getService();
+            isBound = true;
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.i(TAG, "Service disconnected");
-            audioPlayerService = null;
+        public void onServiceDisconnected(ComponentName arg0) {
+            isBound = false;
         }
     };
 
     @Override
     public void load() {
-        super.load();
-        createNotificationChannel();
-        bindAudioService();
-        startAudioService();
-    }
+        Intent intent = new Intent(getContext(), AudioPlayerService.class);
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel playbackChannel = new NotificationChannel(
-                    AudioPlayerService.PLAYBACK_CHANNEL_ID,
-                    "Audio playback",
-                    NotificationManager.IMPORTANCE_LOW
-            );
-
-            NotificationManager manager = getContext().getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(playbackChannel);
-        }
-    }
-
-    private void bindAudioService() {
-        Context appContext = getBridge().getActivity().getApplicationContext();
-        Intent intent = AudioPlayerService.newIntent(appContext);
-        appContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-    }
-
-    private void startAudioService() {
-        Context appContext = getBridge().getActivity().getApplicationContext();
-        appContext.startService(AudioPlayerService.newIntent(appContext));
+        getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        getContext().startForegroundService(intent);
     }
 
     @PluginMethod
-    public void create(@NonNull PluginCall call) {
-        String audioSource = call.getString("audioSource");
-
-        if (audioPlayerService == null) {
-            call.reject("Audio service is not initialized.");
+    public void open(PluginCall call) {
+        String url = call.getString("url");
+        String trackId = call.getString("trackId");
+        if (url == null) {
+            call.reject("URL is required");
             return;
         }
 
-        runInMainThread(() -> {
-            audioPlayerService.createAudioSource(audioSource);
+        if (isBound) {
+            mediaPlaybackService.open(trackId, url);
             call.resolve();
-        });
+        } else {
+            call.reject("Service not bound");
+        }
     }
 
     @PluginMethod
     public void play(PluginCall call) {
-        runInMainThread(() -> {
-            audioPlayerService.play();
-            call.resolve();
-        });
+        mediaPlaybackService.play();
+        call.resolve();
     }
 
     @PluginMethod
-    public void pause(PluginCall call) {
-        runInMainThread(() -> {
-            audioPlayerService.pause();
-            call.resolve();
-        });
+    public void togglePause(PluginCall call) {
+        mediaPlaybackService.togglePause();
+        call.resolve();
     }
 
     @PluginMethod
-    public void seek(@NonNull PluginCall call) {
+    public void seek(PluginCall call) {
         Float position = call.getFloat("position", 0.0f);
         if (position == null) { return; }
-
-        runInMainThread(() -> {
-            audioPlayerService.seek(position.longValue() * 1000);
-            call.resolve();
-        });
+        mediaPlaybackService.seek(position.longValue() * 1000);
+        call.resolve();
     }
 
     @PluginMethod
     public void stop(PluginCall call) {
-        runInMainThread(() -> {
-            audioPlayerService.stop();
-            call.resolve();
-        });
+        mediaPlaybackService.stop();
+        call.resolve();
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void onProgressChanged(@NonNull PluginCall call) {
+    public void onProgressChanged(PluginCall call) {
         call.setKeepAlive(true);
         getBridge().saveCall(call);
-        audioPlayerService.addOnStatusChangeListener(call);
-    }
-
-    private void runInMainThread(Runnable r) {
-        new Handler(Looper.getMainLooper()).post(r);
+        mediaPlaybackService.setOnProgressChangeCall(call);
     }
 
     @Override
     protected void handleOnDestroy() {
-        Context appContext = getBridge().getActivity().getApplicationContext();
-        appContext.stopService(AudioPlayerService.newIntent(appContext));
-        appContext.unbindService(connection);
+        if (isBound) {
+            getContext().unbindService(connection);
+            isBound = false;
+        }
         super.handleOnDestroy();
     }
 }

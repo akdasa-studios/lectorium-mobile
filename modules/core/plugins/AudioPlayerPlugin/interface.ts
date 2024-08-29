@@ -1,7 +1,17 @@
 import { Plugin } from '@capacitor/core'
 
-export interface AudioPlayerPrepareParams {
-  audioSource: string
+export type OpenParams = {
+  url: string,
+  title: string,
+  author: string,
+  trackId: string,
+}
+
+export type Status = {
+  position: number,
+  playing: boolean,
+  duration: number,
+  trackId: string,
 }
 
 export interface AudioPlayerListenerResult {
@@ -9,16 +19,12 @@ export interface AudioPlayerListenerResult {
 }
 
 export interface AudioPlayerPlugin extends Plugin {
-  create(params: AudioPlayerPrepareParams): Promise<{ success: boolean }>
-
+  open(params: OpenParams): Promise<void>
   play(): Promise<void>
-  pause(): Promise<void>
+  togglePause(): Promise<void>
   seek(options: { position: number }): Promise<void>
   stop(): Promise<void>
-
-  // destroy(params: AudioPlayerDefaultParams): Promise<void>
-
   onProgressChanged(
-    callback: (result: { position: number, playing: boolean, duration: number }) => void
+    callback: (status: Status) => void
   ): Promise<AudioPlayerListenerResult>
 }
