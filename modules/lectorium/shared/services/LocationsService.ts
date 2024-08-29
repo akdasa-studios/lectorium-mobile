@@ -16,7 +16,7 @@ type LocationsDBSchema = {
  * Service for retrieving location information.
  */
 export class LocationsService {
-  private database = new Database({ name: 'library-dictionary-v0001' })
+  constructor(private database: Database) {}
 
   /**
    * Retrieves a location based on its ID.

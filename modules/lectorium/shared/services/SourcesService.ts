@@ -19,7 +19,7 @@ type SourcesDBSchema = {
  * Service for managing Sources
  */
 export class SourcesService {
-  private database = new Database({ name: 'library-dictionary-v0001' })
+  constructor(private database: Database) {}
 
   /**
    * Returns Source by ID

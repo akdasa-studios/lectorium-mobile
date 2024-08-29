@@ -36,8 +36,10 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const config = useConfig()
   const isSynced = config.lastSyncedAt.value > 0
+  const isDbInstalled = config.prebuiltDbInstalled.value
+  const shouldSync = !isSynced && !isDbInstalled
 
-  if (!isSynced && to.name !== 'welcome') {
+  if (shouldSync && to.name !== 'welcome') {
     return { name: 'welcome' }
   } else if (isSynced && to.name === 'welcome') {
     return { name: 'playlist' }

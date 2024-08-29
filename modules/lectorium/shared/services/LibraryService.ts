@@ -13,9 +13,10 @@ type TrackDBSchema = {
 }
 
 export class LibraryService {
-  private _libraryTracks: Database = new Database({ name: 'library-tracks-v0001' })
-  private _libraryTranscripts: Database = new Database({ name: 'library-transcripts-v0001' })
-  // private _libraryDictionary: Database = new Database({ name: 'library-dictionary' })
+  constructor(
+    private _libraryTracks: Database,
+    private _libraryTranscripts: Database,
+  ) {}
 
   /**
    * Returns a track by its id.

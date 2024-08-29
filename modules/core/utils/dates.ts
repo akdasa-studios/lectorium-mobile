@@ -1,4 +1,5 @@
 export function formatDate(input: string): string {
+  if (!input) { return '' }
   if (input.length === 8) {
     // Extract year, month, and day
     const year = input.substring(0, 4);

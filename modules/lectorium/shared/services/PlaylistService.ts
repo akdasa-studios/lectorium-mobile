@@ -26,8 +26,9 @@ export type PlaylistChangedEvent = {
  * Service for managing playlist items.
  */
 export class PlaylistService {
-  private _database = new Database({ name: 'data' })
   private _onChangeHandlers: Array<(event: PlaylistChangedEvent) => void> = []
+
+  constructor(private _database: Database) {}
 
   // TODO: unsubscribe
   public onChange(handler: (event: PlaylistChangedEvent) => void) {

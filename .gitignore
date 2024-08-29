@@ -5,3 +5,4 @@ dist/
 *.xcworkspacedata
 IDEWorkspaceChecks.plist
 .env.sentry-build-plugin
+public/library-*.db

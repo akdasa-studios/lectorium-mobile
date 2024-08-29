@@ -5,6 +5,7 @@ export * from './composables/useFilesService'
 export * from './composables/useConfig'
 export * from './composables/useFullSync'
 export * from './composables/useMetrics'
+export * from './composables/useDatabase'
 
 // services:
 export * from './services/DatabaseService'
@@ -30,3 +31,5 @@ export * from './tasks/runSyncTranscriptsWithPlaylist'
 export * from './tasks/runPlaylistPersistence'
 export * from './tasks/runRestoreFailedDownloads'
 export * from './tasks/runSyncPlaylistStatus'
+export * from './tasks/runInstallPrebuiltDatabases'
+export * from './tasks/runSentryIntegration'

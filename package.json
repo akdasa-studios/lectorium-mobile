@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "appflow:build": "node ./modules/tools/updateEnvConfig.js && if [ \"$CI_PLATFORM\" != \"web\" ]; then npx trapeze run appflow.yml -y --$CI_PLATFORM; fi && vue-tsc && vite build",
+    "appflow:build": "sh ./utils/appflow-build.sh",
     "preview": "vite preview",
     "test:unit": "vitest",
     "lint": "eslint ."
@@ -32,10 +32,12 @@
     "@vue/typescript-plugin": "^2.0.26",
     "@vueuse/core": "^10.9.0",
     "@vueuse/sound": "^2.0.1",
+    "cordova-sqlite-storage": "^6.1.0",
     "events": "^3.3.0",
     "fluent-vue": "^3.6.0",
     "ionicons": "^7.4.0",
     "pouchdb": "^9.0.0",
+    "pouchdb-adapter-cordova-sqlite": "^2.0.8",
     "snowball": "^0.3.1",
     "swiper": "^11.1.4",
     "vue": "^3.4.31",
@@ -55,7 +57,8 @@
     "typescript": "^5.5.3",
     "vite": "^5.3.3",
     "vitest": "^0.34.6",
-    "vue-tsc": "^2.0.26"
+    "vue-tsc": "^2.0.26",
+    "pouchdb-adapter-node-websql": "^7.0.0"
   },
   "description": "An Ionic project"
 }

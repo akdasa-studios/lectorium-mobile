@@ -29,12 +29,12 @@ export class DatabaseService<
    * @param {string} databaseName The name of the database.
    */
   constructor(
-    databaseName: string,
+    database: Database,
     serializer: (item: Omit<TItem, keyof Identifiable>) => Omit<TDbScheme, keyof Identifiable>,
     deserializer: (document: TDbScheme) => TItem,
   ) {
-    this._databaseName = databaseName
-    this._database = new Database({ name: databaseName })
+    this._databaseName = database.db.name
+    this._database = database
     this._serializer = serializer
     this._deserializer = deserializer
   }
