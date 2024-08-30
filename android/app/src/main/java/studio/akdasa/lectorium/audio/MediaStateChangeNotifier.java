@@ -16,7 +16,7 @@ public class MediaStateChangeNotifier {
         @Override
         public void run() {
             update();
-            handler.postDelayed(this, 500);
+            handler.postDelayed(this, 1000);
         }
     };
 
@@ -30,7 +30,7 @@ public class MediaStateChangeNotifier {
         this.runnable.run();
     }
 
-    private void update() {
+    public void update() {
         if (player == null || callback  == null) { return; }
 
         JSObject callPayload = new JSObject();

@@ -57,12 +57,16 @@ public class AudioPlayerService extends Service {
         super.onDestroy();
     }
 
-    public void open(String trackId, String url) {
+    public void open(
+            String trackId,
+            String url
+    ) {
         try {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(url);
             mediaPlayer.prepare();
             mediaStateChangeNotifier.setCurrentTrackId(trackId);
+            mediaStateChangeNotifier.update();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,6 +75,7 @@ public class AudioPlayerService extends Service {
     public void play() {
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
+            mediaStateChangeNotifier.update();
         }
     }
 
@@ -80,11 +85,13 @@ public class AudioPlayerService extends Service {
         } else {
             mediaPlayer.start();
         }
+        mediaStateChangeNotifier.update();
     }
 
     public void seek(long position) {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.seekTo(position, SEEK_PREVIOUS_SYNC);
+            mediaStateChangeNotifier.update();
         }
     }
 
@@ -92,6 +99,7 @@ public class AudioPlayerService extends Service {
         mediaPlayer.stop();
         mediaPlayer.reset();
         mediaStateChangeNotifier.setCurrentTrackId(null);
+        mediaStateChangeNotifier.update();
     }
 
     public void setOnProgressChangeCall(PluginCall call) {
