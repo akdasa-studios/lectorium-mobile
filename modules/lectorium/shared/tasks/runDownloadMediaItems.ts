@@ -10,9 +10,7 @@ export async function runDownloadMediaItems() {
   const metrics = useMetrics()
 
   // ── Hooks ───────────────────────────────────────────────────────────
-  setInterval(
-    async () => await downloadNextTrack(), 5000
-  )
+  setInterval(downloadNextTrack, 5000)
 
   // ── Helpers ─────────────────────────────────────────────────────────
   async function downloadNextTrack() {
