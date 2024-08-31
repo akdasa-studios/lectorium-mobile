@@ -26,6 +26,7 @@ import { i18n } from './i18n'
 /* Theme variables */
 import './theme.css'
 
+
 /* */
 import {
   runCleanupFiles,
@@ -40,7 +41,7 @@ import {
   runSentryIntegration,
 } from '@lectorium/shared'
 import { register } from 'swiper/element/bundle'
-import { initNavigationBar, runNavigationBarStyle, runStatusBarStyle } from './app'
+import { initNavigationBar, initStatusBar, runNavigationBarStyle, runStatusBarStyle } from './app'
 
 async function createAndRunApp() {
   register()
@@ -56,19 +57,20 @@ async function createAndRunApp() {
   runSentryIntegration(app, router)
 
   router.isReady().then(async () => {
-    await runCleanupFiles()
-    await runDownloadMediaItems()
-    await runSyncMediaItemsWithPlaylist()
-    await runSyncTranscriptsWithPlaylist()
-    await runPlaylistPersistence()
-    await runRestoreFailedDownloads()
-    await runSyncPlaylistStatus()
-
-    // await initStatusBar()
     await initNavigationBar()
+    await initStatusBar()
 
-    await runStatusBarStyle()
-    await runNavigationBarStyle()
+    runCleanupFiles()
+    runDownloadMediaItems()
+    runSyncMediaItemsWithPlaylist()
+
+    runSyncTranscriptsWithPlaylist()
+    runPlaylistPersistence()
+    runSyncPlaylistStatus()
+    runRestoreFailedDownloads()
+
+    runStatusBarStyle()
+    runNavigationBarStyle()
 
     app.mount('#app')
   })

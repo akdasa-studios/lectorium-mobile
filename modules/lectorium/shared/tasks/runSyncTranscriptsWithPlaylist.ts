@@ -1,4 +1,3 @@
-import { useLibrary } from "@lectorium/library"
 import { useUserData } from "@lectorium/shared"
 import { PlaylistChangedEvent, useSync } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
@@ -26,11 +25,13 @@ export function runSyncTranscriptsWithPlaylist() {
     if (event.event === "added") {
       logger.info(`${trackId} -> added to playlist`)
 
+      // Check if sync is already running or pending
       if (runSyncTimeout) {
         logger.info("to many requests, waiting for 5 seconds")
-        clearTimeout(runSyncTimeout)
+        clearTimeout(runSyncTimeout) // clear pending sync
       }
 
+      // Set a timeout to prevent multiple sync requests
       runSyncTimeout = setTimeout(async () => {
         logger.info("syncing transcripts")
         await sync.execute({
@@ -39,9 +40,8 @@ export function runSyncTranscriptsWithPlaylist() {
             trackIds: await data.playlist.getTrackIds(),
           },
         })
+        clearTimeout(runSyncTimeout)
       }, 5000)
-
-
     }
     // TODO: remove transcript
   }

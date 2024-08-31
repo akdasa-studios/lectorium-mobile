@@ -3,7 +3,6 @@ import { createGlobalState } from '@vueuse/core'
 import { useLibrary } from '@lectorium/library'
 import { useUserData } from './useUserData'
 import { Capacitor } from '@capacitor/core'
-import { Directory, Filesystem } from '@capacitor/filesystem'
 import { AudioPlayer } from '@core/plugins'
 
 export const useAudioPlayer = createGlobalState(() => {
@@ -23,16 +22,14 @@ export const useAudioPlayer = createGlobalState(() => {
   ) {
     const track = await library.tracks.getTrack(trackId)
     const media = await userData.media.getByUrl(track.url)
-    if (!media || media.state !== "downloaded") { return "" }
+    if (!media || media.state !== "downloaded") { return }
+    if (!media.localUrl) { return }
 
     // Get path to the media file according to the platform.
     const isWeb = Capacitor.getPlatform() === "web"
     const audioSource = isWeb
       ? media.remoteUrl
-      : (await Filesystem.getUri({
-          directory: Directory.Data,
-          path: media.localPath
-        })).uri
+      : media.localUrl
 
     // Play the track and seek to the position if needed.
     await AudioPlayer.open({

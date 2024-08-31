@@ -1,49 +1,78 @@
+import { MediaItem } from "@core/models"
+import { BackgroundDownloader, DownloadCompleteEvent } from "@core/plugins"
 import { useMetrics, useUserData } from "@lectorium/shared"
-import { useFilesService, useLogger } from "@lectorium/shared"
+import { useLogger } from "@lectorium/shared"
 
 
-export async function runDownloadMediaItems() {
+export function runDownloadMediaItems() {
   // ── Dependencies ────────────────────────────────────────────────────
   const { media } = useUserData()
   const logger = useLogger({ name: "task::downloadMediaItems" })
-  const filesService = useFilesService()
   const metrics = useMetrics()
 
   // ── Hooks ───────────────────────────────────────────────────────────
-  setInterval(downloadNextTrack, 5000)
+  media.subscribe(e => e.event === "added" && onMediaItemAdded(e.item))
+  // media.subscribe(e => e.event === "updated" && onMediaItemUpdated(e.item))
+  BackgroundDownloader.onDownloadComplete(onDownloadComplete)
 
-  // ── Helpers ─────────────────────────────────────────────────────────
-  async function downloadNextTrack() {
-    // Find media item in the queue that is pending. Exit if none found.
-    const pending = await media.getPending()
-    if (pending.length === 0) { return }
+  // ── Handlers ────────────────────────────────────────────────────────
+  /**
+   * New media item added. Start downloading it.
+   * @param item Added media item
+   */
+  async function onMediaItemAdded(
+    item: MediaItem
+  ) {
+    // Calculate file name and extension for local storage
+    // @ts-ignore
+    const extension = item.remoteUrl.split(/[#?]/)[0].split('.').pop().trim()
+    const fileName = `${item._id.replace("media::", "")}.${extension}`
 
-    logger.info(`Found ${pending.length} media items in 'pending' state`)
-    const item = pending[0];
+    // Start downloading the media item
+    const response = await BackgroundDownloader.downloadFile({
+      url: item.remoteUrl,
+      title: item.title,
+      fileName
+    })
+    logger.info(`Download started for ${item._id} from ` +
+                `${item.remoteUrl} with ${response}`)
 
-    // Item found, download it.
-    logger.info(
-      `Downloading ${item._id} from ${item.remoteUrl} ` +
-      `to ${item.localPath} with ${JSON.stringify(item.meta) || 'no meta'}`)
-    await media.updateState(item._id, { state: 'downloading' })
+    // Update media item state with download ID and new state
+    await media.updateState(item._id, {
+      state:    'downloading',
+      localUrl: response.localUrl,
+      meta:     { ...item.meta, downloadId: response.downloadId }
+    })
 
-    try {
-      const startTime = Date.now()
-      const downloadedFile = await filesService.downloadFile(item.remoteUrl, item.localPath)
-      const endTime = Date.now()
+    // Update metrics
+    metrics.increment('media.download.count', 1)
+  }
 
-      await media.updateState(item._id, {
-        state: 'downloaded',
-        size: downloadedFile.size,
-        localUrl: downloadedFile.localUrl,
-      })
-      metrics.increment('media.download.count', 1)
-      metrics.increment('media.download.bytes', downloadedFile.size, { unit: 'byte' })
-      metrics.distribution('media.download.duration', endTime - startTime, { unit: 'millisecond' })
-    } catch (error) {
-      logger.error('Error downloading file', error instanceof Error ? error.message : error)
-      metrics.increment('media.download.error', 1)
-      await media.updateState(item._id, { state: 'failed', })
+  /**
+   * Download complete event handler.
+   * @param event Download complete event
+   */
+  async function onDownloadComplete(
+    event: DownloadCompleteEvent
+  ) {
+    // Find media item by download ID
+    const mediaItems = await media.getAll()
+    const downloadedItem = mediaItems.find(item => item.meta.downloadId === event.downloadId)
+    if (!downloadedItem) {
+      logger.error(`Downloaded item not found for download ID ${event.downloadId}`)
+      return
+    } else {
+      logger.info(`Download complete for ${downloadedItem._id} with ${event.fileUri}`)
     }
+
+    // Update media item state with download result
+    await media.updateState(downloadedItem._id, {
+      size:     event.fileSize,
+      state:    event.fileUri ? 'downloaded' : 'failed',
+      localUrl: event.fileUri
+    })
+
+    // Update metrics
+    metrics.increment('media.download.bytes', event.fileSize, { unit: 'byte' })
   }
 }

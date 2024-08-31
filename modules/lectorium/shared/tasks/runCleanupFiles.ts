@@ -17,9 +17,9 @@ export async function runCleanupFiles() {
 
   // ── Handlers ────────────────────────────────────────────────────────
   function onMediaChange(event: ItemChangedEvent<MediaItem>) {
-    if (event.event === 'removed') {
-      logger.info(`${event.item.localPath} -> removing`)
-      filesService.deleteFile(event.item.localPath)
+    if (event.event === 'removed' && event.item.localUrl) {
+      logger.info(`${event.item.localUrl} -> removing`)
+      filesService.deleteFile(event.item.localUrl)
     }
   }
 }

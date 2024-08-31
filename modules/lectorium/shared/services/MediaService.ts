@@ -6,18 +6,18 @@ import { DatabaseService, Identifiable, ItemChangedEventHandler } from '@lectori
 
 type MediaDbScheme = {
   _id: string
+  title: string
   remoteUrl: string
   localUrl?: string
-  localPath: string
   state: 'downloaded' | 'downloading' | 'pending' | 'failed'
   size?: number
   meta?: any
 }
 
 const mediaItemSerializer = (item: Omit<MediaItem, keyof Identifiable>): Omit<MediaDbScheme, keyof Identifiable> => ({
+  title: item.title,
   remoteUrl: item.remoteUrl,
   localUrl: item.localUrl,
-  localPath: item.localPath,
   state: item.state,
   size: item.size,
   meta: item.meta,
@@ -25,9 +25,9 @@ const mediaItemSerializer = (item: Omit<MediaItem, keyof Identifiable>): Omit<Me
 
 const mediaItemDeserializer = (document: MediaDbScheme): MediaItem => ({
   _id: document._id,
+  title: document.title,
   remoteUrl: document.remoteUrl,
   localUrl: document.localUrl,
-  localPath: document.localPath,
   state: document.state,
   size: document.size,
   meta: document.meta,
@@ -77,7 +77,7 @@ export class MediaService {
 
   async updateState(
     id: string,
-    state: Partial<Pick<MediaItem, 'state' | 'size' | 'localUrl' >>
+    state: Partial<Pick<MediaItem, 'state' | 'size' | 'localUrl' | 'meta' >>
   ): Promise<void> {
     const mediaItem = await this._databaseService.getOne(id)
     const updatedMediaItem = { ...mediaItem, ...state }
@@ -85,15 +85,16 @@ export class MediaService {
   }
 
   async queueDownload(
+    title: string,
     remoteUrl: string,
-    localPath: string,
     meta?: any
   ): Promise<void> {
     const id = `media::${cyrb53(remoteUrl)}`
     await this._databaseService.addOne({
       _id: id,
+      title,
       state: 'pending',
-      remoteUrl, localPath, meta
+      remoteUrl, meta
     })
   }
 }

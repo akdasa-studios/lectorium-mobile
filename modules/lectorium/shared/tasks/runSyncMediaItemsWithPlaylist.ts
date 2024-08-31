@@ -26,11 +26,8 @@ export function runSyncMediaItemsWithPlaylist() {
     if (event.event === "added") {
       logger.info(`${trackId} -> added to playlist`)
 
-      // @ts-ignore
-      const extension = track.url.split(/[#?]/)[0].split('.').pop().trim()
-      const fileName = `${trackId}.${extension}`
       await media.queueDownload(
-        track.url, fileName, { trackId }
+        track.title, track.url, { trackId }
       )
     } else if (event.event === "removed") {
       logger.info(`${trackId} -> removed from playlist`)
