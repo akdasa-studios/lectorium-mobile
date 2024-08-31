@@ -7,8 +7,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.session.PlaybackState;
 import android.os.Binder;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
@@ -19,9 +21,12 @@ public class AudioPlayerService extends Service {
     private static final int NOTIFICATION_ID = 1;
 
     private final IBinder binder = new LocalBinder();
-    private MediaPlayer mediaPlayer;
+    public MediaPlayer mediaPlayer;
     private MediaStateChangeNotifier mediaStateChangeNotifier;
-    private MediaSessionController controller;
+    public MediaSessionController mediaSessionController;
+    public NotificationChannel notificationChannel;
+    public NotificationManager notificationManager;
+    public Context context;
 
     public class LocalBinder extends Binder {
         AudioPlayerService getService() {
@@ -32,9 +37,15 @@ public class AudioPlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        context = getApplicationContext();
         mediaPlayer = new MediaPlayer();
-        mediaStateChangeNotifier = new MediaStateChangeNotifier(mediaPlayer);
-        createNotificationChannel();
+        mediaStateChangeNotifier = new MediaStateChangeNotifier(this);
+
+        notificationChannel = new NotificationChannel(CHANNEL_ID, "Media Playback", NotificationManager.IMPORTANCE_LOW);
+        notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(notificationChannel);
+
+        mediaSessionController = new MediaSessionController(this);
     }
 
     @Override
@@ -59,7 +70,9 @@ public class AudioPlayerService extends Service {
 
     public void open(
             String trackId,
-            String url
+            String url,
+            String trackTitle,
+            String trackArtist
     ) {
         try {
             mediaPlayer.reset();
@@ -67,6 +80,7 @@ public class AudioPlayerService extends Service {
             mediaPlayer.prepare();
             mediaStateChangeNotifier.setCurrentTrackId(trackId);
             mediaStateChangeNotifier.update();
+            mediaSessionController.setMediaInfo(trackTitle, trackArtist, mediaPlayer.getDuration());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,14 +90,17 @@ public class AudioPlayerService extends Service {
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
             mediaStateChangeNotifier.update();
+            mediaSessionController.setPlaybackState(PlaybackState.STATE_PLAYING, 0);
         }
     }
 
     public void togglePause() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
+            mediaSessionController.setPlaybackState(PlaybackState.STATE_PAUSED, mediaPlayer.getCurrentPosition());
         } else {
             mediaPlayer.start();
+            mediaSessionController.setPlaybackState(PlaybackState.STATE_PLAYING, mediaPlayer.getCurrentPosition());
         }
         mediaStateChangeNotifier.update();
     }
@@ -99,18 +116,13 @@ public class AudioPlayerService extends Service {
         mediaPlayer.stop();
         mediaPlayer.reset();
         mediaStateChangeNotifier.setCurrentTrackId(null);
+        mediaSessionController.setPlaybackState(PlaybackState.STATE_STOPPED, 0);
         mediaStateChangeNotifier.update();
     }
 
     public void setOnProgressChangeCall(PluginCall call) {
         this.mediaStateChangeNotifier.setCallback(call);
         this.mediaStateChangeNotifier.run();
-    }
-
-    private void createNotificationChannel() {
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Media Playback", NotificationManager.IMPORTANCE_LOW);
-        NotificationManager manager = getSystemService(NotificationManager.class);
-        manager.createNotificationChannel(channel);
     }
 
     private Notification createNotification() {

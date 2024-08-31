@@ -43,13 +43,15 @@ public class  AudioPlayerPlugin extends Plugin {
     public void open(PluginCall call) {
         String url = call.getString("url");
         String trackId = call.getString("trackId");
+        String trackTitle = call.getString("title");
+        String trackArtist = call.getString("author");
         if (url == null) {
             call.reject("URL is required");
             return;
         }
 
         if (isBound) {
-            mediaPlaybackService.open(trackId, url);
+            mediaPlaybackService.open(trackId, url, trackTitle, trackArtist);
             call.resolve();
         } else {
             call.reject("Service not bound");
