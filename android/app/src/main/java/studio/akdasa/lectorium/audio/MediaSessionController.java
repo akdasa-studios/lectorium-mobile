@@ -71,7 +71,7 @@ public class MediaSessionController {
                         MediaButtonReceiver.buildMediaButtonPendingIntent(service.context, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
-                        .setShowActionsInCompactView(0, 1));
+                        .setShowActionsInCompactView(0));
 
         Notification notification = notificationBuilder.build();
         service.notificationManager.notify(1, notification);
