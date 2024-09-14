@@ -11,41 +11,51 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.session.PlaybackState;
-import android.os.Binder;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import com.getcapacitor.PluginCall;
 
-public class AudioPlayerService extends Service {
+import studio.akdasa.lectorium.audio.mediaSession.MediaSessionCallback;
+import studio.akdasa.lectorium.audio.mediaSession.MediaSessionController;
+import studio.akdasa.lectorium.audio.mediaStateNotifications.MediaSessionMediaStateNotifier;
+import studio.akdasa.lectorium.audio.mediaStateNotifications.MediaStateNotificationService;
+import studio.akdasa.lectorium.audio.mediaStateNotifications.PluginCallMediaStateNotifier;
+
+
+public final class AudioPlayerService extends Service {
     private static final String CHANNEL_ID = "MediaPlaybackChannel";
     private static final int NOTIFICATION_ID = 1;
 
-    private final IBinder binder = new LocalBinder();
-    public MediaPlayer mediaPlayer;
-    private MediaStateChangeNotifier mediaStateChangeNotifier;
-    public MediaSessionController mediaSessionController;
-    public NotificationChannel notificationChannel;
-    public NotificationManager notificationManager;
-    public Context context;
+    private MediaSessionController mediaSessionController;
 
-    public class LocalBinder extends Binder {
-        AudioPlayerService getService() {
-            return AudioPlayerService.this;
-        }
-    }
+    private MediaPlayer mediaPlayer;
+    private MediaStateNotificationService mediaStateNotificationService;
+    private NotificationManager notificationManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        context = getApplicationContext();
+        Context context = getApplicationContext();
         mediaPlayer = new MediaPlayer();
-        mediaStateChangeNotifier = new MediaStateChangeNotifier(this);
+        mediaStateNotificationService = new MediaStateNotificationService(mediaPlayer);
 
-        notificationChannel = new NotificationChannel(CHANNEL_ID, "Media Playback", NotificationManager.IMPORTANCE_LOW);
+        // Create notification channel
         notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(notificationChannel);
+        notificationManager.createNotificationChannel(
+                new NotificationChannel(
+                        CHANNEL_ID, "Media Playback", NotificationManager.IMPORTANCE_LOW)
+        );
 
-        mediaSessionController = new MediaSessionController(this);
+        // Create media session controller
+        mediaSessionController = new MediaSessionController(
+                context,
+                notificationManager,
+                new MediaSessionCallback(this)
+        );
+
+        // Set media state change notification service
+        mediaStateNotificationService.addNotifier(new MediaSessionMediaStateNotifier(mediaSessionController));
+        mediaStateNotificationService.run();
     }
 
     @Override
@@ -56,20 +66,23 @@ public class AudioPlayerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return binder;
+        return new AudioPlayerServiceBinder(this);
     }
 
     @Override
     public void onDestroy() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
-            mediaPlayer = null;
         }
 
         this.stopForeground(true);
         this.stopSelf();
         notificationManager.deleteNotificationChannel(CHANNEL_ID);
         super.onDestroy();
+    }
+
+    MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
     }
 
     public void open(
@@ -82,8 +95,8 @@ public class AudioPlayerService extends Service {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(url);
             mediaPlayer.prepare();
-            mediaStateChangeNotifier.setCurrentTrackId(trackId);
-            mediaStateChangeNotifier.update();
+            mediaStateNotificationService.setCurrentTrackId(trackId);
+            mediaStateNotificationService.update();
             mediaSessionController.setMediaInfo(trackTitle, trackArtist, mediaPlayer.getDuration());
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +106,7 @@ public class AudioPlayerService extends Service {
     public void play() {
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
-            mediaStateChangeNotifier.update();
+            mediaStateNotificationService.update();
             mediaSessionController.setPlaybackState(PlaybackState.STATE_PLAYING, 0);
         }
     }
@@ -106,27 +119,26 @@ public class AudioPlayerService extends Service {
             mediaPlayer.start();
             mediaSessionController.setPlaybackState(PlaybackState.STATE_PLAYING, mediaPlayer.getCurrentPosition());
         }
-        mediaStateChangeNotifier.update();
+        mediaStateNotificationService.update();
     }
 
     public void seek(long position) {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.seekTo(position, SEEK_PREVIOUS_SYNC);
-            mediaStateChangeNotifier.update();
+            mediaStateNotificationService.update();
         }
     }
 
     public void stop() {
         mediaPlayer.stop();
         mediaPlayer.reset();
-        mediaStateChangeNotifier.setCurrentTrackId(null);
+        mediaStateNotificationService.setCurrentTrackId(null);
         mediaSessionController.setPlaybackState(PlaybackState.STATE_STOPPED, 0);
-        mediaStateChangeNotifier.update();
+        mediaStateNotificationService.update();
     }
 
     public void setOnProgressChangeCall(PluginCall call) {
-        this.mediaStateChangeNotifier.setCallback(call);
-        this.mediaStateChangeNotifier.run();
+        mediaStateNotificationService.addNotifier(new PluginCallMediaStateNotifier(call));
     }
 
     private Notification createNotification() {

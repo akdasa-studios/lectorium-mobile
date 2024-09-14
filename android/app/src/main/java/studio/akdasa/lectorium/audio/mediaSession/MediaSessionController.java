@@ -1,6 +1,8 @@
-package studio.akdasa.lectorium.audio;
+package studio.akdasa.lectorium.audio.mediaSession;
 
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -8,16 +10,21 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.media.session.MediaButtonReceiver;
 
-public class MediaSessionController {
+public final class MediaSessionController {
     private final MediaSessionCompat mediaSession;
-    private final AudioPlayerService service;
+    private final Context context;
+    private final NotificationManager notificationManager;
 
     public MediaSessionController(
-            AudioPlayerService service
+            Context context,
+            NotificationManager notificationManager,
+            MediaSessionCompat.Callback mediaSessionCallback
     ) {
-        this.service = service;
-        this.mediaSession = new MediaSessionCompat(service.context, "MediaSessionPlugin");
-        this.mediaSession.setCallback(new MediaSessionCallback());
+        this.context = context;
+        this.notificationManager = notificationManager;
+
+        this.mediaSession = new MediaSessionCompat(context, "MediaSessionPlugin");
+        this.mediaSession.setCallback(mediaSessionCallback);
         this.mediaSession.setActive(true);
     }
 
@@ -49,10 +56,10 @@ public class MediaSessionController {
 
     private void updateNotification() {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
-                service.context, "MediaPlaybackChannel");
+                context, "MediaPlaybackChannel");
         MediaMetadataCompat metadata = mediaSession.getController().getMetadata();
         PlaybackStateCompat playbackState = mediaSession.getController().getPlaybackState();
-        int appIconResId = service.context.getApplicationInfo().icon;
+        int appIconResId = context.getApplicationInfo().icon;
         if (metadata == null || playbackState == null) { return; }
 
         notificationBuilder
@@ -68,30 +75,12 @@ public class MediaSessionController {
                 .addAction(new NotificationCompat.Action(
                         playbackState.getState() == PlaybackStateCompat.STATE_PLAYING ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play,
                         playbackState.getState() == PlaybackStateCompat.STATE_PLAYING ? "Pause" : "Play",
-                        MediaButtonReceiver.buildMediaButtonPendingIntent(service.context, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken())
                         .setShowActionsInCompactView(0));
 
         Notification notification = notificationBuilder.build();
-        service.notificationManager.notify(1, notification);
-    }
-
-
-    private class MediaSessionCallback extends MediaSessionCompat.Callback {
-        @Override
-        public void onPlay() {
-            service.play();
-        }
-
-        @Override
-        public void onPause() {
-            service.togglePause();
-        }
-
-        @Override
-        public void onStop() {
-            service.stop();
-        }
+        notificationManager.notify(1, notification);
     }
 }

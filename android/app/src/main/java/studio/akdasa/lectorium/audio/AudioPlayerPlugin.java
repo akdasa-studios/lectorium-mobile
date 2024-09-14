@@ -1,10 +1,7 @@
 package studio.akdasa.lectorium.audio;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -13,31 +10,39 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 
 
 @CapacitorPlugin(name="AudioPlayer")
-public class  AudioPlayerPlugin extends Plugin {
+public final class AudioPlayerPlugin extends Plugin {
+    private final AudioPlayerServiceConnection audioPlayerServiceConnection = new AudioPlayerServiceConnection();
 
-    private AudioPlayerService mediaPlaybackService;
-    private boolean isBound = false;
-    private final ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            AudioPlayerService.LocalBinder binder = (AudioPlayerService.LocalBinder) service;
-            mediaPlaybackService = binder.getService();
-            isBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            isBound = false;
-        }
-    };
+    /* -------------------------------------------------------------------------- */
+    /*                             Lifecycle methods                              */
+    /* -------------------------------------------------------------------------- */
 
     @Override
     public void load() {
         Intent intent = new Intent(getContext(), AudioPlayerService.class);
-
-        getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        getContext().bindService(intent, audioPlayerServiceConnection, Context.BIND_AUTO_CREATE);
         getContext().startForegroundService(intent);
     }
+
+    @Override
+    protected void handleOnDestroy() {
+        // If audio service started and playing, just keep it playing.
+        boolean isConnectedAndPlaying =
+                audioPlayerServiceConnection.isConnected() &&
+                audioPlayerServiceConnection.getService().getMediaPlayer().isPlaying();
+        if (isConnectedAndPlaying) { return; }
+
+        // Stop audio player service if it is not playing
+        Intent intent = new Intent(getContext(), AudioPlayerService.class);
+        getContext().unbindService(audioPlayerServiceConnection);
+        getContext().stopService(intent);
+        super.handleOnDestroy();
+    }
+
+    
+    /* -------------------------------------------------------------------------- */
+    /*                               Plugin methods                               */
+    /* -------------------------------------------------------------------------- */
 
     @PluginMethod
     public void open(PluginCall call) {
@@ -45,28 +50,30 @@ public class  AudioPlayerPlugin extends Plugin {
         String trackId = call.getString("trackId");
         String trackTitle = call.getString("title");
         String trackArtist = call.getString("author");
+
         if (url == null) {
-            call.reject("URL is required");
+            call.reject("Argument 'url' is required");
             return;
         }
 
-        if (isBound) {
-            mediaPlaybackService.open(trackId, url, trackTitle, trackArtist);
-            call.resolve();
-        } else {
-            call.reject("Service not bound");
+        if (!audioPlayerServiceConnection.isConnected()) {
+            call.reject("Audio service is not started");
+            return;
         }
+
+        audioPlayerServiceConnection.getService().open(trackId, url, trackTitle, trackArtist);
+        call.resolve();
     }
 
     @PluginMethod
     public void play(PluginCall call) {
-        mediaPlaybackService.play();
+        audioPlayerServiceConnection.getService().play();
         call.resolve();
     }
 
     @PluginMethod
     public void togglePause(PluginCall call) {
-        mediaPlaybackService.togglePause();
+        audioPlayerServiceConnection.getService().togglePause();
         call.resolve();
     }
 
@@ -74,13 +81,13 @@ public class  AudioPlayerPlugin extends Plugin {
     public void seek(PluginCall call) {
         Float position = call.getFloat("position", 0.0f);
         if (position == null) { return; }
-        mediaPlaybackService.seek(position.longValue() * 1000);
+        audioPlayerServiceConnection.getService().seek(position.longValue() * 1000);
         call.resolve();
     }
 
     @PluginMethod
     public void stop(PluginCall call) {
-        mediaPlaybackService.stop();
+        audioPlayerServiceConnection.getService().stop();
         call.resolve();
     }
 
@@ -88,17 +95,6 @@ public class  AudioPlayerPlugin extends Plugin {
     public void onProgressChanged(PluginCall call) {
         call.setKeepAlive(true);
         getBridge().saveCall(call);
-        mediaPlaybackService.setOnProgressChangeCall(call);
-    }
-
-    @Override
-    protected void handleOnDestroy() {
-        if (isBound && !mediaPlaybackService.mediaPlayer.isPlaying()) {
-            Intent intent = new Intent(getContext(), AudioPlayerService.class);
-            getContext().unbindService(connection);
-            getContext().stopService(intent);
-            isBound = false;
-        }
-        super.handleOnDestroy();
+        audioPlayerServiceConnection.getService().setOnProgressChangeCall(call);
     }
 }
