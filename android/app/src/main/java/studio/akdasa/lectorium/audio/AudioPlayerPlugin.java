@@ -93,8 +93,10 @@ public class  AudioPlayerPlugin extends Plugin {
 
     @Override
     protected void handleOnDestroy() {
-        if (isBound) {
+        if (isBound && !mediaPlaybackService.mediaPlayer.isPlaying()) {
+            Intent intent = new Intent(getContext(), AudioPlayerService.class);
             getContext().unbindService(connection);
+            getContext().stopService(intent);
             isBound = false;
         }
         super.handleOnDestroy();

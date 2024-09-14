@@ -65,6 +65,10 @@ public class AudioPlayerService extends Service {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+
+        this.stopForeground(true);
+        this.stopSelf();
+        notificationManager.deleteNotificationChannel(CHANNEL_ID);
         super.onDestroy();
     }
 
