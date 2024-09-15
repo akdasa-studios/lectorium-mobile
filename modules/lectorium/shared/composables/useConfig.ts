@@ -8,7 +8,8 @@ export const useConfig = createGlobalState(() => {
   const tracksQueue          = ref<string[]>([])
   const currentTrackPosition = ref(0)
   const lastSyncedAt         = ref(0)
-  const prebuiltDbInstalled  = ref(false)
+  const prebuiltDbInstalled  = ref<'installed' | 'not-installed' | 'failed'>('not-installed')
+  const locale               = ref('ru')
 
   return {
     currentTrackId,
@@ -17,5 +18,6 @@ export const useConfig = createGlobalState(() => {
     serverBaseUrl,
     lastSyncedAt,
     prebuiltDbInstalled,
+    locale,
   }
 })

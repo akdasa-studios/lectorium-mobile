@@ -1,5 +1,6 @@
+import { getLocalizedTitle } from "@core/models"
 import { useLibrary } from "@lectorium/library"
-import { useUserData } from "@lectorium/shared"
+import { useConfig, useUserData } from "@lectorium/shared"
 import { PlaylistChangedEvent } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
 
@@ -8,7 +9,8 @@ import { useLogger } from "@lectorium/shared"
  */
 export function runSyncMediaItemsWithPlaylist() {
   // ── Dependencies ────────────────────────────────────────────────────
-  const logger  = useLogger({ name: "task::syncMediaItemsWithPlaylist" })
+  const logger              = useLogger({ name: "task::syncMediaItemsWithPlaylist" })
+  const config              = useConfig()
   const { media, playlist } = useUserData()
   const { tracks }          = useLibrary()
 
@@ -27,7 +29,8 @@ export function runSyncMediaItemsWithPlaylist() {
       logger.info(`${trackId} -> added to playlist`)
 
       await media.queueDownload(
-        track.title, track.url, { trackId }
+        getLocalizedTitle(track.title, config.locale.value), 
+        track.url, { trackId }
       )
     } else if (event.event === "removed") {
       logger.info(`${trackId} -> removed from playlist`)

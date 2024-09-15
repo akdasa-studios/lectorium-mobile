@@ -1,13 +1,16 @@
 import { ref } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { useLibrary } from '@lectorium/library'
-import { useUserData } from './useUserData'
 import { Capacitor } from '@capacitor/core'
 import { AudioPlayer } from '@core/plugins'
+import { useUserData } from './useUserData'
+import { useConfig } from './useConfig'
+import { getLocalizedTitle } from '@core/models'
 
 export const useAudioPlayer = createGlobalState(() => {
   const library = useLibrary()
   const userData = useUserData()
+  const config = useConfig()
 
   AudioPlayer.onProgressChanged((v) => {
     _trackId.value  = v.trackId
@@ -35,7 +38,7 @@ export const useAudioPlayer = createGlobalState(() => {
     await AudioPlayer.open({
       trackId: track.id,
       url: audioSource,
-      title: track.title,
+      title: getLocalizedTitle(track.title, config.locale.value),
       author: await library.authors.getLocalizedName(track.author, "ru"),
     })
     if (position) {

@@ -16,7 +16,7 @@ export async function runInstallPrebuiltDatabases() {
 
   // Skip if prebuilt databases are not installed or not on native platform
   if (!Capacitor.isNativePlatform()) { return }
-  if (config.prebuiltDbInstalled.value) { return }
+  if (config.prebuiltDbInstalled.value != 'not-installed') { return }
 
   // ── Install ─────────────────────────────────────────────────────────
   try {
@@ -31,7 +31,12 @@ export async function runInstallPrebuiltDatabases() {
       const res  = await fetch(`https://localhost/${file}`)
       const blob = await res.blob()
 
-      log.info(`Writing ${file}...`)
+      log.info(`Downloaded ${file}: ${res.status} ${res.statusText}...`)
+      if (res.status !== 200) {
+        throw new Error(`Failed to download ${file}`)
+      }
+
+      log.info(`Writing ${file} to filesystem...`)
       await Filesystem.writeFile({
         directory: Directory.Data,
         path: `../databases/${file}`,
@@ -39,9 +44,9 @@ export async function runInstallPrebuiltDatabases() {
       })
     }
     log.info('Prebuilt databases installed');
+    config.prebuiltDbInstalled.value = 'installed'
   } catch (error) {
     log.error('Error while installing databases', JSON.stringify(error));
-  } finally {
-    config.prebuiltDbInstalled.value = true
+    config.prebuiltDbInstalled.value = 'failed'
   }
 }

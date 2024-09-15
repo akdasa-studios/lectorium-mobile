@@ -36,7 +36,7 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const config = useConfig()
   const isSynced = config.lastSyncedAt.value > 0
-  const isDbInstalled = config.prebuiltDbInstalled.value
+  const isDbInstalled = config.prebuiltDbInstalled.value === 'installed'
   const shouldSync = !isSynced && !isDbInstalled
 
   if (shouldSync && to.name !== 'welcome') {

@@ -1,9 +1,12 @@
+export type Date = [number, number, number]
+export type Title = Record<string, string>
+
 export type Track = {
   id: string
-  title: string
+  title: Title
   url: string
   location: string
-  date: string
+  date: Date,
   references: Array<string[]>
   languages: TrackLanguage[]
   author: string
@@ -28,4 +31,12 @@ export type TrackTranscriptText = {
 
 export type TrackTranscript = {
   text: TrackTranscriptText
+}
+
+
+export function getLocalizedTitle(
+  title: Title,
+  locale: string
+): string {
+  return title[locale] || title[Object.keys(title)[0]] || 'No title'
 }

@@ -15,7 +15,9 @@ export async function runConfigPersistence() {
   await bind(config.currentTrackPosition, 'player.current.position', 0)
   await bind(config.tracksQueue,          'player.queue',            [])
   await bind(config.lastSyncedAt,         'sync.lastSyncedAt',       0)
-  await bind(config.prebuiltDbInstalled,  'db.prebuilt.installed',  false)
+  await bind(config.prebuiltDbInstalled,  'db.prebuilt.installed',   'not-installed')
+  await bind(config.locale,               'app.locale',              'ru')
+
 
   // --- Helpers ----------------------------------------
   async function bind<T>(config: Ref<T>, key: string, defaultValue: T) {

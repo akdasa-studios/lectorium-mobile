@@ -3,10 +3,10 @@ import { Database } from '@core/persistence/Database'
 
 type TrackDBSchema = {
   _id: string,
-  title: string,
+  title: Record<string, string>,
   url: string,
   location: string,
-  date: string,
+  date: [number, number, number],
   references: any,
   languages: any,
   author: string,

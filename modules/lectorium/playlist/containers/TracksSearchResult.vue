@@ -18,19 +18,20 @@
 
 <script setup lang="ts">
 import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue'
+import { watchDebounced } from '@vueuse/core'
 import { computed, ref, toRefs } from 'vue'
 import { useSound } from '@vueuse/sound'
 import { formatDate } from '@core/utils'
+import { Track, getLocalizedTitle } from '@core/models'
 import { useLibrary } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
-import { Track } from '@core/models'
-import { PlaylistChangedEvent, useUserData } from '@lectorium/shared'
-import { watchDebounced } from '@vueuse/core'
+import { PlaylistChangedEvent, useUserData, useConfig } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
 const userData = useUserData()
+const config = useConfig()
 const { play: playItemAdded } = useSound(itemAddedSfx, { volume: .15 })
 
 // ── Interface ───────────────────────────────────────────────────────
@@ -101,7 +102,7 @@ async function fetchData(
     const loadedItems = await Promise.all(
       foundTracks.map(async i => ({
         trackId: i.id,
-        title: i.title,
+        title: getLocalizedTitle(i.title, config.locale.value),
         date: formatDate(i.date),
         location: await library.locations.getLocalizedName(i.location, 'ru'),
         references: await library.sources.getLocalizedReferences(i.references, 'ru'),
