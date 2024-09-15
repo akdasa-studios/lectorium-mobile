@@ -58,7 +58,11 @@ export class LocationsService {
     id: string,
     language: string
   ): Promise<LocationName> {
-    const source = await this.get(id)
-    return source.name[language]
+    try {
+      const source = await this.get(id)
+      return source.name[language] || id
+    } catch (error) {
+      return id
+    }
   }
 }
