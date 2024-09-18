@@ -36,8 +36,8 @@ public final class MediaStateNotificationService {
             notifier.send(
                     new MediaState(
                             currentTrackId,
-                            mediaPlayer.getCurrentPosition(),
-                            mediaPlayer.getDuration(),
+                            mediaPlayer.isPlaying() ? mediaPlayer.getCurrentPosition() : 0,
+                            mediaPlayer.isPlaying() ? mediaPlayer.getDuration() : 0,
                             mediaPlayer.isPlaying()));
         }
     }
