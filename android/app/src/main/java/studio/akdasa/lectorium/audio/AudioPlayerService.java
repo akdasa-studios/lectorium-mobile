@@ -71,10 +71,8 @@ public final class AudioPlayerService extends Service {
 
     @Override
     public void onDestroy() {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-        }
-
+        mediaStateNotificationService.stop();
+        if (mediaPlayer != null) { mediaPlayer.release(); }
         this.stopForeground(true);
         this.stopSelf();
         notificationManager.deleteNotificationChannel(CHANNEL_ID);

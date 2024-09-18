@@ -10,11 +10,13 @@ import java.util.List;
 public final class MediaStateNotificationService {
     private final List<IMediaStateNotifier> notifiers = new ArrayList<>();
     private final MediaPlayer mediaPlayer;
+    private boolean isRunning = true;
 
     private final Handler handler = new Handler();
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            if (!isRunning) { return; }
             update();
             handler.postDelayed(this, 1000);
         }
@@ -28,6 +30,7 @@ public final class MediaStateNotificationService {
     }
 
     public void run() {
+        isRunning = true;
         this.runnable.run();
     }
 
@@ -48,5 +51,9 @@ public final class MediaStateNotificationService {
 
     public void addNotifier(IMediaStateNotifier notifier) {
         notifiers.add(notifier);
+    }
+
+    public void stop() {
+        isRunning = false;
     }
 }
