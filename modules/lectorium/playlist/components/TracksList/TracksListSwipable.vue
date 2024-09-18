@@ -7,6 +7,7 @@
       <TracksListItem
         :track-id="item.trackId"
         :title="item.title"
+        :author="item.author"
         :location="item.location"
         :date="item.date"
         :references="item.references"

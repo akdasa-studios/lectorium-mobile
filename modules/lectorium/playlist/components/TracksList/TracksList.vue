@@ -5,6 +5,7 @@
       :key="item.trackId"
       :track-id="item.trackId"
       :title="item.title"
+      :author="item.author"
       :location="item.location"
       :date="item.date"
       :references="item.references"
@@ -16,10 +17,9 @@
 
 
 <script setup lang="ts">
-import { IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon } from '@ionic/vue'
+import { IonList } from '@ionic/vue'
 import TracksListItem from './TracksListItem.vue'
 import { type TrackViewModel } from './TrackViewModel'
-import { trash } from 'ionicons/icons'
 
 // ── Interface ───────────────────────────────────────────────────────
 defineProps<{

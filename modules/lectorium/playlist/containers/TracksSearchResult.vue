@@ -104,6 +104,7 @@ async function fetchData(
         trackId: i.id,
         title: getLocalizedTitle(i.title, config.locale.value),
         date: formatDate(i.date),
+        author: await library.authors.getLocalizedName(i.author, 'ru', 'short'),
         location: await library.locations.getLocalizedName(i.location, 'ru'),
         references: await library.sources.getLocalizedReferences(i.references, 'ru'),
         playingStatus: playlistItems.includes(i.id)

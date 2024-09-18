@@ -12,7 +12,7 @@
         <b>{{ references[0] }}</b>
         {{ title }}
       </h3>
-      <p>{{ location }} • {{ date }}</p>
+      <p>{{ author }} • {{ location }} • {{ date }}</p>
     </IonLabel>
   </IonItem>
 </template>

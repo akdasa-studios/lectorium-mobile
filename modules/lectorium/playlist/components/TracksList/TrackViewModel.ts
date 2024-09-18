@@ -17,6 +17,9 @@ export interface TrackViewModel {
   /** Track title */
   title: string
 
+  /** Author */
+  author: string
+
   /** Track location */
   location: string
 

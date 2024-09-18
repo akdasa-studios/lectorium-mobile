@@ -63,7 +63,7 @@ watch(audioPlayer.trackId, async (value) => {
 
   // TODO: Get author name using app language from config
   //       https://github.com/akdasa-studios/lectorium-mobile/issues/35
-  currentAuthorName.value = (await library.authors.getOne(currentTrack.author)).name['ru']
+  currentAuthorName.value = await library.authors.getLocalizedName(currentTrack.author, 'ru'),
   currentTrackTitle.value = getLocalizedTitle(currentTrack.title, config.locale.value)
 
   // TODO: Get transcrupt using app language from config

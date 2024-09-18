@@ -4,7 +4,7 @@ import { DatabaseService, Identifiable, ItemChangedEventHandler } from '@lectori
 
 export type AuthorDbScheme = {
   _id: string
-  name: Record<string, string>
+  name: Record<string, { full: string, short: string }>
 }
 
 const authorSerializer = (item: Omit<Author, keyof Identifiable>): Omit<AuthorDbScheme, keyof Identifiable> => ({
@@ -35,12 +35,24 @@ export class AuthorsService {
     return this._databaseService.getOne(`author::${id}`)
   }
 
+  /**
+   * Retrieves the name of the author in the specified language.
+   * @param id Author ID
+   * @param language Language code
+   * @param type Full or short name
+   * @returns Name of the author in the specified language
+   */
   public async getLocalizedName(
     id: string,
     language: string,
+    type: 'full' | 'short' = 'full'
   ): Promise<string> {
     const author = await this.getOne(id)
-    return author.name[language] || author.name['en']
+    return (
+      author.name[language] ||
+      author.name['en'] ||
+      { full: id, short: id }
+    )[type] || id
   }
 
 

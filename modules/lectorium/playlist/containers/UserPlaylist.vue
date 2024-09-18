@@ -72,10 +72,11 @@ async function fetchData(): Promise<TrackViewModel[]> {
 
   for (const item of playlistItems) {
     const track = await library.tracks.getTrack(item.trackId)
-    const title = getLocalizedTitle(track.title, config.locale.value) // TODO: get localized title
+    const title = getLocalizedTitle(track.title, config.locale.value)
     const date = formatDate(track.date)
     const location = await library.locations.getLocalizedName(track.location, 'ru')
     const references = await library.sources.getLocalizedReferences(track.references, 'ru')
+    const author = await library.authors.getLocalizedName(track.author, 'ru', 'short')
     const playingStatus =
         (item.transcriptStatus === 'unknown' || item.mediaStatus !== 'downloaded')
           ? PlayingStatus.Loading
@@ -84,7 +85,8 @@ async function fetchData(): Promise<TrackViewModel[]> {
             : PlayingStatus.None
     result.push({
       trackId: item.trackId,
-      location, references, date, title, playingStatus
+      location, references, date,
+      title, playingStatus, author
     })
   }
 
