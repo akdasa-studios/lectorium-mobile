@@ -1,4 +1,3 @@
-/* Sentry */
 import * as Sentry from '@sentry/capacitor'
 import * as SentryVue from '@sentry/vue'
 import { App } from 'vue'
@@ -30,7 +29,7 @@ export function runSentryIntegration(
         SentryVue.metrics.metricsAggregatorIntegration(),
         new SentryVue.BrowserTracing({
           // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-          tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+          tracePropagationTargets: ["localhost", /^https:\/\/app.lectorium.akdasa\.studio/],
           routingInstrumentation: SentryVue.vueRouterInstrumentation(router),
         }),
       ],
