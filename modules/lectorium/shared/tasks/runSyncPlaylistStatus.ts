@@ -48,8 +48,8 @@ export function runSyncPlaylistStatus() {
 
     // Check if the transcript is available for each track
     for (const playlistItem of withoutTranscript) {
-      const transcript = await tracks.getTranscripts(playlistItem.trackId)
-      if (transcript) { // Transcript found, update the status
+      const transcripts = await tracks.getTranscripts(playlistItem.trackId)
+      if (transcripts) { // Transcript found, update the status
         logger.info(`${playlistItem.trackId} -> transcript downloaded`)
         await playlist.setTranscriptStatus(playlistItem.trackId, "downloaded")
       } else { // Transcript not found

@@ -16,7 +16,7 @@ export async function runCleanupFiles() {
   media.subscribe(onMediaChange)
 
   // ── Handlers ────────────────────────────────────────────────────────
-  function onMediaChange(event: ItemChangedEvent<MediaItem>) {
+  async function onMediaChange(event: ItemChangedEvent<MediaItem>) {
     if (event.event === 'removed' && event.item.localUrl) {
       logger.info(`${event.item.localUrl} -> removing`)
       filesService.deleteFile(event.item.localUrl)

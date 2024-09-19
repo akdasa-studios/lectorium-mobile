@@ -71,6 +71,7 @@ userData.playlist.onChange(async (e: PlaylistChangedEvent) => {
 // ── Handlers ────────────────────────────────────────────────────────
 function onTrackClicked(track: TrackViewModel) {
   if (track.playingStatus == PlayingStatus.InQueue) { return }
+  track.playingStatus = PlayingStatus.InQueue
   emit('click', track.trackId)
   playItemAdded()
 }

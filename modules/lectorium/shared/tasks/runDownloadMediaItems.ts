@@ -1,6 +1,6 @@
 import { MediaItem } from "@core/models"
 import { BackgroundDownloader, DownloadCompleteEvent } from "@core/plugins"
-import { useMetrics, useUserData } from "@lectorium/shared"
+import { ItemChangedEvent, useMetrics, useUserData } from "@lectorium/shared"
 import { useLogger } from "@lectorium/shared"
 
 
@@ -11,37 +11,38 @@ export function runDownloadMediaItems() {
   const metrics = useMetrics()
 
   // ── Hooks ───────────────────────────────────────────────────────────
-  media.subscribe(e => e.event === "added" && onMediaItemAdded(e.item))
-  // media.subscribe(e => e.event === "updated" && onMediaItemUpdated(e.item))
+  media.subscribe(onMediaItemAdded)
   BackgroundDownloader.onDownloadComplete(onDownloadComplete)
 
   // ── Handlers ────────────────────────────────────────────────────────
   /**
    * New media item added. Start downloading it.
-   * @param item Added media item
+   * @param event Added media item
    */
   async function onMediaItemAdded(
-    item: MediaItem
+    event: ItemChangedEvent<MediaItem>
   ) {
+    if (event.event !== "added") return
+
     // Calculate file name and extension for local storage
     // @ts-ignore
-    const extension = item.remoteUrl.split(/[#?]/)[0].split('.').pop().trim()
-    const fileName = `${item._id.replace("media::", "")}.${extension}`
+    const extension = event.item.remoteUrl.split(/[#?]/)[0].split('.').pop().trim()
+    const fileName = `${event.item._id.replace("media::", "")}.${extension}`
 
     // Start downloading the media item
     const response = await BackgroundDownloader.downloadFile({
-      url: item.remoteUrl,
-      title: item.title,
+      url: event.item.remoteUrl,
+      title: event.item.title,
       fileName
     })
-    logger.info(`Download started for ${item._id} from ` +
-                `${item.remoteUrl} with ${response}`)
+    logger.info(`Download started for ${event.item._id} from ` +
+                `${event.item.remoteUrl} with ${response}`)
 
     // Update media item state with download ID and new state
-    await media.updateState(item._id, {
+    await media.updateState(event.item._id, {
       state:    'downloading',
       localUrl: response.localUrl,
-      meta:     { ...item.meta, downloadId: response.downloadId }
+      meta:     { ...event.item.meta, downloadId: response.downloadId }
     })
 
     // Update metrics

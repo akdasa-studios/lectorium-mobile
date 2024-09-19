@@ -4,16 +4,18 @@ import { DownloadCompleteEvent, DownloadFileRequest, DownloadFileResponse, type 
 export class WebBackgroundDownloaderPlugin
   implements BackgroundDownloaderPlugin
 {
+  private downloadId = 0;
   private downloadCompleteHandlers: ((event: DownloadCompleteEvent) => void)[] = [];
 
   async downloadFile(
     request: DownloadFileRequest
   ): Promise<DownloadFileResponse> {
+    const currentDownloadId = this.downloadId++;
 
     // Emulate a download
     setTimeout(() => {
       const event: DownloadCompleteEvent = {
-        downloadId: 0,
+        downloadId: currentDownloadId,
         fileSize: 0,
         fileUri: request.url
       }
@@ -21,7 +23,7 @@ export class WebBackgroundDownloaderPlugin
     }, 1000)
 
     return {
-      downloadId: 0,
+      downloadId: currentDownloadId,
       localUrl: request.url
     }
   }

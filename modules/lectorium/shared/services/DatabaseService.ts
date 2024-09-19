@@ -7,7 +7,7 @@ export type ItemChangedEvent<TItem> = {
   event: "added" | "removed" | "updated"
 }
 
-export type ItemChangedEventHandler<TItem> = (event: ItemChangedEvent<TItem>) => void
+export type ItemChangedEventHandler<TItem> = (event: ItemChangedEvent<TItem>) => Promise<void>
 
 export type GetAllRequest = {
   startKey?: string
@@ -102,7 +102,7 @@ export class DatabaseService<
     } catch (error) {
       console.error('Error adding item to database', error)
     }
-    this.notifyChange({ item, event: 'added' })
+    await this.notifyChange({ item, event: 'added' })
   }
 
   /**
@@ -119,7 +119,7 @@ export class DatabaseService<
     const updatedDocument = { ...document, ...this._serializer(item) }
     const updatedItem = this._deserializer(updatedDocument)
     await this._database.db.put(updatedDocument)
-    this.notifyChange({ item: updatedItem, event: 'updated' })
+    await this.notifyChange({ item: updatedItem, event: 'updated' })
   }
 
   /**
@@ -133,18 +133,18 @@ export class DatabaseService<
     const document = await this._database.db.get<TDbScheme>(id)
     const item = this._deserializer(document)
     await this._database.db.remove(document)
-    this.notifyChange({ item, event: 'removed' })
+    await this.notifyChange({ item, event: 'removed' })
   }
 
   /**
    * Notifies all subscribers of a change event.
    * @param event The event to be broadcasted to all subscribers.
    */
-  private notifyChange(
+  private async notifyChange(
     event: ItemChangedEvent<TItem>
   ) {
     for (const handler of this._changeEventHandlers) {
-      handler(event)
+      await handler(event)
     }
   }
 }
