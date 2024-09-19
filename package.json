@@ -28,7 +28,7 @@
     "@sentry/capacitor": "^0.18.0",
     "@sentry/vite-plugin": "^2.22.2",
     "@sentry/vue": "7.114.0",
-    "@vue/typescript-plugin": "^2.0.26",
+    "@vue/typescript-plugin": "^2.1.6",
     "@vueuse/core": "^10.9.0",
     "@vueuse/sound": "^2.0.1",
     "cordova-sqlite-storage": "^6.1.0",
@@ -39,7 +39,7 @@
     "pouchdb-adapter-cordova-sqlite": "^2.0.8",
     "snowball": "^0.3.1",
     "swiper": "^11.1.4",
-    "vue": "^3.4.31",
+    "vue": "^3.5.6",
     "vue-router": "^4.4.0",
     "vue3-radial-progress": "^1.1.1"
   },
