@@ -14,7 +14,7 @@ export function runSyncPlaylistStatus() {
   const sync      = useSync()
   const logger    = useLogger({ name: "task::syncPlaylistStatus" })
   const { media, playlist } = useUserData()
-  const { tracks } = useLibrary()
+  const { transcripts } = useLibrary()
 
   // ── Hooks ───────────────────────────────────────────────────────────
   media.subscribe(onMediaChange)
@@ -48,8 +48,8 @@ export function runSyncPlaylistStatus() {
 
     // Check if the transcript is available for each track
     for (const playlistItem of withoutTranscript) {
-      const transcripts = await tracks.getTranscripts(playlistItem.trackId)
-      if (transcripts) { // Transcript found, update the status
+      const items = await transcripts.getTranscripts(playlistItem.trackId)
+      if (items) { // Transcript found, update the status
         logger.info(`${playlistItem.trackId} -> transcript downloaded`)
         await playlist.setTranscriptStatus(playlistItem.trackId, "downloaded")
       } else { // Transcript not found

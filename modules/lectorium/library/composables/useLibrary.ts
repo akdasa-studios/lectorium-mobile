@@ -1,6 +1,7 @@
 import {
   SourcesService, LocationsService, SearchService, CollectionsService,
-  AuthorsService, LanguagesService, LibraryService
+  AuthorsService, LanguagesService, LibraryService,
+  TracksService
 } from '@lectorium/shared'
 import { useDatabase } from '@lectorium/shared'
 
@@ -11,7 +12,8 @@ export function useLibrary() {
     locations: new LocationsService(database.local.dictionary),
     collections: new CollectionsService(database.local.userData),
     authors: new AuthorsService(database.local.dictionary),
-    tracks: new LibraryService(database.local.tracks, database.local.transcripts),
+    tracks: new TracksService(database.local.tracks),
+    transcripts: new LibraryService(database.local.transcripts),
     languages: new LanguagesService(),
     search: new SearchService(database.local.index)
   }

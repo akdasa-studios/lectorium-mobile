@@ -36,8 +36,8 @@ function onSelect(ids: string[]) {
 // ── Helpers ─────────────────────────────────────────────────────────
 function map2(sources: Source[]) {
   return sources.map((source) => ({
-    id: source.id,
-    title: source.name['ru'].short,
+    id: source._id,
+    title: source.getName('ru', 'short'),
     checked: false,
   }))
 }

@@ -1,4 +1,3 @@
-import { getLocalizedTitle } from "@core/models"
 import { useLibrary } from "@lectorium/library"
 import { useConfig, useUserData } from "@lectorium/shared"
 import { PlaylistChangedEvent } from "@lectorium/shared"
@@ -22,14 +21,14 @@ export function runSyncMediaItemsWithPlaylist() {
     event: PlaylistChangedEvent
   ) {
     const { trackId } = event.item;
-    const track = await tracks.getTrack(trackId)
+    const track = await tracks.getOne(trackId)
     if (!track) return
 
     if (event.event === "added") {
       logger.info(`${trackId} -> added to playlist`)
 
       await media.queueDownload(
-        getLocalizedTitle(track.title, config.locale.value), 
+        track.getTitle(config.locale.value),
         track.url, { trackId }
       )
     } else if (event.event === "removed") {

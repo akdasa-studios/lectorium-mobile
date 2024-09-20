@@ -22,7 +22,7 @@ import { watchDebounced } from '@vueuse/core'
 import { computed, ref, toRefs } from 'vue'
 import { useSound } from '@vueuse/sound'
 import { formatDate } from '@core/utils'
-import { Track, getLocalizedTitle } from '@core/models'
+import { Track } from '@core/models'
 import { useLibrary } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
@@ -50,11 +50,11 @@ const items = ref<TrackViewModel[]>([])
 const infiniteScrollEnabled = ref(true)
 const isReady = ref(false)
 
-fetchData(searchQuery.value, 0)
+fetchData(searchQuery.value, config.locale.value, 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
 watchDebounced(searchQuery, async (value) => {
-  infiniteScrollEnabled.value = await fetchData(value, 0)
+  infiniteScrollEnabled.value = await fetchData(value, config.locale.value, 0)
 }, { debounce: 250, maxWait: 1000 })
 
 userData.playlist.onChange(async (e: PlaylistChangedEvent) => {
@@ -77,14 +77,16 @@ function onTrackClicked(track: TrackViewModel) {
 }
 
 async function onInfiniteSctoll(e: InfiniteScrollCustomEvent) {
-  infiniteScrollEnabled.value = await fetchData(searchQuery.value, items.value.length)
+  infiniteScrollEnabled.value = await fetchData(
+    searchQuery.value, config.locale.value, items.value.length)
   e.target.complete()
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
 async function fetchData(
   query: string,
-  offset: number = 0
+  language: string,
+  offset: number = 0,
 ): Promise<boolean> {
   try {
     // TODO: use languge of application. Note: user can search in any language.
@@ -97,22 +99,36 @@ async function fetchData(
       const tracksToLoad = foundTrackIds.ids.slice(offset, offset + 25)
       foundTracks = await library.tracks.getMany(tracksToLoad)
     } else {
-      foundTracks = await library.tracks.getAll(offset)
+      foundTracks = await library.tracks.getAll({ skip: offset, limit: 25 })
     }
 
-    const loadedItems = await Promise.all(
-      foundTracks.map(async i => ({
-        trackId: i.id,
-        title: getLocalizedTitle(i.title, config.locale.value),
+    // Map tracks to view model
+    const loadedItems: TrackViewModel[] = []
+    for (const i of foundTracks) {
+      const author   = await library.authors.getOne(i.author)
+      const location = await library.locations.getOne(i.location)
+      const title    = i.getTitle(language)
+
+      const references = []
+      for (const reference of i.references) {
+        const source           = await library.sources.getOne(reference[0])
+        const sourceShortName  = source.getName(language, 'short')
+        const referenceNumbers = reference.slice(1).join('.')
+        references.push(`${sourceShortName} ${referenceNumbers}`)
+      }
+
+      loadedItems.push({
+        trackId: i._id,
         date: formatDate(i.date),
-        author: await library.authors.getLocalizedName(i.author, 'ru', 'short'),
-        location: await library.locations.getLocalizedName(i.location, 'ru'),
-        references: await library.sources.getLocalizedReferences(i.references, 'ru'),
-        playingStatus: playlistItems.includes(i.id)
+        title: title,
+        author: author.getName(language, 'short'),
+        location: location.getName(language),
+        references: references,
+        playingStatus: playlistItems.includes(i._id)
             ? PlayingStatus.InQueue
             : PlayingStatus.None,
-      }))
-    )
+      })
+    }
 
     if (offset === 0) {
       items.value = loadedItems

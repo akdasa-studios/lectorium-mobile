@@ -14,7 +14,8 @@ type MediaDbScheme = {
   meta?: any
 }
 
-const mediaItemSerializer = (item: Omit<MediaItem, keyof Identifiable>): Omit<MediaDbScheme, keyof Identifiable> => ({
+const mediaItemSerializer = (item: MediaItem): MediaDbScheme => ({
+  _id: item._id,
   title: item.title,
   remoteUrl: item.remoteUrl,
   localUrl: item.localUrl,
