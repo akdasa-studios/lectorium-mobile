@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { formatDate } from '@core/utils'
-import { getLocalizedTitle } from '@core/models'
 import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksListSwipable } from '@lectorium/playlist'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useAsyncState } from '@vueuse/core'
@@ -65,28 +64,40 @@ async function onTrackRemoved(playlistItem: TrackViewModel) {
 }
 
 async function fetchData(): Promise<TrackViewModel[]> {
+  const language = config.locale.value
   const result: TrackViewModel[] = []
   const playlistItems = (
     await userData.playlist.getAll()
   ).sort((a, b) => a.order - b.order)
 
   for (const item of playlistItems) {
-    const track = await library.tracks.getTrack(item.trackId)
-    const title = getLocalizedTitle(track.title, config.locale.value)
-    const date = formatDate(track.date)
-    const location = await library.locations.getLocalizedName(track.location, 'ru')
-    const references = await library.sources.getLocalizedReferences(track.references, 'ru')
-    const author = await library.authors.getLocalizedName(track.author, 'ru', 'short')
+    const references = []
+    const track      = await library.tracks.getOne(item.trackId)
+    const author     = await library.authors.getOne(track.author)
+    const location   = await library.locations.getOne(track.location)
+
+    for (const reference of track.references) {
+      const source           = await library.sources.getOne(reference[0])
+      const sourceShortName  = source.getName(language, 'short')
+      const referenceNumbers = reference.slice(1).join('.')
+      references.push(`${sourceShortName} ${referenceNumbers}`)
+    }
+
     const playingStatus =
         (item.transcriptStatus === 'unknown' || item.mediaStatus !== 'downloaded')
           ? PlayingStatus.Loading
-          : audioPlayer.trackId.value === track.id
+          : audioPlayer.trackId.value === track._id
             ? audioPlayer.trackId.value ? PlayingStatus.Playing : PlayingStatus.Paused
             : PlayingStatus.None
+
     result.push({
       trackId: item.trackId,
-      location, references, date,
-      title, playingStatus, author
+      date: formatDate(track.date),
+      location: location.getName(language),
+      author: author.getName(language, 'short'),
+      title: track.getTitle(config.locale.value),
+      references,
+      playingStatus,
     })
   }
 

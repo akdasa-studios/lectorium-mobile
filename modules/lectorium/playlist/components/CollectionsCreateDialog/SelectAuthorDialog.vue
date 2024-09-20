@@ -39,7 +39,7 @@ function map2(authors: Author[]) {
     id: author._id,
     // TODO: Get author name using app language
     //       https://github.com/akdasa-studios/lectorium-mobile/issues/35
-    title: author.name["ru"].full,
+    title: author.getName('ru','full'),
     checked: false,
   }))
 }

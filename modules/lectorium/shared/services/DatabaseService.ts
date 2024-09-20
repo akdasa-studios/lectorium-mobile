@@ -12,28 +12,34 @@ export type ItemChangedEventHandler<TItem> = (event: ItemChangedEvent<TItem>) =>
 export type GetAllRequest = {
   startKey?: string
   endKey?: string
+  limit?: number
+  skip?: number
+}
+
+export type GetManyRequest = {
+  ids: string[]
+  limit?: number
+  skip?: number
 }
 
 export class DatabaseService<
   TItem extends Identifiable,
   TDbScheme extends Identifiable,
 > {
-  private _databaseName: string
   private _database: Database
   private _changeEventHandlers: ItemChangedEventHandler<TItem>[] = []
   private _deserializer: (document: TDbScheme) => TItem
-  private _serializer: (item: Omit<TItem, keyof Identifiable>) => Omit<TDbScheme, keyof Identifiable>
+  private _serializer: (item: TItem) => TDbScheme
 
   /**
    * Constructs a new instance of the DatabaseService class.
-   * @param {string} databaseName The name of the database.
+   * @param {Database} database Database.
    */
   constructor(
     database: Database,
-    serializer: (item: Omit<TItem, keyof Identifiable>) => Omit<TDbScheme, keyof Identifiable>,
+    serializer: (item: TItem) => TDbScheme,
     deserializer: (document: TDbScheme) => TItem,
   ) {
-    this._databaseName = database.db.name
     this._database = database
     this._serializer = serializer
     this._deserializer = deserializer
@@ -61,7 +67,7 @@ export class DatabaseService<
   ): Promise<TItem> {
     const document = await this._database.db.get<TDbScheme>(id)
     if (!document) {
-      throw new Error(`Document with Id ${id} on database ${this._databaseName} not found`)
+      throw new Error(`Document with Id ${id} on database ${this._database.db.name} not found`)
     }
     return this._deserializer(document)
   }
@@ -77,6 +83,8 @@ export class DatabaseService<
     const dbRequest: any = {}
     if (request?.startKey) { dbRequest.startkey = request.startKey }
     if (request?.endKey)   { dbRequest.endkey = request.endKey }
+    if (request?.limit)    { dbRequest.limit = request.limit }
+    if (request?.skip)     { dbRequest.skip = request.skip }
 
     const allDocs = await this._database.db.allDocs<TDbScheme>({
       ...dbRequest,
@@ -85,6 +93,27 @@ export class DatabaseService<
 
     return allDocs.rows.map(row => this._deserializer(row.doc!))
   }
+
+  async getMany(
+    request: GetManyRequest
+  ): Promise<TItem[]> {
+    const dbRequest: any = {}
+    if (request?.limit) { dbRequest.limit = request.limit }
+    if (request?.skip)  { dbRequest.skip = request.skip }
+
+    const entities = await this._database.db.allDocs<TDbScheme>({
+      keys: request.ids,
+      include_docs: true
+    })
+    return entities.rows
+      .filter(x => "id" in x)
+      .map(row => this._deserializer(row.doc!))
+  }
+
+  async getCount(): Promise<number> {
+    return (await this._database.db.allDocs()).total_rows
+  }
+
 
   /**
    * Adds an item to the database with the specified Id.
@@ -96,7 +125,6 @@ export class DatabaseService<
   ): Promise<void> {
     try {
       await this._database.db.put({
-        _id: item._id,
         ...this._serializer(item)
       })
     } catch (error) {
@@ -113,7 +141,7 @@ export class DatabaseService<
    */
   async updateOne(
     id: string,
-    item: Omit<TItem, keyof Identifiable>
+    item: TItem
   ): Promise<void> {
     const document = await this._database.db.get<TDbScheme>(id)
     const updatedDocument = { ...document, ...this._serializer(item) }

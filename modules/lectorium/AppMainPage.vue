@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { TrackTranscript, getLocalizedTitle } from '@core/models'
+import { TrackTranscript } from '@core/models'
 import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useLibrary } from '@lectorium/library'
 import { MainSection, PlayerSection, useAppLayout } from '@lectorium/app'
@@ -58,17 +58,17 @@ watch(audioPlayer.trackId, async (value) => {
     return
   }
 
-  const currentTrack = await library.tracks.getTrack(value)
+  const currentTrack = await library.tracks.getOne(value)
   if (!currentTrack) { return }
 
   // TODO: Get author name using app language from config
   //       https://github.com/akdasa-studios/lectorium-mobile/issues/35
-  currentAuthorName.value = await library.authors.getLocalizedName(currentTrack.author, 'ru'),
-  currentTrackTitle.value = getLocalizedTitle(currentTrack.title, config.locale.value)
+  currentAuthorName.value = (await library.authors.getOne(currentTrack.author)).getName('ru', 'full'),
+  currentTrackTitle.value = currentTrack.getTitle(config.locale.value)
 
   // TODO: Get transcrupt using app language from config
   //       https://github.com/akdasa-studios/lectorium-mobile/issues/31
-  currentTranscript.value = await library.tracks.getTranscript(value, 'ru')
+  currentTranscript.value = await library.transcripts.getTranscript(value, 'ru')
 
 }, { immediate: true })
 

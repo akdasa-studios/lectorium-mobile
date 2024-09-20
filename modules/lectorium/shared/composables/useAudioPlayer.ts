@@ -5,7 +5,6 @@ import { Capacitor } from '@capacitor/core'
 import { AudioPlayer } from '@core/plugins'
 import { useUserData } from './useUserData'
 import { useConfig } from './useConfig'
-import { getLocalizedTitle } from '@core/models'
 
 export const useAudioPlayer = createGlobalState(() => {
   const library = useLibrary()
@@ -23,7 +22,7 @@ export const useAudioPlayer = createGlobalState(() => {
     trackId: string,
     position?: number
   ) {
-    const track = await library.tracks.getTrack(trackId)
+    const track = await library.tracks.getOne(trackId)
     const media = await userData.media.getByUrl(track.url)
     if (!media || media.state !== "downloaded") { return }
     if (!media.localUrl) { return }
@@ -36,10 +35,10 @@ export const useAudioPlayer = createGlobalState(() => {
 
     // Play the track and seek to the position if needed.
     await AudioPlayer.open({
-      trackId: track.id,
+      trackId: track._id,
       url: audioSource,
-      title: getLocalizedTitle(track.title, config.locale.value),
-      author: await library.authors.getLocalizedName(track.author, "ru"),
+      title: track.getTitle(config.locale.value),
+      author: (await library.authors.getOne(track.author)).getName(config.locale.value, 'full'),
     })
     if (position) {
       await AudioPlayer.seek({

@@ -21,6 +21,7 @@ export * from './services/LibraryService'
 export * from './services/FilesService'
 export * from './services/Sync/SyncService'
 export * from './services/Sync/SyncStep'
+export * from './services/TracksService'
 
 // tasks:
 export * from './tasks/runCleanupFiles'

@@ -1,5 +1,6 @@
-import { Location, LocationName } from '@core/models'
+import { Location } from '@core/models'
 import { Database } from '@core/persistence'
+import { DatabaseService } from '@lectorium/shared'
 
 /**
  * Schema of the Source documents in the Library collection.
@@ -11,26 +12,35 @@ type LocationsDBSchema = {
   }
 }
 
+const locationSerializer   = (item: Location): LocationsDBSchema => item.props
+const locationDeserializer = (document: LocationsDBSchema): Location => new Location(document)
+
 
 /**
  * Service for retrieving location information.
  */
 export class LocationsService {
-  constructor(private database: Database) {}
+  private _databaseService: DatabaseService<Location, LocationsDBSchema>
+  private _cache: Map<string, Location> = new Map()
+
+  constructor(private database: Database) {
+    this._databaseService = new DatabaseService(
+      database, locationSerializer, locationDeserializer)
+  }
 
   /**
    * Retrieves a location based on its ID.
    * @param id - The ID of the location.
    * @returns A Promise that resolves to the location.
    */
-  async get(
+  async getOne(
     id: string
   ): Promise<Location> {
-    const document = await this.database.db.get<LocationsDBSchema>(`location::${id}`)
-    return {
-      id: document._id,
-      name: document.name
-    }
+    const entity = (
+      this._cache.get(id) ||
+      await this._databaseService.getOne(`location::${id}`))
+    this._cache.set(id, entity)
+    return entity
   }
 
   /**
@@ -38,31 +48,9 @@ export class LocationsService {
    * @returns A Promise that resolves to all available locations.
    */
   async getAll(): Promise<Location[]> {
-    return (await this.database.db.allDocs<LocationsDBSchema>({
-      startkey: 'location::',
-      endkey: 'location::\uffff',
-      include_docs: true
-    })).rows.map(row => ({
-      id: row.doc!._id.replace('location::', ''),
-      name: row.doc!.name
-    }))
-  }
-
-  /**
-   * Retrieves the localized name of a location based on its ID and language.
-   * @param id - The ID of the location.
-   * @param language - The language code for the desired localization.
-   * @returns A Promise that resolves to the localized name of the location.
-   */
-  async getLocalizedName(
-    id: string,
-    language: string
-  ): Promise<LocationName> {
-    try {
-      const source = await this.get(id)
-      return source.name[language] || id
-    } catch (error) {
-      return id
-    }
+    return this._databaseService.getAll({
+      startKey: 'location::',
+      endKey: 'location::\uffff',
+    })
   }
 }

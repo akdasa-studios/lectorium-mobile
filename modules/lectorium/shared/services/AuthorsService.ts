@@ -1,23 +1,19 @@
 import { Author } from '@core/models'
 import { Database } from '@core/persistence'
-import { DatabaseService, Identifiable, ItemChangedEventHandler } from '@lectorium/shared'
+import { DatabaseService } from '@lectorium/shared'
 
 export type AuthorDbScheme = {
   _id: string
   name: Record<string, { full: string, short: string }>
 }
 
-const authorSerializer = (item: Omit<Author, keyof Identifiable>): Omit<AuthorDbScheme, keyof Identifiable> => ({
-  name: item.name,
-})
+const authorSerializer   = (item: Author): AuthorDbScheme => item.props
+const authorDeserializer = (document: AuthorDbScheme): Author => new Author(document)
 
-const authorDeserializer = (document: AuthorDbScheme): Author => ({
-  _id: document._id,
-  name: document.name,
-})
 
 export class AuthorsService {
   private _databaseService: DatabaseService<Author, AuthorDbScheme>
+  private _cache: Map<string, Author> = new Map()
 
   constructor(database: Database) {
     this._databaseService = new DatabaseService(
@@ -29,32 +25,15 @@ export class AuthorsService {
    * @param id Id of the author
    * @returns Author
    */
-  public getOne(
+  public async getOne(
     id: string
   ): Promise<Author> {
-    return this._databaseService.getOne(`author::${id}`)
+    const entity = (
+      this._cache.get(id) ||
+      await this._databaseService.getOne(`author::${id}`))
+    this._cache.set(id, entity)
+    return entity
   }
-
-  /**
-   * Retrieves the name of the author in the specified language.
-   * @param id Author ID
-   * @param language Language code
-   * @param type Full or short name
-   * @returns Name of the author in the specified language
-   */
-  public async getLocalizedName(
-    id: string,
-    language: string,
-    type: 'full' | 'short' = 'full'
-  ): Promise<string> {
-    const author = await this.getOne(id)
-    return (
-      author.name[language] ||
-      author.name['en'] ||
-      { full: id, short: id }
-    )[type] || id
-  }
-
 
   /**
    * Retrieves all authors.
