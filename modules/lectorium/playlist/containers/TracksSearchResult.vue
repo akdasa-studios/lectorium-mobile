@@ -19,24 +19,25 @@
 <script setup lang="ts">
 import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue'
 import { watchDebounced } from '@vueuse/core'
-import { computed, ref, toRefs } from 'vue'
+import { computed, ref, toRefs, watch } from 'vue'
 import { useSound } from '@vueuse/sound'
 import { formatDate } from '@core/utils'
 import { Track } from '@core/models'
-import { useLibrary } from '@lectorium/library'
+import { useLibrary, type TracksFilterValue } from '@lectorium/library'
 import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
 import { PlaylistChangedEvent, useUserData, useConfig } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const library = useLibrary()
+const library  = useLibrary()
 const userData = useUserData()
-const config = useConfig()
+const config   = useConfig()
 const { play: playItemAdded } = useSound(itemAddedSfx, { volume: .15 })
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
   searchQuery: string
+  filters: TracksFilterValue
 }>()
 
 const emit = defineEmits<{
@@ -44,7 +45,7 @@ const emit = defineEmits<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const { searchQuery } = toRefs(props)
+const { searchQuery, filters } = toRefs(props)
 const nothingFound = computed(() => items.value.length === 0)
 const items = ref<TrackViewModel[]>([])
 const infiniteScrollEnabled = ref(true)
@@ -53,9 +54,10 @@ const isReady = ref(false)
 fetchData(searchQuery.value, config.locale.value, 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watchDebounced(searchQuery, async (value) => {
-  infiniteScrollEnabled.value = await fetchData(value, config.locale.value, 0)
-}, { debounce: 250, maxWait: 1000 })
+watchDebounced([searchQuery, filters], async (value) => {
+  infiniteScrollEnabled.value = await fetchData(value[0], config.locale.value, 0)
+}, { debounce: 250, maxWait: 1000, deep: true })
+
 
 userData.playlist.onChange(async (e: PlaylistChangedEvent) => {
   if (e.event !== 'added') { return }
@@ -94,13 +96,23 @@ async function fetchData(
     // https://github.com/akdasa-studios/lectorium-mobile/issues/32
     const playlistItems = (await userData.playlist.getAll()).map(x => x.trackId)
     let foundTracks: Track[] = []
-    if (query) {
-      const foundTrackIds = await library.search.search(query, 'Russian');
-      const tracksToLoad = foundTrackIds.ids.slice(offset, offset + 25)
-      foundTracks = await library.tracks.getMany(tracksToLoad)
-    } else {
-      foundTracks = await library.tracks.getAll({ skip: offset, limit: 25 })
-    }
+
+    const searchQueryTrackIds = query
+      ? await library.search.search(query, 'Russian')
+      : { ids: undefined };
+
+
+    foundTracks = await library.tracks.getMany({
+      ids: searchQueryTrackIds.ids,
+      authors: props.filters.authors,
+      locations: props.filters.locations,
+      sources: props.filters.sources,
+      languages: props.filters.languages,
+      dates: props.filters.dates,
+      duration: props.filters.duration,
+      skip: offset,
+      limit: 25,
+    })
 
     // Map tracks to view model
     const loadedItems: TrackViewModel[] = []

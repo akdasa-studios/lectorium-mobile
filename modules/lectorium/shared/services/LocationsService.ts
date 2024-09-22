@@ -13,7 +13,10 @@ type LocationsDBSchema = {
 }
 
 const locationSerializer   = (item: Location): LocationsDBSchema => item.props
-const locationDeserializer = (document: LocationsDBSchema): Location => new Location(document)
+const locationDeserializer = (document: LocationsDBSchema): Location => {
+  const { _id, ...rest } = document
+  return new Location({ _id: _id.replace("location::", ""), ...rest })
+}
 
 
 /**

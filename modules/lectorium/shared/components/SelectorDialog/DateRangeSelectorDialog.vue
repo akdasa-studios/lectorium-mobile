@@ -1,0 +1,86 @@
+<template>
+  <SelectorDialog
+    :open="open"
+    :title="title"
+  >
+    <IonItem>
+      <IonLabel>{{ $t('filter-date-start') }}</IonLabel>
+      <IonButton id="start-date-button" fill="clear">
+        {{ value.from ? formatDate(value.from) : 'SELECT' }}
+      </IonButton>
+    </IonItem>
+
+    <IonItem>
+      <IonLabel>{{ $t('filter-date-end') }}</IonLabel>
+      <IonButton id="end-date-button" fill="clear">
+        {{ value.to ? formatDate(value.to) : 'SELECT' }}
+      </IonButton>
+    </IonItem>
+
+    <IonPopover trigger="start-date-button">
+      <IonDatetime
+        presentation="month-year"
+        :value="value.from"
+        @ionChange="v => onStartDateChanged(v.detail.value)"
+      />
+    </IonPopover>
+
+    <IonPopover trigger="end-date-button">
+      <IonDatetime
+        presentation="month-year"
+        :value="value.to"
+        @ionChange="v => onEndDateChanged(v.detail.value)"
+      />
+    </IonPopover>
+  </SelectorDialog>
+</template>
+
+
+<script setup lang="ts">
+import { IonButton, IonDatetime, IonPopover, IonItem, IonLabel } from '@ionic/vue'
+import SelectorDialog from './SelectorDialog.vue'
+import { PropType } from 'vue';
+
+// ── Interface ───────────────────────────────────────────────────────
+type Range = { from: string, to: string }
+const props = defineProps<{
+  open: boolean,
+  title: string,
+}>()
+
+// ── State ───────────────────────────────────────────────────────────
+const value = defineModel({
+  type: Object as PropType<Range>,
+  required: true
+})
+
+// ── Handlers ────────────────────────────────────────────────────────
+function onStartDateChanged(v: string | string[] | undefined | null) {
+  if (typeof v !== 'string') return
+  value.value.from = getFirstDayOfMonth(new Date(v))
+}
+
+function onEndDateChanged(v: string | string[] | undefined | null) {
+  if (typeof v !== 'string') return
+  value.value.to = getLastDayOfMonth(new Date(v))
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+function getFirstDayOfMonth(date: Date) {
+  return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-01`
+}
+
+function getLastDayOfMonth(date: Date) {
+  const newDate = new Date(date.getFullYear(), date.getMonth() + 1, 0, 0, 0, 0, 0)
+  return `${newDate.getFullYear()}-${(newDate.getMonth()+1).toString().padStart(2, '0')}-${newDate.getDate()}`
+}
+
+function formatDate(date: string) {
+  // TODO: Use app locale
+  return new Date(date).toLocaleDateString('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+</script>

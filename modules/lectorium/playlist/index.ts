@@ -1,5 +1,4 @@
 // components:
-export { default as CollectionsCreateDialog } from './components/CollectionsCreateDialog/CollectionsCreateDialog.vue'
 export { default as CollectionsList } from './components/CollectionsList/CollectionsList.vue'
 export { default as PlaylistEmpty } from './components/PlaylistEmpty/PlaylistEmpty.vue'
 export { default as TracksList } from './components/TracksList/TracksList.vue'

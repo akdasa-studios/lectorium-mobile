@@ -1,84 +1,79 @@
 <template>
+  <!--
+  TODO: test UI/UX
+  :initial-breakpoint=".75"
+  :breakpoints="[0, 0.25, 0.5, 0.75, 1]"
+  -->
   <IonModal
     :isOpen="open"
-    @didDismiss="open = false"
+    :initial-breakpoint=".75"
+    :breakpoints="[0, 0.25, 0.5, 0.75]"
+    :backdrop-dismiss="false"
+    :backdrop-breakpoint="0.25"
+    :handle="true"
+    @didDismiss="onClose"
   >
     <Header>
       <IonToolbar>
+        <!-- <IonButtons slot="start">
+          <IonButton @click="onClose">
+            <IonIcon slot="icon-only" :icon="arrowBack" />
+          </IonButton>
+        </IonButtons> -->
+
         <IonTitle>{{ title }}</IonTitle>
+
         <IonButtons slot="end">
-          <IonButton @click="onClose">Close</IonButton>
+          <IonButton
+            @click="onSelect"
+            color="light"
+            shape="round"
+            fill="solid"
+          >
+            <IonIcon slot="end" :icon="checkmarkCircleOutline" />
+            {{ $t('save') }}
+          </IonButton>
         </IonButtons>
       </IonToolbar>
     </Header>
 
     <IonContent>
-      <Searchbar v-model="query" />
-      <IonList lines="full" class="ion-no-margin ion-no-padding">
-        <IonItem
-          v-for="item in filteredItems"
-          :key="item.id"
-        >
-          <IonCheckbox
-            label-placement="end"
-            justify="start"
-            v-model="item.checked"
-          >
-            {{ item.title }}
-          </IonCheckbox>
-        </IonItem>
-      </IonList>
+      <slot />
     </IonContent>
   </IonModal>
 </template>
 
 
-<script setup lang="ts" generic="T extends Item">
+<script setup lang="ts">
 import {
-  IonModal, IonContent, IonList, IonSearchbar, IonToolbar,
-  IonButtons, IonButton, IonTitle, IonCheckbox, IonItem
+  IonModal, IonContent, IonToolbar, IonButtons,
+  IonButton, IonTitle, IonIcon
 } from '@ionic/vue'
-import { Header, Searchbar } from '@lectorium/shared/components'
-import { useArrayFilter } from '@vueuse/core'
-import { reactive, ref, toRef } from 'vue'
+import { Header } from '@lectorium/shared/components'
+import { arrowBack, checkmarkCircleOutline } from 'ionicons/icons'
 
 // ── Interface ───────────────────────────────────────────────────────
-export type ItemId = string
-export type Item = {
-  id: ItemId
+defineProps<{
+  open: boolean
   title: string
-  checked: boolean
-}
-
-const props = defineProps<{
-  title: string,
-  items: Item[],
 }>()
+
+// const open = defineModel('open', { type: Boolean, default: false })
 
 const emit = defineEmits<{
-  select: [items: ItemId[]]
+  close: [],
+  select: []
 }>()
 
-const open = defineModel('open', { type: Boolean, default: false })
-
-// ── State ───────────────────────────────────────────────────────────
-const query = ref('')
-const items = reactive(toRef(props, 'items'))
-
-const filteredItems = useArrayFilter(
-  items, (item) => compareStrings(item.title, query.value) || item.checked)
-
 // ── Handlers ────────────────────────────────────────────────────────
-function onClose() {
-  const itemIds = items.value
-    .filter((item) => item.checked)
-    .map((item) => item.id)
-  emit('select', itemIds)
-  open.value = false
+function onSelect() {
+  emit('select')
+  emit('close')
+  // open.value = false
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────
-function compareStrings(a: string, b: string) {
-  return a.toLocaleLowerCase().includes(b.toLocaleLowerCase())
+function onClose() {
+  emit('close')
+  // open.value = false
 }
 </script>

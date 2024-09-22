@@ -24,6 +24,21 @@ const trackSerializer   = (item: Track): TracksDBSchema => (item.props)
 const trackDeserializer = (document: TracksDBSchema): Track => new Track(document)
 
 
+export type TracksFilter = {
+  ids?: string[]
+  authors?: string[]
+  locations?: string[]
+  sources?: string[]
+  languages?: string[]
+  duration?: { min: number, max: number }
+  dates?: { from: string, to: string }
+}
+
+export type Pagination = {
+  skip: number
+  limit: number
+}
+
 /**
  * Service for managing Tracks
  */
@@ -51,12 +66,49 @@ export class TracksService {
     return entity
   }
 
-  async getAll(request: { skip: number, limit: number }): Promise<Track[]> {
+  async getAll(request: Pagination): Promise<Track[]> {
     return this._databaseService.getAll(request)
   }
 
-  async getMany(ids: string[]): Promise<Track[]> {
-    return this._databaseService.getMany({ ids })
+  async getMany(request: TracksFilter & Pagination): Promise<Track[]> {
+    const selector: any = {}
+
+    if (request.ids)       { selector._id = { $in: request.ids } }
+    if (request.authors)   { selector.author = { $in: request.authors } }
+    if (request.locations) { selector.location = { $in: request.locations } }
+    if (request.sources)   { selector.references = { $elemMatch: { 0: { $in: request.sources } } } }
+    if (request.languages) {
+      selector.languages = {
+        $elemMatch: {
+          language: { $in: request.languages },
+          source:   { $eq: 'track' }
+        }
+      }
+    }
+    if (request.dates) {
+      // convert iso date to array of [year, month, day]
+      const date = (iso: string) => {
+        const d = new Date(iso)
+        return [d.getFullYear(), d.getMonth()+1, d.getDate()]
+      }
+
+      selector.date = {
+        $gte: date(request.dates.from),
+        $lte: date(request.dates.to),
+      }
+    }
+    if (request.duration) {
+      selector.duration = {
+        $gte: request.duration.min,
+        $lte: request.duration.max,
+      }
+    }
+
+    console.log(selector)
+
+    return this._databaseService.getMany({
+      selector, limit: request.limit, skip: request.skip
+    })
   }
 
   async getCount(): Promise<number> {

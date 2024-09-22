@@ -23,6 +23,9 @@ import '@ionic/vue/css/display.css'
 /* I18n */
 import { i18n } from './i18n'
 
+/* Swiper */
+import 'swiper/css'
+
 /* Theme variables */
 import './theme.css'
 

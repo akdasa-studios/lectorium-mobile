@@ -8,3 +8,5 @@ tracks = Лекции
 transcripts = Транскрипты
 search-index = Поисковой индекс
 loading-data = Загружаем
+
+save = Сохранить
