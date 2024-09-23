@@ -12,7 +12,7 @@
     </template>
 
     <!-- List of a filters: author, source, location ... -->
-    <SearchFilters
+    <TracksSearchFilters
       v-model="filters"
     />
 
