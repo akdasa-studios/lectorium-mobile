@@ -1,6 +1,6 @@
 <template>
   <div class="chip-list-container">
-    <SearchFilterChip
+    <TracksSearchFiltersChip
       v-for="filter in filters"
       :key="filter.id"
       :applied="filter.applied"
@@ -9,12 +9,12 @@
       class="chip-list-item"
     >
       {{ filter.title }}
-    </SearchFilterChip>
+    </TracksSearchFiltersChip>
   </div>
 </template>
 
 <script setup lang="ts">
-import SearchFilterChip from './SearchFilterChip.vue'
+import TracksSearchFiltersChip from './TracksSearchFiltersChip.vue'
 
 // ── Interface ───────────────────────────────────────────────────────
 type Filter = {

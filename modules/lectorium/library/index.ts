@@ -5,9 +5,9 @@ export * from './models/TracksFilterValue'
 export * from './composables/useLibrary'
 
 // components:
-export { default as SearchFilterChips } from './components/SearchFilter/SearchFilterChips.vue'
-export { default as NothingFound } from './components/NothingFound/NothingFound.vue'
+export { default as TracksSearchFiltersBar } from './components/TracksSearchFiltersBar/TracksSearchFiltersBar.vue'
+export { default as TracksNotFound } from './components/TracksNotFound/TracksNotFound.vue'
 
 // containers:
-export { default as SearchFilters } from './containers/SearchFilters.vue'
+export { default as TracksSearchFilters } from './containers/TracksSearchFilters.vue'
 export { default as TracksSearchResult } from './containers/TracksSearchResult.vue'

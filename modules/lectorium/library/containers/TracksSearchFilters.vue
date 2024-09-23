@@ -1,6 +1,6 @@
 <template>
   <!-- Chips representing filters -->
-  <SearchFilterChips
+  <TracksSearchFiltersBar
     :filters="filterChipStates"
     @click="onFilterChipClicked"
     @remove="onFilterChipRemoved"
@@ -62,7 +62,7 @@ import {
   ListItemsSelectorDialog, SelectDialogItem, DateRangeSelectorDialog
 } from '@lectorium/shared/components'
 import {
-  SearchFilterChips, useLibrary, type TracksFilterValue
+  TracksSearchFiltersBar, useLibrary, type TracksFilterValue
 } from '@lectorium/library'
 
 // ── Interface ───────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 <template>
   <!-- Nothing found sticker -->
-  <NothingFound
-    v-if="nothingFound && isReady"
+  <TracksNotFound
+    v-if="tracksNotFound && isReady"
   />
 
   <!-- List of found items -->
@@ -40,7 +40,7 @@ import {
 import { formatDate } from '@core/utils'
 import { Track } from '@core/models'
 import {
-  useLibrary, NothingFound, type TracksFilterValue
+  useLibrary, TracksNotFound, type TracksFilterValue
 } from '@lectorium/library'
 import {
   PlaylistChangedEvent, useUserData, useConfig, TrackViewModel,
@@ -66,7 +66,7 @@ const emit = defineEmits<{
 
 // ── State ───────────────────────────────────────────────────────────
 const { searchQuery, filters } = toRefs(props)
-const nothingFound = computed(() => items.value.length === 0)
+const tracksNotFound = computed(() => items.value.length === 0)
 const items = ref<TrackViewModel[]>([])
 const infiniteScrollEnabled = ref(true)
 const isReady = ref(false)

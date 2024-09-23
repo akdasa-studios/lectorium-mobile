@@ -30,7 +30,8 @@
 import { onBeforeMount, ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import {
-  useLibrary, TracksSearchResult, SearchFilters, type TracksFilterValue
+  useLibrary, TracksSearchResult, TracksSearchFilters,
+  type TracksFilterValue
 } from '@lectorium/library'
 import {
   Searchbar, PageWithHeader, useUserData
