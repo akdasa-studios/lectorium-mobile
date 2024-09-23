@@ -1,32 +1,52 @@
 <template>
+  <!-- Nothing found sticker -->
   <NothingFound
     v-if="nothingFound && isReady"
   />
-  <TracksList
-    v-else
-    :items="items"
-    @click="onTrackClicked"
-  />
+
+  <!-- List of found items -->
+  <IonList v-else>
+    <TracksListItem
+      v-for="item in items"
+      :key="item.trackId"
+      :track-id="item.trackId"
+      :title="item.title"
+      :author="item.author"
+      :location="item.location"
+      :date="item.date"
+      :references="item.references"
+      :playing-status="item.playingStatus"
+      @click="onTrackClicked(item)"
+    />
+  </IonList>
+
   <IonInfiniteScroll
     @ionInfinite="onInfiniteSctoll"
     :disabled="!infiniteScrollEnabled"
   >
-    <IonInfiniteScrollContent></IonInfiniteScrollContent>
+    <IonInfiniteScrollContent />
   </IonInfiniteScroll>
 </template>
 
 
 <script setup lang="ts">
-import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue'
+import { computed, ref, toRefs } from 'vue'
 import { watchDebounced } from '@vueuse/core'
-import { computed, ref, toRefs, watch } from 'vue'
 import { useSound } from '@vueuse/sound'
+import {
+  InfiniteScrollCustomEvent, IonInfiniteScroll,
+  IonInfiniteScrollContent, IonList,
+} from '@ionic/vue'
 import { formatDate } from '@core/utils'
 import { Track } from '@core/models'
-import { useLibrary, type TracksFilterValue } from '@lectorium/library'
-import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
+import {
+  useLibrary, NothingFound, type TracksFilterValue
+} from '@lectorium/library'
+import {
+  PlaylistChangedEvent, useUserData, useConfig, TrackViewModel,
+  PlayingStatus, TracksListItem
+} from '@lectorium/shared'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
-import { PlaylistChangedEvent, useUserData, useConfig } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library  = useLibrary()

@@ -28,10 +28,9 @@
 
 
 <script setup lang="ts" generic="T extends Item">
+import { computed, ref } from 'vue'
 import { IonList, IonCheckbox, IonItem } from '@ionic/vue'
-import { Searchbar } from '@lectorium/shared/components'
-import { useArrayFilter } from '@vueuse/core'
-import { computed, reactive, ref, toRef, watch } from 'vue'
+import { Searchbar } from '@lectorium/shared'
 import SelectorDialog from './SelectorDialog.vue'
 
 // ── Interface ───────────────────────────────────────────────────────

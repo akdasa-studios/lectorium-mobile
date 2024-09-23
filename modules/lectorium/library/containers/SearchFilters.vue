@@ -58,9 +58,12 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useFluent } from 'fluent-vue'
-import { ListItemsSelectorDialog, SelectDialogItem, DateRangeSelectorDialog } from '@lectorium/shared/components'
-import { SearchFilterChips } from '@lectorium/library'
-import { useLibrary, type TracksFilterValue } from '@lectorium/library'
+import {
+  ListItemsSelectorDialog, SelectDialogItem, DateRangeSelectorDialog
+} from '@lectorium/shared/components'
+import {
+  SearchFilterChips, useLibrary, type TracksFilterValue
+} from '@lectorium/library'
 
 // ── Interface ───────────────────────────────────────────────────────
 const value = defineModel<TracksFilterValue>({ required: true })
@@ -156,13 +159,10 @@ watch(durations, (durations) => {
 }, { deep: true })
 
 watch(dates, (dates) => {
-  if (dates.from === '' || dates.to === '') {
-    value.value.dates = undefined
-  } else {
-    value.value.dates = {
-      from: dates.from, to: dates.to
-  }
-  }
+  value.value.dates =
+    dates.from === '' && dates.to === ''
+      ? undefined
+      : { from: dates.from, to: dates.to }
 }, { deep: true })
 
 // ── Hooks ───────────────────────────────────────────────────────────

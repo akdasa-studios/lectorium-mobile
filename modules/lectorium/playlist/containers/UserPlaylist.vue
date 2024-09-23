@@ -13,12 +13,14 @@
 
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import { formatDate } from '@core/utils'
-import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksListSwipable } from '@lectorium/playlist'
-import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useAsyncState } from '@vueuse/core'
+import { formatDate } from '@core/utils'
+import { PlaylistEmpty, TracksListSwipable } from '@lectorium/playlist'
 import { useLibrary } from '@lectorium/library'
-import { PlaylistChangedEvent, useUserData, useConfig } from '@lectorium/shared'
+import {
+  PlaylistChangedEvent, useUserData, useConfig, useAudioPlayer,
+  PlayingStatus, TrackViewModel
+} from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()

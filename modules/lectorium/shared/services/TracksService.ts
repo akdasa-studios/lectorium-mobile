@@ -91,11 +91,9 @@ export class TracksService {
         const d = new Date(iso)
         return [d.getFullYear(), d.getMonth()+1, d.getDate()]
       }
-
-      selector.date = {
-        $gte: date(request.dates.from),
-        $lte: date(request.dates.to),
-      }
+      selector.date = {}
+      if (request.dates.from) { selector.date.$gte = date(request.dates.from) }
+      if (request.dates.to)   { selector.date.$lte = date(request.dates.to) }
     }
     if (request.duration) {
       selector.duration = {
@@ -103,8 +101,6 @@ export class TracksService {
         $lte: request.duration.max,
       }
     }
-
-    console.log(selector)
 
     return this._databaseService.getMany({
       selector, limit: request.limit, skip: request.skip

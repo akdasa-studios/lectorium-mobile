@@ -6,14 +6,14 @@
     <IonItem>
       <IonLabel>{{ $t('filter-date-start') }}</IonLabel>
       <IonButton id="start-date-button" fill="clear">
-        {{ value.from ? formatDate(value.from) : 'SELECT' }}
+        {{ value.from ? formatDate(value.from) : $t('select') }}
       </IonButton>
     </IonItem>
 
     <IonItem>
       <IonLabel>{{ $t('filter-date-end') }}</IonLabel>
       <IonButton id="end-date-button" fill="clear">
-        {{ value.to ? formatDate(value.to) : 'SELECT' }}
+        {{ value.to ? formatDate(value.to) : $t('select') }}
       </IonButton>
     </IonItem>
 

@@ -10,3 +10,5 @@ search-index = Поисковой индекс
 loading-data = Загружаем
 
 save = Сохранить
+apply = Применить
+select = Выбрать

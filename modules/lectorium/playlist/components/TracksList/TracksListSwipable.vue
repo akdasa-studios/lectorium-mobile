@@ -35,9 +35,11 @@
 
 
 <script setup lang="ts">
-import { IonList, IonItemSliding, IonItemOptions, IonItemOption, IonIcon } from '@ionic/vue'
-import TracksListItem from './TracksListItem.vue'
-import { type TrackViewModel } from './TrackViewModel'
+import {
+  IonList, IonItemSliding, IonItemOptions,
+  IonItemOption, IonIcon
+} from '@ionic/vue'
+import { TracksListItem, type TrackViewModel } from '@lectorium/shared'
 import { trash } from 'ionicons/icons'
 
 // ── Interface ───────────────────────────────────────────────────────

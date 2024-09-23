@@ -28,13 +28,13 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
-import { TracksSearchResult } from '@lectorium/playlist'
-import { useUserData } from '@lectorium/shared'
-import { useLibrary, type TracksFilterValue } from '@lectorium/library'
-import { SearchFilters } from '@lectorium/library'
-import { Searchbar } from '@lectorium/shared/components'
-import { PageWithHeader } from '@lectorium/shared/components'
 import { useLocalStorage } from '@vueuse/core'
+import {
+  useLibrary, TracksSearchResult, SearchFilters, type TracksFilterValue
+} from '@lectorium/library'
+import {
+  Searchbar, PageWithHeader, useUserData
+} from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
