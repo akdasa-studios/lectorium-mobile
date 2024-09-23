@@ -14,7 +14,10 @@
             shape="round"
             fill="solid"
           >
-            <IonIcon slot="end" :icon="checkmarkCircleOutline" />
+            <IonIcon
+              slot="end"
+              :icon="checkmarkCircleOutline"
+            />
             {{ $t('apply') }}
           </IonButton>
         </IonButtons>
@@ -42,8 +45,6 @@ defineProps<{
   title: string
 }>()
 
-// const open = defineModel('open', { type: Boolean, default: false })
-
 const emit = defineEmits<{
   close: [],
   select: []
@@ -53,11 +54,9 @@ const emit = defineEmits<{
 function onSelect() {
   emit('select')
   emit('close')
-  // open.value = false
 }
 
 function onClose() {
   emit('close')
-  // open.value = false
 }
 </script>

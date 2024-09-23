@@ -8,6 +8,7 @@
     <Searchbar
       v-if="items.length > 10"
       v-model="query"
+      :placeholder="$t('search')"
     />
     <IonList lines="full" class="ion-no-margin ion-no-padding">
       <IonItem
@@ -44,7 +45,6 @@ export type Item = {
 const props = defineProps<{
   title: string,
   open: boolean,
-  // items: Item[],
 }>()
 
 const emit = defineEmits<{
@@ -52,12 +52,10 @@ const emit = defineEmits<{
   select: [items: ItemId[]]
 }>()
 
-// const open = defineModel('open', { type: Boolean, default: false })
 const items = defineModel<Item[]>('items', { type: Array<Item>, default: () => [] as Item[] })
 
 // ── State ───────────────────────────────────────────────────────────
 const query = ref('')
-// const items = reactive(toRef(props, 'items'))
 
 const filteredItems = computed(() =>
   items.value.filter((item) => compareStrings(item.title, query.value) || item.checked,
@@ -66,7 +64,6 @@ const filteredItems = computed(() =>
 // ── Handlers ────────────────────────────────────────────────────────
 function onClose() {
   emit('close')
-  // open = false
 }
 
 function onSelect() {
@@ -74,7 +71,6 @@ function onSelect() {
     .filter((item) => item.checked)
     .map((item) => item.id)
   emit('select', itemIds)
-  // open.value = false
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
