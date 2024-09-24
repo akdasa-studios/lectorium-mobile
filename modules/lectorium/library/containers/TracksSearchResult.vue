@@ -137,8 +137,8 @@ async function fetchData(
     // Map tracks to view model
     const loadedItems: TrackViewModel[] = []
     for (const i of foundTracks) {
+      const location = await library.locations.getName(i.location, language)
       const author   = await library.authors.getOne(i.author)
-      const location = await library.locations.getOne(i.location)
       const title    = i.getTitle(language)
 
       const references = []
@@ -154,7 +154,7 @@ async function fetchData(
         date: formatDate(i.date),
         title: title,
         author: author.getName(language, 'short'),
-        location: location.getName(language),
+        location: location,
         references: references,
         playingStatus: playlistItems.includes(i._id)
             ? PlayingStatus.InQueue

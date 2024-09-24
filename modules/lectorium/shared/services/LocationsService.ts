@@ -12,6 +12,8 @@ type LocationsDBSchema = {
   }
 }
 
+type LocationRef = { id?: string, name?: string } | undefined
+
 const locationSerializer   = (item: Location): LocationsDBSchema => item.props
 const locationDeserializer = (document: LocationsDBSchema): Location => {
   const { _id, ...rest } = document
@@ -26,7 +28,7 @@ export class LocationsService {
   private _databaseService: DatabaseService<Location, LocationsDBSchema>
   private _cache: Map<string, Location> = new Map()
 
-  constructor(private database: Database) {
+  constructor(database: Database) {
     this._databaseService = new DatabaseService(
       database, locationSerializer, locationDeserializer)
   }
@@ -44,6 +46,22 @@ export class LocationsService {
       await this._databaseService.getOne(`location::${id}`))
     this._cache.set(id, entity)
     return entity
+  }
+
+  async getName(
+    param: LocationRef,
+    lang: string
+  ): Promise<string | undefined> {
+    var result = param?.name || param?.id
+    try {
+      return param?.id
+        ? (await this.getOne(param.id)).getName(lang)
+        : result
+    } catch (error) {
+      // TODO: use logger service
+      console.error("No location found for ID", param?.id)
+      return result
+    }
   }
 
   /**

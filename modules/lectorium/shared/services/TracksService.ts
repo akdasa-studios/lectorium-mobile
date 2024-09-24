@@ -9,7 +9,7 @@ type TracksDBSchema = {
   _id: string
   title: Record<string, string>
   url: string
-  location: string
+  location?: { id? : string, name?: string }
   date: [number, number, number]
   references: Array<string[]>
   languages: Array<{
@@ -21,7 +21,18 @@ type TracksDBSchema = {
 }
 
 const trackSerializer   = (item: Track): TracksDBSchema => (item.props)
-const trackDeserializer = (document: TracksDBSchema): Track => new Track(document)
+const trackDeserializer = (document: TracksDBSchema): Track => {
+  // TODO: once migration is completed remove location transformation
+  //       should be simple -> new Track(document)
+  const { location, ...rest } = document
+
+  return new Track({
+    ...rest,
+    location: location
+      ? typeof location === 'object' ? location : { id: location }
+      : undefined,
+  })
+}
 
 
 export type TracksFilter = {

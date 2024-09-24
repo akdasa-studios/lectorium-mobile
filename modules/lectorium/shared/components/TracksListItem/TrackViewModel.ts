@@ -21,7 +21,7 @@ export interface TrackViewModel {
   author: string
 
   /** Track location */
-  location: string
+  location?: string
 
   /** Track references */
   references: string[]

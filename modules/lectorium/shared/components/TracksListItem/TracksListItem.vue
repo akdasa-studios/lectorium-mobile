@@ -12,7 +12,13 @@
         <b>{{ references[0] }}</b>
         {{ title }}
       </h3>
-      <p>{{ author }} • {{ location }} • {{ date }}</p>
+      <p>
+        {{ author }}
+        <template v-if="location">
+          • {{ location }}
+        </template>
+        • {{ date }}
+      </p>
     </IonLabel>
   </IonItem>
 </template>
