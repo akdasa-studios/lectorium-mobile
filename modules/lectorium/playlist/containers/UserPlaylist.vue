@@ -79,6 +79,7 @@ async function fetchData(): Promise<TrackViewModel[]> {
     const location   = await library.locations.getName(track.location, language)
 
     for (const reference of track.references) {
+      if (reference.length === 0) { continue }
       const source           = await library.sources.getOne(reference[0])
       const sourceShortName  = source.getName(language, 'short')
       const referenceNumbers = reference.slice(1).join('.')
@@ -94,7 +95,7 @@ async function fetchData(): Promise<TrackViewModel[]> {
 
     result.push({
       trackId: item.trackId,
-      date: formatDate(track.date),
+      date: track.date ? formatDate(track.date) : '',
       location: location,
       author: author.getName(language, 'short'),
       title: track.getTitle(config.locale.value),

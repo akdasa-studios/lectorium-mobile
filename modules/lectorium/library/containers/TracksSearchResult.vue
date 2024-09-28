@@ -143,6 +143,8 @@ async function fetchData(
 
       const references = []
       for (const reference of i.references) {
+        console.log('reference', reference)
+        if (reference.length === 0) { continue }
         const source           = await library.sources.getOne(reference[0])
         const sourceShortName  = source.getName(language, 'short')
         const referenceNumbers = reference.slice(1).join('.')
@@ -151,7 +153,7 @@ async function fetchData(
 
       loadedItems.push({
         trackId: i._id,
-        date: formatDate(i.date),
+        date: i.date ? formatDate(i.date) : "",
         title: title,
         author: author.getName(language, 'short'),
         location: location,

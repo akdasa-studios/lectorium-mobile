@@ -17,7 +17,9 @@
         <template v-if="location">
           • {{ location }}
         </template>
-        • {{ date }}
+        <template v-if="date">
+          • {{ date }}
+        </template>
       </p>
     </IonLabel>
   </IonItem>
