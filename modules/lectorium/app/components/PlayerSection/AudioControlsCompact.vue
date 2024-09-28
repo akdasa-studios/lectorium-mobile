@@ -50,11 +50,17 @@ const emit = defineEmits<{
   flex-direction: column;
   gap: 3px;
   font-size: 0.8rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .trackTitle {
   font-weight: bold;
   color: var(--ion-color-oxford-blue-contrast);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .buttons {
