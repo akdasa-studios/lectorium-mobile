@@ -2,16 +2,18 @@ import { language } from "ionicons/icons"
 
 export type Date = [number, number, number]
 export type Title = Record<string, string>
+type Location = { id?: string, name?: string }
 
 export type TrackProps = {
   _id: string
   title: Title
   url: string
-  location: string
+  location?: Location
   date: Date,
   references: Array<string[]>
   languages: TrackLanguage[]
   author: string
+  sourceUrl?: string
 }
 
 export type TrackLanguage = {
@@ -48,7 +50,7 @@ export class Track {
   get _id(): string { return this.props._id }
   getTitle(language: string): string { return this.props.title[language] || this.props.title[Object.keys(this.props.title)[0]] || 'No title' }
   get url(): string { return this.props.url }
-  get location(): string { return this.props.location }
+  get location(): Location | undefined { return this.props.location }
   get date(): Date { return this.props.date }
   get references(): Array<string[]> { return this.props.references }
   get languages(): TrackLanguage[] { return this.props.languages }

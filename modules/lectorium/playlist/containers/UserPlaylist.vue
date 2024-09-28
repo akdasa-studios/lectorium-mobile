@@ -13,12 +13,14 @@
 
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import { formatDate } from '@core/utils'
-import { PlaylistEmpty, PlayingStatus, TrackViewModel, TracksListSwipable } from '@lectorium/playlist'
-import { useAudioPlayer } from '@lectorium/shared/composables'
 import { useAsyncState } from '@vueuse/core'
+import { formatDate } from '@core/utils'
+import { PlaylistEmpty, TracksListSwipable } from '@lectorium/playlist'
 import { useLibrary } from '@lectorium/library'
-import { PlaylistChangedEvent, useUserData, useConfig } from '@lectorium/shared'
+import {
+  PlaylistChangedEvent, useUserData, useConfig, useAudioPlayer,
+  PlayingStatus, TrackViewModel
+} from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const library = useLibrary()
@@ -74,9 +76,10 @@ async function fetchData(): Promise<TrackViewModel[]> {
     const references = []
     const track      = await library.tracks.getOne(item.trackId)
     const author     = await library.authors.getOne(track.author)
-    const location   = await library.locations.getOne(track.location)
+    const location   = await library.locations.getName(track.location, language)
 
     for (const reference of track.references) {
+      if (reference.length === 0) { continue }
       const source           = await library.sources.getOne(reference[0])
       const sourceShortName  = source.getName(language, 'short')
       const referenceNumbers = reference.slice(1).join('.')
@@ -92,8 +95,8 @@ async function fetchData(): Promise<TrackViewModel[]> {
 
     result.push({
       trackId: item.trackId,
-      date: formatDate(track.date),
-      location: location.getName(language),
+      date: track.date ? formatDate(track.date) : '',
+      location: location,
       author: author.getName(language, 'short'),
       title: track.getTitle(config.locale.value),
       references,

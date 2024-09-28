@@ -32,7 +32,7 @@ import { useUserData } from '@lectorium/shared'
 import { IonContent, IonPage } from '@ionic/vue'
 // import { PageWithDrawer } from '@lectorium/shared/components'
 import { useAudioPlayer } from '@lectorium/shared/composables'
-import { CollectionsCreateDialog, UserPlaylist, UserCollectionsList } from '@lectorium/playlist'
+import { UserPlaylist, UserCollectionsList } from '@lectorium/playlist'
 import { Collection } from '@core/models'
 
 // ── Dependencies ────────────────────────────────────────────────────

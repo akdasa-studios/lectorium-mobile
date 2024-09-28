@@ -10,7 +10,7 @@
 
 
 <script setup lang="ts">
-import { PageWithHeader } from '@lectorium/shared/components'
+import { PageWithHeader } from '@lectorium/shared'
 import { UserMediaList } from '@lectorium/settings'
 </script>
 

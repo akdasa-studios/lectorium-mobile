@@ -1,42 +1,63 @@
 <template>
-  <NothingFound
-    v-if="nothingFound && isReady"
+  <!-- Nothing found sticker -->
+  <TracksNotFound
+    v-if="tracksNotFound && isReady"
   />
-  <TracksList
-    v-else
-    :items="items"
-    @click="onTrackClicked"
-  />
+
+  <!-- List of found items -->
+  <IonList v-else>
+    <TracksListItem
+      v-for="item in items"
+      :key="item.trackId"
+      :track-id="item.trackId"
+      :title="item.title"
+      :author="item.author"
+      :location="item.location"
+      :date="item.date"
+      :references="item.references"
+      :playing-status="item.playingStatus"
+      @click="onTrackClicked(item)"
+    />
+  </IonList>
+
   <IonInfiniteScroll
     @ionInfinite="onInfiniteSctoll"
     :disabled="!infiniteScrollEnabled"
   >
-    <IonInfiniteScrollContent></IonInfiniteScrollContent>
+    <IonInfiniteScrollContent />
   </IonInfiniteScroll>
 </template>
 
 
 <script setup lang="ts">
-import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue'
-import { watchDebounced } from '@vueuse/core'
 import { computed, ref, toRefs } from 'vue'
+import { watchDebounced } from '@vueuse/core'
 import { useSound } from '@vueuse/sound'
+import {
+  InfiniteScrollCustomEvent, IonInfiniteScroll,
+  IonInfiniteScrollContent, IonList,
+} from '@ionic/vue'
 import { formatDate } from '@core/utils'
 import { Track } from '@core/models'
-import { useLibrary } from '@lectorium/library'
-import { NothingFound, TracksList, TrackViewModel, PlayingStatus } from '@lectorium/playlist'
+import {
+  useLibrary, TracksNotFound, type TracksFilterValue
+} from '@lectorium/library'
+import {
+  PlaylistChangedEvent, useUserData, useConfig, TrackViewModel,
+  PlayingStatus, TracksListItem
+} from '@lectorium/shared'
 import itemAddedSfx from '@lectorium/playlist/assets/item-added.mp3'
-import { PlaylistChangedEvent, useUserData, useConfig } from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
-const library = useLibrary()
+const library  = useLibrary()
 const userData = useUserData()
-const config = useConfig()
+const config   = useConfig()
 const { play: playItemAdded } = useSound(itemAddedSfx, { volume: .15 })
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<{
   searchQuery: string
+  filters: TracksFilterValue
 }>()
 
 const emit = defineEmits<{
@@ -44,8 +65,8 @@ const emit = defineEmits<{
 }>()
 
 // ── State ───────────────────────────────────────────────────────────
-const { searchQuery } = toRefs(props)
-const nothingFound = computed(() => items.value.length === 0)
+const { searchQuery, filters } = toRefs(props)
+const tracksNotFound = computed(() => items.value.length === 0)
 const items = ref<TrackViewModel[]>([])
 const infiniteScrollEnabled = ref(true)
 const isReady = ref(false)
@@ -53,9 +74,10 @@ const isReady = ref(false)
 fetchData(searchQuery.value, config.locale.value, 0)
 
 // ── Hooks ───────────────────────────────────────────────────────────
-watchDebounced(searchQuery, async (value) => {
-  infiniteScrollEnabled.value = await fetchData(value, config.locale.value, 0)
-}, { debounce: 250, maxWait: 1000 })
+watchDebounced([searchQuery, filters], async (value) => {
+  infiniteScrollEnabled.value = await fetchData(value[0], config.locale.value, 0)
+}, { debounce: 250, maxWait: 1000, deep: true })
+
 
 userData.playlist.onChange(async (e: PlaylistChangedEvent) => {
   if (e.event !== 'added') { return }
@@ -94,23 +116,35 @@ async function fetchData(
     // https://github.com/akdasa-studios/lectorium-mobile/issues/32
     const playlistItems = (await userData.playlist.getAll()).map(x => x.trackId)
     let foundTracks: Track[] = []
-    if (query) {
-      const foundTrackIds = await library.search.search(query, 'Russian');
-      const tracksToLoad = foundTrackIds.ids.slice(offset, offset + 25)
-      foundTracks = await library.tracks.getMany(tracksToLoad)
-    } else {
-      foundTracks = await library.tracks.getAll({ skip: offset, limit: 25 })
-    }
+
+    const searchQueryTrackIds = query
+      ? await library.search.search(query, 'Russian')
+      : { ids: undefined };
+
+
+    foundTracks = await library.tracks.getMany({
+      ids: searchQueryTrackIds.ids,
+      authors: props.filters.authors,
+      locations: props.filters.locations,
+      sources: props.filters.sources,
+      languages: props.filters.languages,
+      dates: props.filters.dates,
+      duration: props.filters.duration,
+      skip: offset,
+      limit: 25,
+    })
 
     // Map tracks to view model
     const loadedItems: TrackViewModel[] = []
     for (const i of foundTracks) {
+      const location = await library.locations.getName(i.location, language)
       const author   = await library.authors.getOne(i.author)
-      const location = await library.locations.getOne(i.location)
       const title    = i.getTitle(language)
 
       const references = []
       for (const reference of i.references) {
+        console.log('reference', reference)
+        if (reference.length === 0) { continue }
         const source           = await library.sources.getOne(reference[0])
         const sourceShortName  = source.getName(language, 'short')
         const referenceNumbers = reference.slice(1).join('.')
@@ -119,10 +153,10 @@ async function fetchData(
 
       loadedItems.push({
         trackId: i._id,
-        date: formatDate(i.date),
+        date: i.date ? formatDate(i.date) : "",
         title: title,
         author: author.getName(language, 'short'),
-        location: location.getName(language),
+        location: location,
         references: references,
         playingStatus: playlistItems.includes(i._id)
             ? PlayingStatus.InQueue

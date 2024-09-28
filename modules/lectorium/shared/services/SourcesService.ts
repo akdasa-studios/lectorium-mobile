@@ -16,7 +16,10 @@ type SourcesDBSchema = {
 }
 
 const sourceSerializer   = (item: Source): SourcesDBSchema => item.props
-const sourceDeserializer = (document: SourcesDBSchema): Source => new Source(document)
+const sourceDeserializer = (document: SourcesDBSchema): Source => {
+  const { _id, ...rest } = document
+  return new Source({ _id: _id.replace("source::", ""), ...rest })
+}
 
 
 /**

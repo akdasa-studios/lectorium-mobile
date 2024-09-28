@@ -68,7 +68,13 @@ watch(audioPlayer.trackId, async (value) => {
 
   // TODO: Get transcrupt using app language from config
   //       https://github.com/akdasa-studios/lectorium-mobile/issues/31
-  currentTranscript.value = await library.transcripts.getTranscript(value, 'ru')
+  const transcriptLanguages = currentTrack.languages
+    .filter(x => x.source === 'transcript')
+    .map(x => x.language)
+  const transcriptLanguage = transcriptLanguages.includes(config.locale.value)
+    ? config.locale.value
+    : transcriptLanguages[0]
+  currentTranscript.value = await library.transcripts.getTranscript(value, transcriptLanguage)
 
 }, { immediate: true })
 

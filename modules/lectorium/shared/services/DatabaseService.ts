@@ -17,7 +17,8 @@ export type GetAllRequest = {
 }
 
 export type GetManyRequest = {
-  ids: string[]
+  // ids: string[]
+  selector?: any
   limit?: number
   skip?: number
 }
@@ -101,13 +102,16 @@ export class DatabaseService<
     if (request?.limit) { dbRequest.limit = request.limit }
     if (request?.skip)  { dbRequest.skip = request.skip }
 
-    const entities = await this._database.db.allDocs<TDbScheme>({
-      keys: request.ids,
-      include_docs: true
+    const entities = await this._database.db.find({
+      selector: request.selector,
+      limit: request.limit,
+      skip: request.skip,
     })
-    return entities.rows
-      .filter(x => "id" in x)
-      .map(row => this._deserializer(row.doc!))
+
+    return entities.docs
+      // .filter(x => "id" in x)
+      // @ts-ignore
+      .map(doc => this._deserializer(doc))
   }
 
   async getCount(): Promise<number> {

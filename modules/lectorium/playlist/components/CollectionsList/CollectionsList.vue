@@ -1,5 +1,5 @@
 <template>
-  <swiper-container
+  <Swiper
     :slides-per-view="3.1"
     :space-between="-10"
     ref="swiper"
@@ -23,7 +23,7 @@
         @click="emit('add')"
       />
     </SwiperSlide>
-  </swiper-container>
+  </Swiper>
 </template>
 
 
