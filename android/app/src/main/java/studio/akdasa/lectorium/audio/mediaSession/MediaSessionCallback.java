@@ -1,5 +1,6 @@
 package studio.akdasa.lectorium.audio.mediaSession;
 
+import android.content.Intent;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import studio.akdasa.lectorium.audio.AudioPlayerService;
@@ -24,5 +25,11 @@ public final class MediaSessionCallback extends MediaSessionCompat.Callback {
     @Override
     public void onStop() {
         service.stop();
+    }
+
+    @Override
+    public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+        // Handle media button event, return true if handled
+        return super.onMediaButtonEvent(mediaButtonEvent);
     }
 }

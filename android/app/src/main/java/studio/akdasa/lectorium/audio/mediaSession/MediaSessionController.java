@@ -30,7 +30,7 @@ public final class MediaSessionController {
                 context,
                 0,
                 new Intent(Intent.ACTION_MEDIA_BUTTON),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         ));
         this.mediaSession.setCallback(mediaSessionCallback);
         this.mediaSession.setActive(true);
