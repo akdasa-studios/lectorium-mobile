@@ -9,6 +9,7 @@ type TracksDBSchema = {
   _id: string
   title: Record<string, string>
   url: string
+  audioNormalizedUrl?: string
   location?: { id? : string, name?: string }
   date: [number, number, number]
   references: Array<string[]>
