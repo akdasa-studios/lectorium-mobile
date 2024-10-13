@@ -11,8 +11,15 @@
       />
     </template>
 
+    <!-- List of a filters: author, source, location ... -->
+    <TracksSearchFilters
+      v-model="filters"
+    />
+
+    <!-- List of tracks -->
     <TracksSearchResult
       :searchQuery="searchQuery"
+      :filters="filters"
       @click="onSearchResultItemClicked"
     />
   </PageWithHeader>
@@ -21,12 +28,14 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
-import { PageWithHeader } from '@lectorium/shared/components'
-import { TracksSearchResult } from '@lectorium/playlist'
-import { useUserData } from '@lectorium/shared'
-import { useLibrary } from '@lectorium/library'
-import Searchbar from '@lectorium/shared/components/Searchbar/Searchbar.vue'
 import { useLocalStorage } from '@vueuse/core'
+import {
+  useLibrary, TracksSearchResult, TracksSearchFilters,
+  type TracksFilterValue
+} from '@lectorium/library'
+import {
+  Searchbar, PageWithHeader, useUserData
+} from '@lectorium/shared'
 
 // ── Dependencies ────────────────────────────────────────────────────
 const userData = useUserData()
@@ -35,6 +44,7 @@ const library = useLibrary()
 // ── State ───────────────────────────────────────────────────────────
 const tracksCount = useLocalStorage('library.tracks.count', 0)
 const searchQuery = ref('')
+const filters     = ref<TracksFilterValue>({})
 
 // ── Hooks ───────────────────────────────────────────────────────────
 onBeforeMount(async () => {
@@ -45,4 +55,5 @@ onBeforeMount(async () => {
 async function onSearchResultItemClicked(trackId: string) {
   await userData.playlist.addTrack(trackId)
 }
+
 </script>

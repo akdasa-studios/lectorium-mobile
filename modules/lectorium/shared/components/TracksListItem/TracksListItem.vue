@@ -12,17 +12,27 @@
         <b>{{ references[0] }}</b>
         {{ title }}
       </h3>
-      <p>{{ author }} • {{ location }} • {{ date }}</p>
+      <p>
+        {{ author }}
+        <template v-if="location">
+          • {{ location }}
+        </template>
+        <template v-if="date">
+          • {{ date }}
+        </template>
+      </p>
     </IonLabel>
   </IonItem>
 </template>
 
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { IonItem, IonLabel, IonIcon } from '@ionic/vue'
 import { PlayingStatus, type TrackViewModel } from './TrackViewModel'
-import { headset, checkmarkCircle, checkmarkDoneCircle, caretDownCircle, cloudDownloadOutline } from 'ionicons/icons'
-import { computed } from 'vue';
+import {
+  headset, checkmarkCircle, checkmarkDoneCircle, cloudDownloadOutline
+} from 'ionicons/icons'
 
 // ── Interface ───────────────────────────────────────────────────────
 const props = defineProps<

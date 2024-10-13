@@ -34,3 +34,12 @@ export * from './tasks/runRestoreFailedDownloads'
 export * from './tasks/runSyncPlaylistStatus'
 export * from './tasks/runInstallPrebuiltDatabases'
 export * from './tasks/runSentryIntegration'
+
+// components:
+export { default as TracksListItem } from './components/TracksListItem/TracksListItem.vue'
+export { default as PageWithHeader } from './components/PageWithHeader.vue'
+export { default as Searchbar } from './components/Searchbar/Searchbar.vue'
+export * from './components/TracksListItem/TrackViewModel'
+
+// composables:
+export * from './composables/useAudioPlayer'

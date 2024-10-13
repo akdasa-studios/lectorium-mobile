@@ -8,7 +8,10 @@ export type AuthorDbScheme = {
 }
 
 const authorSerializer   = (item: Author): AuthorDbScheme => item.props
-const authorDeserializer = (document: AuthorDbScheme): Author => new Author(document)
+const authorDeserializer = (document: AuthorDbScheme): Author => {
+  const { _id, ...rest } = document
+  return new Author({ _id: _id.replace("author::", ""), ...rest })
+}
 
 
 export class AuthorsService {

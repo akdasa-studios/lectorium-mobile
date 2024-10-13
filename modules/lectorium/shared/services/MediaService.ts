@@ -1,7 +1,7 @@
 import { MediaItem } from '@core/models'
 import { Database } from '@core/persistence'
 import { cyrb53 } from '@core/utils'
-import { DatabaseService, Identifiable, ItemChangedEventHandler } from '@lectorium/shared'
+import { DatabaseService, ItemChangedEventHandler } from '@lectorium/shared'
 
 
 type MediaDbScheme = {
