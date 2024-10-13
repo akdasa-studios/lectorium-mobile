@@ -2,7 +2,9 @@ package studio.akdasa.lectorium.audio.mediaSession;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -24,6 +26,12 @@ public final class MediaSessionController {
         this.notificationManager = notificationManager;
 
         this.mediaSession = new MediaSessionCompat(context, "MediaSessionPlugin");
+        mediaSession.setMediaButtonReceiver(PendingIntent.getBroadcast(
+                context,
+                0,
+                new Intent(Intent.ACTION_MEDIA_BUTTON),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        ));
         this.mediaSession.setCallback(mediaSessionCallback);
         this.mediaSession.setActive(true);
     }
