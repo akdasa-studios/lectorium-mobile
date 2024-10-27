@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core'
 import { AudioPlayer } from '@core/plugins'
 import { useUserData } from './useUserData'
 import { useConfig } from './useConfig'
+import { cyrb53 } from '@core/utils'
 
 export const useAudioPlayer = createGlobalState(() => {
   const library = useLibrary()
@@ -23,7 +24,7 @@ export const useAudioPlayer = createGlobalState(() => {
     position?: number
   ) {
     const track = await library.tracks.getOne(trackId)
-    const media = await userData.media.getByUrl(track.url)
+    const media = await userData.media.getById(cyrb53(track.url).toString())
     if (!media || media.state !== "downloaded") { return }
     if (!media.localUrl) { return }
 

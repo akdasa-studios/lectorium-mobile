@@ -16,7 +16,7 @@ if (!sentryDsn) {
 // Step 2: Define the content template
 const contentTemplate = `
 export const ENVIRONMENT = {
-  databaseUrl: "{{SERVER_BASE_URL}}/database",
+  baseUrl: "{{SERVER_BASE_URL}}",
   sentryDsn: "${sentryDsn}",
 }
 `;

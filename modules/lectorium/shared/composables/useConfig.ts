@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { ENVIRONMENT } from '@core/env'
 
 export const useConfig = createGlobalState(() => {
-  const serverBaseUrl        = ref(ENVIRONMENT.databaseUrl)
+  const serverBaseUrl        = ref(ENVIRONMENT.baseUrl)
   const currentTrackId       = ref<string | undefined>(undefined)
   const tracksQueue          = ref<string[]>([])
   const currentTrackPosition = ref(0)

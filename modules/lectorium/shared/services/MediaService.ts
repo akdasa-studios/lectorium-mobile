@@ -51,11 +51,10 @@ export class MediaService {
     this._databaseService.subscribe(handler)
   }
 
-  async getByUrl(
-    url: string
+  async getById(
+    id: string
   ): Promise<MediaItem | undefined> {
-    const urlHash = cyrb53(url)
-    return await this._databaseService.getOne(`media::${urlHash}`)
+    return await this._databaseService.getOne(`media::${id}`)
   }
 
   async getAll(): Promise<MediaItem[]> {
@@ -86,13 +85,13 @@ export class MediaService {
   }
 
   async queueDownload(
+    id: string,
     title: string,
     remoteUrl: string,
     meta?: any
   ): Promise<void> {
-    const id = `media::${cyrb53(remoteUrl)}`
     await this._databaseService.addOne({
-      _id: id,
+      _id: `media::${id}`,
       title,
       state: 'pending',
       remoteUrl, meta

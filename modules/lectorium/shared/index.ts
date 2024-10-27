@@ -22,6 +22,7 @@ export * from './services/FilesService'
 export * from './services/Sync/SyncService'
 export * from './services/Sync/SyncStep'
 export * from './services/TracksService'
+export * from './services/SignedUrlGenerator'
 
 // tasks:
 export * from './tasks/runCleanupFiles'
@@ -43,3 +44,4 @@ export * from './components/TracksListItem/TrackViewModel'
 
 // composables:
 export * from './composables/useAudioPlayer'
+export * from './composables/useSignedUrlGenerator'

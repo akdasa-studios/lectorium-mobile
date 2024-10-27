@@ -1,4 +1,4 @@
 export const ENVIRONMENT = {
-  databaseUrl: "http://localhost:5984",
+  baseUrl: "https://lectorium.dev",
   sentryDsn: "",
 }

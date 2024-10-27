@@ -16,10 +16,10 @@ export function useDatabase() {
       index:       new Database({ name: 'library-index-v0001.db', adapter: localAdapter })
     },
     remote: {
-      tracks:      new Database({ name: serverBaseUrl + '/library-tracks-v0001' }),
-      transcripts: new Database({ name: serverBaseUrl + '/library-transcripts-v0001' }),
-      dictionary:  new Database({ name: serverBaseUrl + '/library-dictionary-v0001' }),
-      index:       new Database({ name: serverBaseUrl + '/library-index-v0001' })
+      tracks:      new Database({ name: serverBaseUrl + '/database/library-tracks-v0001' }),
+      transcripts: new Database({ name: serverBaseUrl + '/database/library-transcripts-v0001' }),
+      dictionary:  new Database({ name: serverBaseUrl + '/database/library-dictionary-v0001' }),
+      index:       new Database({ name: serverBaseUrl + '/database/library-index-v0001' })
     }
   }
 }
