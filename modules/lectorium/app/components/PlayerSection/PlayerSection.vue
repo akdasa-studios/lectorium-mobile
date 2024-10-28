@@ -19,7 +19,7 @@
       color="oxford-blue"
     >
       <Prompter
-        :blocks="transcript?.text?.blocks || []"
+        :blocks="transcript?.blocks || []"
         :time="position"
         @rewind="pos => emit('rewind', pos)"
       />

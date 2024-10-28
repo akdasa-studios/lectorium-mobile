@@ -7,9 +7,12 @@ import { DatabaseService } from '@lectorium/shared'
  */
 type TracksDBSchema = {
   _id: string
+  version?: number
   title: Record<string, string>
-  url: string
-  audioNormalizedUrl?: string
+  audioUrl: {
+    original: string,
+    normalized?: string
+  }
   location?: { id? : string, name?: string }
   date: [number, number, number]
   references: Array<string[]>
@@ -23,16 +26,18 @@ type TracksDBSchema = {
 
 const trackSerializer   = (item: Track): TracksDBSchema => (item.props)
 const trackDeserializer = (document: TracksDBSchema): Track => {
-  // TODO: once migration is completed remove location transformation
-  //       should be simple -> new Track(document)
-  const { location, ...rest } = document
+  const props = document
 
-  return new Track({
-    ...rest,
-    location: location
-      ? typeof location === 'object' ? location : { id: location }
-      : undefined,
-  })
+  if (!props.version) {
+    props.audioUrl = {
+      // @ts-ignore
+      original: props.url,
+      // @ts-ignore
+      normalized: props.audioNormalizedUrl
+    }
+  }
+
+  return new Track(props)
 }
 
 

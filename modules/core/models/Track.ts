@@ -5,8 +5,10 @@ type Location = { id?: string, name?: string }
 export type TrackProps = {
   _id: string
   title: Title
-  url: string
-  audioNormalizedUrl?: string
+  audioUrl: {
+    original: string,
+    normalized?: string
+  }
   location?: Location
   date: Date,
   references: Array<string[]>
@@ -28,12 +30,8 @@ export type TrackTranscriptBlock = {
   text: string
 }
 
-export type TrackTranscriptText = {
-  blocks: TrackTranscriptBlock[]
-}
-
 export type TrackTranscript = {
-  text: TrackTranscriptText
+  blocks: TrackTranscriptBlock[]
 }
 
 export class Track {
@@ -48,7 +46,7 @@ export class Track {
    */
   get _id(): string { return this.props._id }
   getTitle(language: string): string { return this.props.title[language] || this.props.title[Object.keys(this.props.title)[0]] || 'No title' }
-  get url(): string { return this.props.audioNormalizedUrl || this.props.url }
+  get url(): string { return this.props.audioUrl.normalized || this.props.audioUrl.original }
   get location(): Location | undefined { return this.props.location }
   get date(): Date { return this.props.date }
   get references(): Array<string[]> { return this.props.references }

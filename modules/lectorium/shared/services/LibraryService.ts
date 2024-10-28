@@ -14,7 +14,7 @@ export class LibraryService {
     return {
       // TODO
       //@ts-ignore
-      text: entity.text
+      blocks: entity.blocks || entity.text.blocks
     }
   }
 
@@ -30,7 +30,7 @@ export class LibraryService {
     return entities.rows.map((entity) => ({
       // TODO
       //@ts-ignore
-      text: entity.doc.text
+      blocks: entity.doc.blocks || entity.doc.text.blocks
     }))
   }
 }
