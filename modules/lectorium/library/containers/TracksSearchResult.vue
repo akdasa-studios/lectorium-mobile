@@ -143,7 +143,6 @@ async function fetchData(
 
       const references = []
       for (const reference of i.references) {
-        console.log('reference', reference)
         if (reference.length === 0) { continue }
         const source           = await library.sources.getOne(reference[0])
         const sourceShortName  = source.getName(language, 'short')
