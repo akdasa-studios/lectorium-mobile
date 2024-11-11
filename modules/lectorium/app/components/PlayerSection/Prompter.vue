@@ -76,6 +76,11 @@ function update() {
   hyphens: auto;
   -moz-hyphens: auto;
   /* text-align: justify; */
+
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text !important;
 }
 .paragraph {
   transition: all 0.5s;
